@@ -181,7 +181,7 @@ input:focus-visible {
 .graph-node text { text-anchor: middle; font-family: var(--sans); font-size: 11px; font-weight: 650; pointer-events: none; }.entity-node text { fill: #f5f4eb; font-size: 10px; }.case-node text { fill: var(--ink); font-size: 10px; }
 .ring-detail-grid { display: grid; grid-template-columns: minmax(260px, .8fr) minmax(330px, 1.2fr); gap: 30px; padding-top: 26px; }
 .ring-reasons ol { margin: 16px 0 0; padding: 0; list-style: none; counter-reset: ring-reason; }.ring-reasons li { position: relative; padding: 0 0 16px 32px; color: var(--ink-soft); font-size: 13px; line-height: 1.5; counter-increment: ring-reason; }.ring-reasons li::before { content: counter(ring-reason); position: absolute; left: 0; top: 0; width: 20px; height: 20px; display: grid; place-items: center; color: var(--blue); border: 1px solid var(--blue); font-size: 10px; font-weight: 700; }
-.ring-case-row { display: grid; grid-template-columns: minmax(0,1fr) 100px 44px; gap: 12px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 12px; font-variant-numeric: tabular-nums; }.ring-case-row span:first-child strong, .ring-case-row small { display: block; }.ring-case-row small { margin-top: 3px; color: #708078; font-size: 10px; }.ring-case-row b { color: var(--risk); text-align: right; }
+.ring-case-row { display: grid; grid-template-columns: minmax(0,1fr) 100px 66px; gap: 12px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 12px; font-variant-numeric: tabular-nums; }.ring-case-row span:first-child strong, .ring-case-row small { display: block; }.ring-case-row small { margin-top: 3px; color: #708078; font-size: 10px; }.ring-case-row b { color: var(--risk); text-align: right; }
 
 .page-intro {
   min-height: 92px;
@@ -345,7 +345,7 @@ input:focus-visible {
 
 .queue-columns {
   display: grid;
-  grid-template-columns: 1fr 76px 42px;
+  grid-template-columns: 1fr 76px 66px;
   gap: 9px;
   padding: 10px 20px;
   border-top: 1px solid var(--line);
@@ -361,7 +361,7 @@ input:focus-visible {
   width: 100%;
   min-height: 82px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 76px 42px;
+  grid-template-columns: minmax(0, 1fr) 76px 66px;
   align-items: center;
   gap: 9px;
   padding: 13px 20px;
@@ -626,7 +626,7 @@ canvas { display: block; width: 100%; height: 320px; }
   .ring-facts div:nth-child(4) { border-top: 1px solid var(--line); }
   #ringGraph { min-height: 360px; }
   .ring-detail-grid { grid-template-columns: 1fr; gap: 24px; }
-  .ring-case-row { grid-template-columns: minmax(0,1fr) 82px 40px; gap: 7px; }
+  .ring-case-row { grid-template-columns: minmax(0,1fr) 82px 66px; gap: 7px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

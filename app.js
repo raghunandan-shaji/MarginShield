@@ -15,7 +15,7 @@ const fmtRisk = (value) => {
   const percent = Number(value);
   if (percent >= 99.95) return ">99.9%";
   if (percent < 0.05) return "<0.1%";
-  if (percent >= 99) return `${percent.toFixed(1)}%`;
+  if (percent >= 99) return `${percent.toFixed(3)}%`;
   if (percent < 1) return `${percent.toFixed(2)}%`;
   return percent < 10 ? `${percent.toFixed(1)}%` : `${Math.round(percent)}%`;
 };
@@ -293,6 +293,19 @@ function downloadPacket() {
   showToast(`Review packet downloaded for ${item.case_id}.`);
 }
 
+async function recordAnalystAction(action, successMessage) {
+  const response = await fetch(`/api/decisions/${encodeURIComponent(state.selected.case_id)}/action`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action, note: "Recorded from the MarginShield casework UI" }),
+  });
+  if (!response.ok) {
+    showToast("Could not record analyst action.");
+    return;
+  }
+  showToast(successMessage);
+}
+
 function switchView(viewName) {
   if (!viewName || !$(`#${viewName}View`)) return;
   $$(".nav-tab").forEach((button) => button.classList.toggle("is-active", button.dataset.view === viewName));
@@ -316,8 +329,8 @@ function bindEvents() {
   $("#nextCase").addEventListener("click", () => moveSelection(1));
   $("#reviewBtn").addEventListener("click", showPacket);
   $("#downloadPacket").addEventListener("click", downloadPacket);
-  $("#acceptAction").addEventListener("click", () => showToast(`${state.selected.action} accepted for ${state.selected.case_id}.`));
-  $("#overrideAction").addEventListener("click", () => showToast(`${state.selected.case_id} added to analyst review.`));
+  $("#acceptAction").addEventListener("click", () => recordAnalystAction("accepted_recommendation", `${state.selected.action} accepted for ${state.selected.case_id}.`));
+  $("#overrideAction").addEventListener("click", () => recordAnalystAction("escalated", `${state.selected.case_id} added to analyst review.`));
   document.addEventListener("keydown", (event) => {
     if (event.key === "/" && document.activeElement !== $("#caseSearch")) { event.preventDefault(); $("#caseSearch").focus(); }
   });

@@ -23,12 +23,11 @@ def build_ring_catalog(cases: pd.DataFrame, bundle: LiveModelBundle, window_days
     """Build merchant-facing suspected rings without ring labels or simulator metadata."""
     frame = cases.copy()
     frame["event_timestamp"] = pd.to_datetime(frame["event_timestamp"], utc=True, format="mixed")
-    if "split" in frame and frame["split"].eq("test").any():
-        frame = frame.loc[frame["split"].eq("test")].copy()
+    if "split" in frame and frame["split"].isin(["test", "live"]).any():
+        frame = frame.loc[frame["split"].isin(["test", "live"])].copy()
     end_time = frame["event_timestamp"].max()
     frame = frame.loc[frame["event_timestamp"] >= end_time - pd.Timedelta(days=window_days)].copy()
     frame["ring_probability"] = score_live_bundle(bundle, frame)
-    frame["pair_key"] = frame["device_id"].astype(str) + "|" + frame["payment_token_id"].astype(str)
     graph = nx.Graph()
     entity_metadata: dict[str, dict[str, Any]] = {}
 
@@ -46,38 +45,30 @@ def build_ring_catalog(cases: pd.DataFrame, bundle: LiveModelBundle, window_days
             entity_metadata[node]["accounts"] = max(entity_metadata[node]["accounts"], accounts)
         return node
 
-    for pair_key, group in frame.groupby("pair_key", sort=False):
-        accounts = int(group["customer_id"].nunique())
-        if accounts < 2:
-            continue
-        has_model_support = bool((group["ring_probability"] >= bundle.threshold).any())
-        if not has_model_support:
-            continue
-        device_id = str(group["device_id"].iloc[0])
-        payment_id = str(group["payment_token_id"].iloc[0])
-        device_node = add_entity("device", device_id, accounts)
-        payment_node = add_entity("payment_token", payment_id, accounts)
-        for case_id in group["case_id"]:
-            case_node = f"case:{case_id}"
-            graph.add_edge(case_node, device_node, relation="device")
-            graph.add_edge(case_node, payment_node, relation="payment-token")
-        for address_id, address_group in group.groupby("address_id", sort=False):
-            address_accounts = int(address_group["customer_id"].nunique())
-            if address_accounts < 2:
+    for column, entity_type, relation in (
+        ("device_id", "device", "device"),
+        ("address_id", "address", "address"),
+        ("payment_token_id", "payment_token", "payment-token"),
+    ):
+        for identifier, group in frame.groupby(column, sort=False):
+            accounts = int(group["customer_id"].nunique())
+            if accounts < 2:
                 continue
-            address_node = add_entity("address", str(address_id), address_accounts)
-            for case_id in address_group["case_id"]:
-                graph.add_edge(f"case:{case_id}", address_node, relation="address")
+            entity_node = add_entity(entity_type, str(identifier), accounts)
+            for case_id in group["case_id"]:
+                graph.add_edge(f"case:{case_id}", entity_node, relation=relation)
 
     rings: list[dict[str, Any]] = []
     indexed = frame.set_index("case_id", drop=False)
     for component in nx.connected_components(graph):
         case_nodes = sorted(node for node in component if node.startswith("case:"))
         entity_nodes = sorted(node for node in component if node.startswith("entity:"))
-        if len(case_nodes) < 2:
+        if len(case_nodes) < 3:
             continue
         case_ids = [node.removeprefix("case:") for node in case_nodes]
         cluster = indexed.loc[case_ids].sort_values("event_timestamp")
+        if cluster["customer_id"].nunique() < 3 or not (cluster["ring_probability"] >= bundle.threshold).any():
+            continue
         entities = [entity_metadata[node] for node in entity_nodes]
         high = int((cluster["ring_probability"] >= bundle.threshold).sum())
         scores = cluster["ring_probability"].to_numpy(float)
@@ -87,16 +78,26 @@ def build_ring_catalog(cases: pd.DataFrame, bundle: LiveModelBundle, window_days
         loss_values = cluster.get("expected_loss_if_ring_inr", cluster["refund_amount_inr"]).to_numpy(float)
         model_weighted_exposure = float(np.sum(scores * loss_values))
         latest_event = cluster["event_timestamp"].max()
+        entity_types = ", ".join(sorted({item["entity_type"] for item in entities}))
         reasons = [
-            f"{account_count} customer accounts connect through {len(entities)} shared identifiers, including both device and payment token.",
+            f"{account_count} customer accounts connect through {len(entities)} submitted shared identifiers ({entity_types}).",
             f"{high} request{'s' if high != 1 else ''} meet the calibrated review policy.",
             f"INR {model_weighted_exposure:,.0f} model-weighted loss exposure across INR {refund_exposure:,.0f} in connected refunds.",
         ]
-        nodes = [{
-            "id": f"case:{row.case_id}", "label": row.case_id, "kind": "case",
-            "risk_probability": round(float(row.ring_probability), 4),
-            "refund_amount_inr": int(row.refund_amount_inr), "merchant_id": row.merchant_id,
-        } for row in cluster.itertuples()] + entities
+        nodes = []
+        for row in cluster.itertuples():
+            if float(row.ring_probability) < bundle.threshold:
+                action = "approve"
+            elif int(row.shared_identifier_types_30d) >= 2 or int(row.multi_identifier_neighbor_accounts) >= 1:
+                action = "verify_evidence"
+            else:
+                action = "manual_review"
+            nodes.append({
+                "id": f"case:{row.case_id}", "label": row.case_id, "kind": "case",
+                "risk_probability": round(float(row.ring_probability), 4), "action": action,
+                "refund_amount_inr": int(row.refund_amount_inr), "merchant_id": row.merchant_id,
+            })
+        nodes += entities
         edges = [{"source": source, "target": target, "relation": data["relation"]} for source, target, data in graph.subgraph(component).edges(data=True)]
         rings.append({
             "ring_id": _cluster_id(case_ids),
@@ -121,5 +122,5 @@ def build_ring_catalog(cases: pd.DataFrame, bundle: LiveModelBundle, window_days
         "as_of": end_time.isoformat(), "window_days": window_days,
         "candidate_rings": rings[:30],
         "ranking_note": "P1 is reviewed first. Queue ranks are unique and ordered by model-weighted loss exposure.",
-        "method": "Suspected clusters require a shared device-payment relationship across at least two accounts plus support from the calibrated coordinated-ring model. P1 is the highest queue rank; ranks are unique and ordered by model-weighted loss exposure. No ring labels, scenario types or future relative to the as-of timestamp are used.",
+        "method": "Suspected clusters are label-free connected components spanning at least three cases and three customer accounts through submitted device, address or payment-token links, with support from the calibrated coordinated-ring model. P1 is the highest queue rank; ranks are unique and ordered by model-weighted loss exposure. No ring labels, scenario types or future relative to the as-of timestamp are used.",
     }

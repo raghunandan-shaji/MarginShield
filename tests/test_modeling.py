@@ -41,6 +41,9 @@ class ModelingTests(unittest.TestCase):
         self.assertIn("ring_recall", test["ring_level"])
         self.assertIn("precision", self.report["test_temporal_bootstrap_95pct_ci"])
         self.assertGreater(test["precision"], 0.0)
+        self.assertIn("expected_calibration_error", test["calibration"])
+        self.assertTrue(test["calibration"]["bins"])
+        self.assertIn("above_1pct", test["calibration"])
         costs = test["costs"]
         self.assertEqual(
             costs["net_preventable_value_inr"],
@@ -53,10 +56,20 @@ class ModelingTests(unittest.TestCase):
         self.assertGreater(self.report["diagnostics"]["graph_velocity_only"]["test"]["pr_auc"], diagnostics["pr_auc"])
 
     def test_pair_rule_shortcut_is_reported(self) -> None:
-        diagnostic = self.report["diagnostics"]["device_payment_pair_rule"]["test"]
+        diagnostic = self.report["diagnostics"]["device_payment_pair_rule"]["validation"]
         self.assertEqual(diagnostic["rule"], "device_payment_pair_accounts_30d >= 2")
-        self.assertGreater(diagnostic["precision"], 0.8)
+        self.assertLess(diagnostic["precision"], 0.70)
         self.assertIn("recoverability", diagnostic["interpretation"])
+
+    def test_within_shared_shortcut_and_topology_diagnostics_are_reported(self) -> None:
+        diagnostic = self.report["diagnostics"]["within_shared_identity"]["validation"]
+        self.assertLess(diagnostic["maximum_univariate_ap_lift"], 2.0)
+        self.assertGreater(diagnostic["rows"], 0)
+        topology = self.report["test_topology_recall"]["by_topology"]
+        self.assertGreaterEqual(len(topology), 4)
+        self.assertTrue(all("early_ring_recall" in row for row in topology))
+        rates = [row["refund_value_rate"] for row in self.report["false_positive_cost_sensitivity"]]
+        self.assertEqual(rates, [0.05, 0.075, 0.15])
 
     def test_threshold_selection_enforces_precision_and_review_volume(self) -> None:
         frame = pd.DataFrame({
@@ -77,10 +90,15 @@ class ModelingTests(unittest.TestCase):
 
     def test_first_request_is_not_an_observed_multi_account_ring(self) -> None:
         frame = pd.DataFrame({
+            "case_id": ["case-1", "case-2"],
             "ring_label": [1, 1], "ring_id": ["A", "A"],
             "expected_loss_if_ring_inr": [100, 100], "false_positive_cost_inr": [0, 0],
-            "review_cost_inr": [10, 10], "device_id": ["d", "d"], "payment_token_id": ["p", "p"],
+            "review_cost_inr": [10, 10], "customer_id": ["c1", "c2"],
+            "device_id": ["d", "d"], "address_id": ["a1", "a2"], "payment_token_id": ["p", "p"],
             "device_payment_pair_accounts_30d": [1, 2],
+            "shared_device_accounts_30d": [1, 2],
+            "shared_address_accounts_90d": [1, 1],
+            "shared_payment_accounts_30d": [1, 2],
             "event_timestamp": pd.date_range("2025-01-01", periods=2, tz="UTC"),
         })
         metric = ring_level_metrics(frame, np.array([0.9, 0.1]), threshold=0.5)

@@ -4,7 +4,7 @@ const fmtPct = (value) => {
   const percent = Number(value) * 100;
   if (percent >= 99.95) return ">99.9%";
   if (percent < 0.05) return "<0.1%";
-  if (percent >= 99) return `${percent.toFixed(1)}%`;
+  if (percent >= 99) return `${percent.toFixed(3)}%`;
   if (percent < 1) return `${percent.toFixed(2)}%`;
   return percent < 10 ? `${percent.toFixed(1)}%` : `${Math.round(percent)}%`;
 };
@@ -55,7 +55,7 @@ function renderGraph(detail) {
   const nodeMarkup = detail.nodes.map((node) => {
     const point = positions.get(node.id);
     if (node.kind === "entity") return `<g class="graph-node entity-node" transform="translate(${point.x} ${point.y})"><circle r="39"></circle><text y="-2">${esc(node.entity_type)}</text><text y="15">${node.accounts} accounts</text></g>`;
-    const riskClass = node.risk_probability >= state.meta.verify_evidence_threshold ? "verify" : node.risk_probability >= state.meta.manual_review_threshold ? "review" : "approve";
+    const riskClass = node.action === "verify_evidence" ? "verify" : node.action === "manual_review" ? "review" : "approve";
     return `<g class="graph-node case-node ${riskClass}" transform="translate(${point.x} ${point.y})"><circle r="31"></circle><text y="-3">${esc(node.label)}</text><text y="15">${fmtPct(node.risk_probability)}</text></g>`;
   }).join("");
   svg.innerHTML = `<title>${esc(detail.ring_id)} relationship graph</title>${edgeMarkup}${nodeMarkup}`;

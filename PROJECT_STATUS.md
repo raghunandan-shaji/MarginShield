@@ -1,259 +1,232 @@
-# MarginShield: Audited Project Status
+# MarginShield V3: Expert Handoff
 
-Audit date: 2026-09-04
+Audit date: 2026-09-05
 
-## Executive verdict
+Active version: `3.0.0-locked`
 
-MarginShield is worthy of a buildathon submission as an honest, working prototype.
-It is more substantial than a notebook classifier because it joins point-in-time
-graph features, a validation-locked decision policy, a live scoring API, per-case
-explanations, and an analyst investigation workflow. Its algorithm is not novel and
-its synthetic benchmark is not evidence of production performance.
+Status: submission-ready prototype; not production-ready
 
-The submission is strongest when framed as a product and evaluation methodology for
-one narrow loss class. It should not be framed as a state-of-the-art Razorpay fraud
-model, a production replacement, or proof that 88% precision will transfer to real
-merchant traffic.
+## Executive Verdict
 
-## Exact problem
+MarginShield is a complete buildathon prototype for detecting **coordinated
+refund-abuse rings at refund-request time**. Its strongest claim is methodological:
+raw-event scoring, one shared offline/live feature engine, a narrow loss class,
+hard legitimate negatives, validation-locked intervention policy, a structurally
+different final test, graph investigation, explanations, and a durable audit trail.
 
-Refund controls usually inspect one request or customer at a time. Coordinated abuse
-can instead distribute refund requests across multiple customer accounts that reuse
-devices, payment tokens, or addresses. A single request can look ordinary while the
-time-evolving relationship pattern is not.
+It must not be described as state of the art or as validated on real fraud. All
+performance is synthetic. The final test has high point precision but low recall,
+and the precision confidence interval crosses the 85% policy floor.
 
-MarginShield scores each refund request using only information available at that
-request's decision time. It then:
+## Exact Problem And Action
 
-1. recommends **approve**, **manual review**, or **verify evidence**;
-2. groups model-supported requests connected by shared entities;
-3. ranks suspected rings by model-weighted conditional loss exposure; and
-4. gives an analyst the graph, contributing signals, request history, and a review
-   packet workflow. It never auto-rejects a customer.
+A single refund request may look ordinary. A coordinated ring distributes requests
+over multiple customer accounts while reusing or rotating devices, addresses,
+payment tokens, products, and merchants. MarginShield computes only information
+available at that request's timestamp and estimates whether it belongs to such a
+ring.
 
-The flagship target is only `ring_label`: membership in a simulated coordinated,
-multi-account refund-abuse event sequence. It is not a broad refund, return, fraud,
-chargeback, or account-risk classifier.
+The only target is `ring_label`: membership in a simulated coordinated multi-account
+refund-abuse sequence. Generic return abuse, first-party fraud, chargebacks, and
+single-account abuse are outside scope.
 
-## What is active
+Policy:
 
-- Dataset generator: `marginshield/data_builder.py` (version 1.1.1-audited)
-- Model tournament and evaluation: `marginshield/tournament.py`
-- Graph investigation catalog: `marginshield/rings.py`
-- FastAPI service: `server.py`
-- Analyst UI: `index.html`, `rings.html`, `app.js`, `rings.js`, `styles.css`
-- Active dataset: `data/processed/master_refund_cases.csv.gz`
+1. Below the validation-locked probability threshold: `approve`.
+2. Above threshold with at least two shared identifier types or one account linked
+   through multiple identifier types: `verify_evidence`.
+3. Above threshold without that named structural evidence: `manual_review`.
+4. There is no auto-reject action.
+
+## Architecture And Files
+
+- Shared incremental features: `marginshield/feature_engine.py`
+- Synthetic event generator and gates: `marginshield/data_builder.py`
+- Tournament, calibration, policy, evaluation: `marginshield/tournament.py`
+- Label-free candidate graphs: `marginshield/rings.py`
+- Typed API, SQLite audit trail, dashboard payload: `server.py`
+- UI: `index.html`, `rings.html`, `app.js`, `rings.js`, `styles.css`
 - Active model: `data/model/live_refund_ring_model.joblib`
 - Active report: `data/reports/ring_model_report.json`
+- Locked protocol: `SIMULATOR_V3_DESIGN.md`
+- Superseded history: `data/model/v2.1/`, `data/reports/v2.1/`
 
-Old broad-refund artifacts and source-download experiments are retained under
-`legacy/` and are not referenced by the active application.
+SQLite `data/decisions.sqlite` is runtime state and is gitignored.
 
-## Data and leakage boundary
+## What The Audit Changed
 
-- 75,000 synthetic refund requests: 52,455 train, 11,234 validation, 11,311 test.
-- 1,578 positive requests; overall simulated prevalence 2.104%.
-- Explicit coordinated ring sequences and difficult legitimate household, office,
-  and hostel clusters are injected only after chronological split boundaries exist.
-- Test rings unfold more slowly than train/validation rings, but use the same shared
-  device-plus-payment mechanism.
-- Account history, velocities, merchant volume, entity reuse, pair reuse, bursts, and
-  graph overlap are computed in event order from current and prior events only.
-- `ring_id`, scenario type, topology, sequence position, target, and latent simulator
-  metadata are excluded from the 15-feature serving contract.
-- Olist supplies no rows and no refund-fraud labels. Public datasets informed the
-  design only; every row and label used by the app is synthetic.
+Claude's valid findings were reproduced and fixed:
 
-## Model and policy
+- **Timestamp resolution:** pandas datetime integers could be microseconds rather
+  than nanoseconds, silently expanding all windows by 1000x. Conversion now uses
+  `.dt.as_unit("s")`; a 6-day/8-day regression test proves seven-day expiry.
+- **Training/serving skew:** batch features and live features now use the exact same
+  `PointInTimeFeatureEngine`; replaying all 75,000 rows reproduces the feature table.
+- **Entity collision:** device, address, and token IDs are type-namespaced.
+- **Simulator shortcut:** independent traffic now contains incidental sharing;
+  legitimate mechanisms include sparse and dense reuse; address, merchant, timing,
+  product, and existing-customer modes overlap across labels.
+- **Non-live API:** `POST /api/events` now accepts raw events, computes features,
+  scores, logs, and commits state in that order.
+- **Unexplainable second threshold:** verify-evidence is now based on observable
+  multi-identifier structure, not another probability cutoff.
+- **Unvalidated input:** exact Pydantic schemas reject missing, extra, or impossible
+  values with 422 responses.
+- **No audit trail:** SQLite stores raw event, exact features, model version,
+  threshold, probability, recommendation, evidence, prior links, and analyst actions.
+- **Misleading calibration headline:** the report includes calibration for scores
+  above 1%, where final-test ECE is 0.0551, not only the all-row ECE of 0.0046.
+- **Weak uncertainty blocks:** confidence intervals now resample days rather than
+  weeks.
+- **Ring window mismatch:** evaluation and the Rings page both use a trailing 30-day
+  candidate window.
+- **Cost fragility:** results include false-positive cost sensitivity at 5%, 7.5%,
+  and 15% of refund value.
 
-The tournament compares a transparent graph-rule baseline, L2-regularized logistic
-regression, and calibrated CatBoost over three rolling chronological training folds.
-Logistic regression won by mean rolling-fold PR-AUC. Platt calibration is fitted on
-the early validation half. The later validation half selects the manual-review
-threshold by maximum recall subject to at least 85% precision and at least 30 flags.
-The final test is excluded from model and threshold selection.
+One audit recommendation was rejected: moving the threshold because it improved the
+already-scored v2.1 test would be test tuning. V3 uses a pre-declared validation-only
+log-odds midpoint and a new seed/test period.
 
-Locked manual-review threshold: 0.467238. Verify-evidence threshold: 0.603596.
+## Dataset
 
-| Metric | Validation policy window | Final synthetic test |
+| Split | Rows | Positive requests |
 |---|---:|---:|
-| Rows | 5,617 | 11,311 |
-| PR-AUC | 0.8341 | 0.8138 |
-| ROC-AUC | 0.9400 | 0.9191 |
-| Brier score | 0.00489 | 0.00718 |
-| Precision | 87.04% | 88.04% |
-| Recall | 84.68% | 69.43% |
-| Review volume | 108 | 209 |
-| Flag rate | 1.92% | 1.85% |
-| Early ring precision | 86.96% | 86.54% |
-| Early ring recall | 100.00% | 95.65% |
-| Synthetic net preventable value | INR 181,266 | INR 370,702 |
+| Train | 52,364 | 1,047 |
+| Validation | 11,275 | 261 |
+| Final test | 11,361 | 262 |
 
-Test temporal-bootstrap 95% intervals:
+The split is assigned before label injection. Development rings use device/payment
+hubs, alternating chains, and two-core bridges. Test rings use four slower and
+relation-aware disjoint structures: device-address ladders, partial pair meshes,
+rotating two-hub bridges, and sparse address-payment chains.
 
-- Precision: 81.05%-93.55%
-- Recall: 64.71%-74.18%
-- PR-AUC: 0.7125-0.8997
-- Synthetic net preventable value: INR 179,068-INR 575,101
+Hard negatives model family wallets, group purchases, corporate cards, hostels,
+offices, and support migrations. Every row is synthetic. Product and merchant
+context are present, but no source row from Olist is redistributed.
 
-The point estimate clears 85% precision, but its confidence interval does not
-guarantee 85%. The project must state both.
+## Shortcut Gates
 
-The validation precision is measured on the same later-validation slice used to
-select the threshold under the 85% constraint. It proves policy-constraint
-satisfaction, not independent generalization. The final synthetic test is the only
-out-of-sample policy estimate.
+All generation gates pass. Key validation diagnostics:
 
-Synthetic cost assumptions:
+| Diagnostic | Result |
+|---|---:|
+| Independent legitimate rows with shared identity | 376 |
+| Precision of any-sharing rule | 11.02% |
+| Shared subset prevalence | 10.95% |
+| Best univariate AP within shared subset | 0.1426 |
+| Best univariate AP lift over shared prevalence | 1.302x |
+| Direct device-payment-pair rule precision | 13.68% |
+| Context-only PR-AUC | 0.0385 |
 
-- Loss if ring = refund amount plus 55% of simulated gross margin.
-- Review cost = INR 65, or INR 140 above a INR 5,000 refund.
-- Legitimate-review cost = 7.5% of refund value plus review cost.
-- Net value subtracts false-positive cost and review cost for true positives.
+The gate requires within-shared AP lift below 2.0. Final test is diagnostic only:
+its corresponding lift is 1.781x. Passing these tests reduces simple artifacts; it
+does not rule out multivariate simulator fingerprints.
 
-These assumptions are demonstration parameters, not Razorpay economics.
+## Model And Policy
 
-## Sanity-check results
+Mean chronological training-fold metrics:
 
-- Dataset validation: all 12 contract checks pass.
-- Automated suite: 18/18 `unittest` tests pass.
-- Python and JavaScript syntax checks pass.
-- Installed Python packages have no broken requirements.
-- No null or non-finite values exist in active model features.
-- Serialized model contract exactly matches the dataset feature contract.
-- No target-only field enters the model or scoring API.
-- Context-only test PR-AUC is 0.0261, close to random for the rare target; graph and
-  velocity signals, not commerce context, drive separation.
-- Final-test errors: 25 false positives, all simulated benign households; 81 ring
-  requests are missed.
-- Ring queue ranks are unique P1-P30 and sorted by descending model-weighted exposure.
-- Case risk is rendered as calibrated probability/percentage, not a binary class.
-- Policy Lab recomputes scenarios from validation only and identifies one locked
-  operating point; it does not optimize on final-test labels.
-- Casework and ring sidebars scroll independently on desktop.
-- Desktop analyst workflows were visually exercised at 1280x720. Responsive CSS was
-  inspected, but no separate physical-device browser run is claimed in this audit.
-- Static routes expose only the intended frontend assets. Attempts to fetch the
-  dataset, model, report, Python source, requirements, or this status file return 404.
-- Dependency versions are pinned to the audited artifact-compatible environment and
-  `httpx`, required by FastAPI's test client, is declared.
-- Re-running the documented dataset command produces byte-identical dataset, entity
-  link, and analyst-review gzip artifacts in the pinned environment.
+| Candidate | PR-AUC | ROC-AUC | Brier | Recall at 85% precision |
+|---|---:|---:|---:|---:|
+| Graph rule | 0.1063 | 0.8608 | 0.0185 | 0.0000 |
+| L2 logistic | 0.2375 | 0.9080 | 0.0173 | 0.0000 |
+| Regularized CatBoost | **0.5349** | **0.9378** | **0.0130** | **0.1907** |
 
-## Known limitations and failure modes
+CatBoost is the locked winner. It uses depth 4, 360 trees, learning rate 0.04,
+L2 regularization 30, and Platt calibration. Per-case explanations are CatBoost SHAP
+contributions scaled into calibrated log-odds. The locked review threshold is
+`0.5450029782`.
 
-1. **Synthetic-only truth.** Performance can collapse on real behavior, missing
-   identifiers, delayed outcomes, or adversarial adaptation.
-2. **Narrow simulator topology.** Test rings are slower, not structurally different.
-   Several graph features exceed 0.995 correlation because the same relationship
-   mechanism drives them. This is the largest validity risk.
-   The direct `device_payment_pair_accounts_30d >= 2` rule alone achieves 86.90%
-   precision and 82.64% recall on the final synthetic test. The flagship model's
-   result therefore mostly demonstrates recovery of the generator's motif, not a
-   sophisticated or generalizable fraud boundary.
-3. **Household confusion.** All test false positives come from legitimate households
-   sharing device and payment identifiers. Evidence verification is therefore safer
-   than automatic refusal.
-4. **Probability transfer.** Platt calibration is valid only for this simulator and
-   prevalence. Production probabilities require representative outcomes and ongoing
-   calibration monitoring.
-5. **Economic transfer.** Loss and review-cost assumptions are synthetic.
-6. **Operational gaps.** There is no authentication, persistent case state, data
-   connector, analyst-feedback loop, drift monitor, audit log, or production graph
-   store. NetworkX is used in memory; Neo4j is not required for this prototype.
-7. **Extreme scores.** The narrow simulator creates many probabilities near 0 or 1.
-   Real data should be expected to be noisier and less separable.
+The largest global importances are linked merchants, linked 72-hour refund burst,
+identifier reuse balance, graph overlap, shared device accounts, merchant vertical,
+shared payment accounts, and linked same-product accounts. Importances are not causal.
+
+## Locked Results
+
+| Metric | Validation policy | Final synthetic test |
+|---|---:|---:|
+| Rows | 5,637 | 11,361 |
+| PR-AUC | 0.5635 | 0.3795 |
+| ROC-AUC | 0.9509 | 0.9164 |
+| Brier score | 0.0143 | 0.0181 |
+| Precision | 87.88% | 91.89% |
+| Request recall | 22.83% | 12.98% |
+| Flags | 33 | 37 |
+| Flag rate | 0.59% | 0.33% |
+| Ring-candidate precision | 78.57% | 85.00% |
+| Early ring recall | 47.83% | 38.46% |
+| Net synthetic preventable value | INR 69,018 | INR 80,609 |
+
+Final confusion matrix: 11,096 TN, 3 FP, 228 FN, 34 TP.
+
+Day-block bootstrap 95% intervals:
+
+- Final precision: 83.33%-100%.
+- Final recall: 9.91%-16.38%.
+- Final PR-AUC: 0.3261-0.4366.
+- Final net synthetic value: INR 53,546-INR 114,553.
+- Validation precision: 79.23%-96.61%.
+
+The point estimate clears the track's 85% bar; neither validation nor test interval
+guarantees it. This uncertainty must be stated.
+
+Early ring recall by unseen test topology:
+
+| Topology | Early ring recall |
+|---|---:|
+| Device-address ladder | 80.00% |
+| Partial pair mesh | 55.56% |
+| Rotating two-hub bridge | 20.00% |
+| Sparse address-payment chain | 0.00% |
+
+The system is precise but conservative. It misses slow sparse structures; claiming
+comprehensive ring coverage would be false.
+
+## Verification
+
+- `24/24` unit and API tests pass.
+- Full-dataset offline/live feature replay passes.
+- Target-only metadata is excluded from the exact model contract.
+- Future entity mutations do not alter past features.
+- Unseen categorical values score successfully.
+- Duplicate and out-of-order live events are rejected.
+- Runtime decisions and analyst actions are auditable.
+- Ring queue ranks are unique and sorted by model-weighted exposure.
+- Source, models, data, reports, and requirements are not exposed as static routes.
+
+Artifact SHA-256:
+
+- Dataset: `de6bb654edac1e89446c36ca92c9236089c4683858b4b102f5093fc5fac1e414`
+- Entity links: `efe116424412de1b90de50087aedf8f22eb46d9aa1bff8a44c4a8724d8b77b3c`
+- Model: `084dd280d82186a0f26af1b40bc3d28f92cc02cc1b1d0687b2d390460de64130`
+- Report: `3c775200e2b28d07308b6241c2d74299be006b86e48456d4e799b38dd3d62c0a`
 
 ## Feasibility
 
-### Current prototype
+**Buildathon submission: feasible and complete.** It runs locally without paid
+infrastructure and demonstrates the requested detector plus honest precision,
+recall, and false-positive cost.
 
-Status: feasible and complete for a local buildathon demo. It requires Python 3.10,
-the listed requirements, roughly 75,000 generated rows, and no paid service.
+**Merchant pilot: feasible with substantial work.** Assuming event-time identifiers
+and adjudicated outcomes exist, a rough estimate is 6-10 weeks for ML, backend/data,
+privacy, and risk-operations work. This is engineering judgment, not a Razorpay plan.
 
-### Credible merchant pilot
+**Production: not feasible as-is.** Required work includes authentication,
+privacy-safe identifier hashing, event-time buffering, durable feature storage,
+merchant/time holdouts, delayed-label learning, prospective shadow evaluation,
+drift/calibration monitoring, access controls, retention policy, and load testing.
 
-Status: feasible with material changes. A realistic estimate is 6-10 weeks for an ML
-engineer, a data/backend engineer, and regular risk-operations input, assuming usable
-point-in-time identifiers and adjudicated outcomes already exist. Required work:
+Likely failure modes: missing or unstable identifiers, benign high-density sharing,
+slow sparse rings, merchant-specific shifts, adversarial adaptation, delayed labels,
+policy-induced selection bias, and review-capacity mismatch. NetworkX is sufficient
+for this prototype; Neo4j is not required until graph persistence/query scale demands it.
 
-- replace synthetic labels with merchant-confirmed ring investigations;
-- define legal/privacy-safe device, payment-token, and address representations;
-- replay historical requests with strict event-time joins;
-- estimate real review friction and preventable loss;
-- perform merchant/time holdouts, calibration, load tests, and analyst shadow mode;
-- build case persistence, access control, feedback capture, and monitoring.
+## Submission Positioning
 
-The estimate is engineering judgment, not a verified Razorpay delivery estimate.
+Lead with a request that looks normal alone, then show the prior links, probability,
+named evidence, action, candidate ring, and immutable audit record. Follow it with a
+legitimate shared-identity example and the shortcut audit. Do not lead with synthetic
+precision or imply MarginShield replaces Razorpay's existing fraud systems.
 
-### Production system
-
-Status: not feasible as-is. Expect at least 3-6 months after data access for a limited
-production deployment, with the schedule dominated by data quality, policy review,
-integration, and prospective validation rather than classifier training.
-
-Likely failure modes are identity sparsity, family/shared-office false positives,
-merchant-specific behavior, label delay/bias, changing abuse tactics, leakage in
-historical joins, and analyst capacity constraints.
-
-## Submission positioning
-
-This is likely to be noticed if the demo leads with the operational insight: one
-ordinary-looking refund becomes suspicious only when its point-in-time device and
-payment relationships reveal coordinated accounts. Show a legitimate household next
-to a ring, the actual model contribution, the locked 85%-precision policy, and the
-early-loss ring metric.
-
-What is impressive:
-
-- one sharply defined loss class rather than a generic fraud score;
-- graph and temporal feature engineering with leakage tests;
-- explicit hard negatives and honest false-positive analysis;
-- validation-locked decision policy with review economics;
-- complete path from generator to trained model, API, casework, and graph workflow.
-
-What is not impressive on its own:
-
-- logistic regression as an algorithm;
-- the 88.04% synthetic test precision without its uncertainty and limitations;
-- a dashboard without a clear action and evidence workflow.
-
-Final verdict: submit it. It is a strong internship buildathon prototype, not the
-best available refund-risk system. The single highest-value improvement before a
-technical review is an out-of-distribution stress benchmark with structurally varied
-rings and more legitimate multi-identifier sharing, locked without touching this
-final test.
-
-## Reproduction and verification
-
-```bash
-python3 build_dataset.py --rows 75000 --seed 20260904
-python3 train_live_model.py \
-  --dataset data/processed/master_refund_cases.csv.gz \
-  --model-dir data/model \
-  --report-dir data/reports \
-  --minimum-precision 0.85 \
-  --minimum-validation-flags 30
-python3 -m unittest discover -s tests -v
-python3 -m compileall -q .
-node --check app.js
-node --check rings.js
-python3 -m uvicorn server:app --host 127.0.0.1 --port 8003
-```
-
-Audited artifact SHA-256 values:
-
-- Dataset: `58d1543dc8d4eccd76bd4fe451218d59dceeb76eaafc3eba6a5a2bc383365451`
-- Model: `7ef75fd7a7ee98f1f077eb9f091d292b911304696c2d52e61d80659d433fabe2`
-- Report: `849ac71cb348d2dda37bf5d237f76473ef484a8bde6cc19cbfd40c08862b2bb9`
-
-Audited environment: Python 3.10.5, pandas 2.3.2, NumPy 2.1.3,
-scikit-learn 1.7.2, CatBoost 1.2.10, FastAPI 0.135.3, NetworkX 3.4.2,
-and Uvicorn 0.43.0.
-
-Reference methodology consulted during design:
-
-- Amazon Fraud Dataset Benchmark: https://github.com/amazon-science/fraud-dataset-benchmark
-- Fraud Detection Handbook: https://fraud-detection-handbook.github.io/fraud-detection-handbook/
-- IBM AMLSim: https://github.com/IBM/AMLSim/
-- FiFAR: https://springernature.figshare.com/articles/dataset/Financial_Fraud_Alert_Review_Dataset/28351172
+The appropriate claim is: **a focused post-payment coordination layer that gives
+refund-risk operations earlier, explainable ring evidence and a review-ready workflow.**

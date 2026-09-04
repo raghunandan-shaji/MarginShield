@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from marginshield.tournament import TournamentConfig, load_dataset, tournament, train_live_model
+from marginshield.tournament import TournamentConfig, load_dataset, tournament, train_live_model, validate_policy_only
 
 
 def main() -> None:
@@ -16,6 +16,7 @@ def main() -> None:
     parser.add_argument("--minimum-validation-flags", type=int, default=30)
     parser.add_argument("--bootstrap-samples", type=int, default=300)
     parser.add_argument("--tournament-only", action="store_true")
+    parser.add_argument("--validation-only", action="store_true")
     args = parser.parse_args()
     if not 0 < args.minimum_precision <= 1:
         parser.error("--minimum-precision must be in (0, 1]")
@@ -26,6 +27,10 @@ def main() -> None:
     )
     if args.tournament_only:
         winner, report = tournament(load_dataset(args.dataset), config)
+        print(json.dumps(report, indent=2))
+        return
+    if args.validation_only:
+        report = validate_policy_only(load_dataset(args.dataset), config)
         print(json.dumps(report, indent=2))
         return
     report = train_live_model(

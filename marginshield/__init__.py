@@ -1,3 +1,3 @@
 """MarginShield risk modeling package."""
 
-__version__ = "1.1.1-audited"
+__version__ = "3.0.0-locked"

@@ -1,0 +1,96 @@
+{
+  "passed": true,
+  "checks": {
+    "mandatory_columns_present": true,
+    "unique_case_ids": true,
+    "all_rows_marked_synthetic": true,
+    "one_loss_class_target": true,
+    "chronological_split": true,
+    "no_target_columns_in_feature_contract": true,
+    "three_entity_links_per_case": true,
+    "ring_events_have_ids": true,
+    "benign_shared_identity_negatives": true,
+    "test_rings_are_temporally_slower": true,
+    "test_topology_names_are_disjoint": true,
+    "test_relation_graph_fingerprints_are_disjoint": true,
+    "four_development_and_test_ring_motifs": true,
+    "six_hard_negative_motifs": true,
+    "legitimate_pair_reuse_exceeds_positive_pair_reuse": true,
+    "validation_pair_rule_below_70pct_precision": true,
+    "feature_contract_excludes_latent_metadata": true
+  },
+  "rows": {
+    "refund_cases": 75000,
+    "entity_links": 225000,
+    "review_samples": 9000
+  },
+  "target": {
+    "ring_rate": 0.021,
+    "by_split": {
+      "test": 0.02334011139598621,
+      "train": 0.019940901725288344,
+      "validation": 0.02358910450418373
+    }
+  },
+  "scenarios": {
+    "independent_legitimate": 63533,
+    "benign_group_purchase": 1662,
+    "benign_hostel_kiosk": 1661,
+    "benign_corporate_card": 1659,
+    "benign_family_wallet": 1647,
+    "benign_support_migration": 1639,
+    "benign_office_network": 1624,
+    "coordinated_refund_abuse": 1575
+  },
+  "topologies": {
+    "none": 63533,
+    "group_purchase": 1662,
+    "hostel_kiosk": 1661,
+    "corporate_card": 1659,
+    "family_wallet": 1647,
+    "support_migration": 1639,
+    "office_network": 1624,
+    "alternating_device_payment_chain": 337,
+    "device_hub_rotating_payment": 334,
+    "payment_hub_rotating_device": 326,
+    "two_core_bridge": 314,
+    "device_address_ladder": 70,
+    "sparse_address_payment_chain": 66,
+    "partial_pair_mesh": 65,
+    "rotating_two_hub_bridge": 63
+  },
+  "shortcut_gate": {
+    "validation_pair_rule_precision": 0.07174887892376682,
+    "positive_pair_reuse_rows": 64,
+    "legitimate_pair_reuse_rows": 828
+  },
+  "feature_contract": [
+    "vertical",
+    "payment_method",
+    "refund_amount_inr",
+    "refund_share",
+    "account_age_days",
+    "refund_velocity_24h",
+    "refund_velocity_7d",
+    "merchant_refund_volume_index_30d",
+    "shared_device_accounts_30d",
+    "shared_address_accounts_90d",
+    "shared_payment_accounts_30d",
+    "shared_identifier_types_30d",
+    "device_payment_pair_accounts_30d",
+    "connected_accounts_max_window",
+    "multi_identifier_neighbor_accounts",
+    "identifier_reuse_balance",
+    "linked_refund_burst_72h",
+    "linked_merchants_30d",
+    "graph_overlap_surprisal"
+  ],
+  "target_only_columns": [
+    "ring_label",
+    "ring_id",
+    "scenario_type",
+    "ring_topology",
+    "loss_sequence_position",
+    "simulator_internal_score"
+  ]
+}

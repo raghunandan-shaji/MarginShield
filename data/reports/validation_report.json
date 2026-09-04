@@ -11,28 +11,226 @@
     "ring_events_have_ids": true,
     "benign_shared_identity_negatives": true,
     "test_rings_are_temporally_slower": true,
-    "test_topology_label_is_honest": true,
+    "test_topology_names_are_disjoint": true,
+    "test_relation_graph_fingerprints_are_disjoint": true,
+    "four_development_and_test_ring_motifs": true,
+    "six_hard_negative_motifs": true,
+    "legitimate_pair_reuse_exceeds_positive_pair_reuse": true,
+    "validation_pair_rule_below_70pct_precision": true,
+    "shared_identifier_rule_below_50pct_precision": true,
+    "independent_legitimate_rows_include_shared_identity": true,
+    "within_shared_univariate_ap_below_2x_prevalence": true,
+    "nuisance_modes_have_both_labels": true,
+    "positive_payment_methods_cover_validation_context": true,
     "feature_contract_excludes_latent_metadata": true
   },
   "rows": {
     "refund_cases": 75000,
     "entity_links": 225000,
-    "review_samples": 4269
+    "review_samples": 9000
   },
   "target": {
-    "ring_rate": 0.02104,
+    "ring_rate": 0.020933333333333335,
     "by_split": {
-      "test": 0.023428520908849792,
-      "train": 0.019979029644457153,
-      "validation": 0.02358910450418373
+      "test": 0.023061350233254115,
+      "train": 0.01999465281491101,
+      "validation": 0.023148558758314855
     }
   },
   "scenarios": {
-    "independent_legitimate": 69785,
-    "coordinated_refund_abuse": 1578,
-    "benign_household": 1234,
-    "benign_office": 1202,
-    "benign_hostel": 1201
+    "independent_legitimate": 63534,
+    "benign_hostel_kiosk": 1683,
+    "benign_family_wallet": 1683,
+    "benign_group_purchase": 1667,
+    "benign_corporate_card": 1628,
+    "benign_office_network": 1623,
+    "benign_support_migration": 1612,
+    "coordinated_refund_abuse": 1570
+  },
+  "topologies": {
+    "none": 63534,
+    "hostel_kiosk": 1683,
+    "family_wallet": 1683,
+    "group_purchase": 1667,
+    "corporate_card": 1628,
+    "office_network": 1623,
+    "support_migration": 1612,
+    "payment_hub_rotating_device": 334,
+    "device_hub_rotating_payment": 331,
+    "alternating_device_payment_chain": 325,
+    "two_core_bridge": 318,
+    "partial_pair_mesh": 67,
+    "device_address_ladder": 67,
+    "rotating_two_hub_bridge": 65,
+    "sparse_address_payment_chain": 63
+  },
+  "shortcut_gate": {
+    "validation_pair_rule_precision": 0.13679245283018868,
+    "positive_pair_reuse_rows": 58,
+    "legitimate_pair_reuse_rows": 366,
+    "shared_identifier_rule_precision": 0.10952146028613714,
+    "shared_subset_rows": 2027,
+    "shared_subset_prevalence": 0.10952146028613714,
+    "maximum_within_shared_univariate_pr_auc": 0.1426012541908644,
+    "maximum_within_shared_univariate_ap_lift": 1.302039379481451,
+    "within_shared_univariate_features": [
+      {
+        "feature": "shared_address_accounts_90d",
+        "best_pr_auc": 0.1426012541908644,
+        "direction": "low"
+      },
+      {
+        "feature": "merchant_refund_volume_index_30d",
+        "best_pr_auc": 0.14111999271766512,
+        "direction": "high"
+      },
+      {
+        "feature": "linked_merchants_30d",
+        "best_pr_auc": 0.1338928535575307,
+        "direction": "low"
+      },
+      {
+        "feature": "identifier_reuse_balance",
+        "best_pr_auc": 0.1323368432425765,
+        "direction": "low"
+      },
+      {
+        "feature": "linked_refund_burst_72h",
+        "best_pr_auc": 0.12740458595212892,
+        "direction": "high"
+      },
+      {
+        "feature": "multi_identifier_neighbor_accounts",
+        "best_pr_auc": 0.12718249990780386,
+        "direction": "low"
+      },
+      {
+        "feature": "linked_same_product_accounts_30d",
+        "best_pr_auc": 0.12602341964641284,
+        "direction": "high"
+      },
+      {
+        "feature": "refund_share",
+        "best_pr_auc": 0.1258171225382771,
+        "direction": "low"
+      },
+      {
+        "feature": "refund_amount_inr",
+        "best_pr_auc": 0.11854785455219177,
+        "direction": "low"
+      },
+      {
+        "feature": "account_age_days",
+        "best_pr_auc": 0.11791841539266266,
+        "direction": "high"
+      },
+      {
+        "feature": "device_payment_pair_accounts_30d",
+        "best_pr_auc": 0.1166463141940425,
+        "direction": "high"
+      },
+      {
+        "feature": "connected_accounts_max_window",
+        "best_pr_auc": 0.11617128049941502,
+        "direction": "low"
+      },
+      {
+        "feature": "shared_identifier_types_30d",
+        "best_pr_auc": 0.11534140056797383,
+        "direction": "high"
+      },
+      {
+        "feature": "graph_overlap_surprisal",
+        "best_pr_auc": 0.11259991079515613,
+        "direction": "high"
+      },
+      {
+        "feature": "refund_velocity_7d",
+        "best_pr_auc": 0.11132708694431487,
+        "direction": "low"
+      },
+      {
+        "feature": "shared_device_accounts_30d",
+        "best_pr_auc": 0.11107664288791905,
+        "direction": "high"
+      },
+      {
+        "feature": "refund_velocity_24h",
+        "best_pr_auc": 0.11015424650106447,
+        "direction": "high"
+      },
+      {
+        "feature": "shared_payment_accounts_30d",
+        "best_pr_auc": 0.1070106001509464,
+        "direction": "low"
+      }
+    ],
+    "independent_legitimate_shared_identity_rows": 389,
+    "nuisance_mode_coverage": {
+      "cluster_address_mode": {
+        "hub": {
+          "positive": 97,
+          "negative": 947
+        },
+        "pairs": {
+          "positive": 54,
+          "negative": 388
+        },
+        "unique": {
+          "positive": 110,
+          "negative": 315
+        }
+      },
+      "cluster_merchant_mode": {
+        "pool": {
+          "positive": 50,
+          "negative": 612
+        },
+        "single": {
+          "positive": 112,
+          "negative": 555
+        },
+        "spread": {
+          "positive": 99,
+          "negative": 483
+        }
+      },
+      "cluster_spacing_mode": {
+        "bursty": {
+          "positive": 93,
+          "negative": 621
+        },
+        "exponential": {
+          "positive": 111,
+          "negative": 595
+        },
+        "uniform": {
+          "positive": 57,
+          "negative": 434
+        }
+      },
+      "cluster_product_mode": {
+        "pairs": {
+          "positive": 98,
+          "negative": 446
+        },
+        "same": {
+          "positive": 105,
+          "negative": 572
+        },
+        "spread": {
+          "positive": 58,
+          "negative": 632
+        }
+      }
+    },
+    "positive_payment_methods": [
+      "card",
+      "cod",
+      "netbanking",
+      "upi",
+      "wallet"
+    ]
   },
   "feature_contract": [
     "vertical",
@@ -45,10 +243,15 @@
     "merchant_refund_volume_index_30d",
     "shared_device_accounts_30d",
     "shared_address_accounts_90d",
+    "shared_payment_accounts_30d",
     "shared_identifier_types_30d",
     "device_payment_pair_accounts_30d",
+    "connected_accounts_max_window",
+    "multi_identifier_neighbor_accounts",
+    "identifier_reuse_balance",
     "linked_refund_burst_72h",
     "linked_merchants_30d",
+    "linked_same_product_accounts_30d",
     "graph_overlap_surprisal"
   ],
   "target_only_columns": [
@@ -57,6 +260,11 @@
     "scenario_type",
     "ring_topology",
     "loss_sequence_position",
-    "simulator_internal_score"
+    "simulator_internal_score",
+    "cluster_address_mode",
+    "cluster_merchant_mode",
+    "cluster_spacing_mode",
+    "cluster_product_mode",
+    "cluster_existing_customer_member"
   ]
 }

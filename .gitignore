@@ -6,3 +6,6 @@ __pycache__/
 # Raw source datasets are staged temporarily and must not be committed.
 data/raw/
 data/staging/
+data/decisions.sqlite
+data/decisions.sqlite-shm
+data/decisions.sqlite-wal
