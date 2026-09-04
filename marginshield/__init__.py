@@ -1,0 +1,3 @@
+"""MarginShield risk modeling package."""
+
+__version__ = "1.1.1-audited"

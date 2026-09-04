@@ -1,0 +1,15 @@
+{
+  "dataset_name": "MarginShield Coordinated Refund-Abuse Ring Benchmark",
+  "version": "1.1.1-audited",
+  "seed": 20260904,
+  "target": "ring_label",
+  "target_definition": "A refund request generated as part of a coordinated multi-account refund-abuse event sequence.",
+  "all_output_rows_synthetic": true,
+  "source_statement": "Olist has no refund-fraud labels. It informs only high-level commerce context; no Olist source row or label is used.",
+  "limitations": [
+    "This is a synthetic benchmark, not real-world or production performance evidence.",
+    "True refund-abuse labels require merchant investigation outcomes, disputed refunds and chargeback evidence.",
+    "The test rings unfold more slowly than train/validation rings, but retain the same two-identifier graph mechanism."
+  ],
+  "validation_passed": true
+}

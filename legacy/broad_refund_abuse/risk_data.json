@@ -1,0 +1,3920 @@
+{
+  "generated_from": "Python synthetic commerce/refund simulator",
+  "positioning": "Refund abuse verifier for Razorpay Risk Manager track",
+  "cases": [
+    {
+      "case_id": "RF-1397",
+      "merchant": "Kosha Beauty",
+      "vertical": "Beauty",
+      "customer": "CUST-77262",
+      "refund_amount": 923,
+      "order_amount": 932,
+      "margin_amount": 128,
+      "days_since_delivery": 7,
+      "reason": "size fit",
+      "refund_method": "manual bank transfer",
+      "label": 1,
+      "risk_score": 98,
+      "confidence": 91,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 999,
+      "prevented_loss": 479,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 26.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 19,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 4,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 932"
+        },
+        {
+          "step": "Delivered",
+          "value": "7 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "96% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1441",
+      "merchant": "Bluecut Denim",
+      "vertical": "Fashion",
+      "customer": "CUST-25775",
+      "refund_amount": 4510,
+      "order_amount": 4510,
+      "margin_amount": 826,
+      "days_since_delivery": 5,
+      "reason": "changed mind",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 96,
+      "confidence": 89,
+      "action": "Manual review",
+      "status": "High risk",
+      "expected_loss": 5005,
+      "prevented_loss": 4104,
+      "review_cost": 95,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 28,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 24.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 21.8,
+          "direction": "raises"
+        },
+        {
+          "name": "Weak item evidence",
+          "impact": 2.9,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 7,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 4,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 4,510"
+        },
+        {
+          "step": "Delivered",
+          "value": "5 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "52% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1289",
+      "merchant": "Nova Audio",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-78162",
+      "refund_amount": 487,
+      "order_amount": 959,
+      "margin_amount": 117,
+      "days_since_delivery": 7,
+      "reason": "changed mind",
+      "refund_method": "wallet credit",
+      "label": 1,
+      "risk_score": 96,
+      "confidence": 90,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 557,
+      "prevented_loss": 267,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 26.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 20,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 16.6,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 5,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 959"
+        },
+        {
+          "step": "Delivered",
+          "value": "7 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "59% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1294",
+      "merchant": "Bluecut Denim",
+      "vertical": "Fashion",
+      "customer": "CUST-56950",
+      "refund_amount": 1216,
+      "order_amount": 1216,
+      "margin_amount": 222,
+      "days_since_delivery": 15,
+      "reason": "not as described",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 94,
+      "confidence": 88,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 1349,
+      "prevented_loss": 647,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 24.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 21.9,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 15,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 4,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,216"
+        },
+        {
+          "step": "Delivered",
+          "value": "15 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "not as described"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "65% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1115",
+      "merchant": "Nova Audio",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-68948",
+      "refund_amount": 1880,
+      "order_amount": 2513,
+      "margin_amount": 306,
+      "days_since_delivery": 5,
+      "reason": "not as described",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 92,
+      "confidence": 86,
+      "action": "Manual review",
+      "status": "High risk",
+      "expected_loss": 2063,
+      "prevented_loss": 1691,
+      "review_cost": 95,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 28,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 8.2,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 5,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 3,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 2,513"
+        },
+        {
+          "step": "Delivered",
+          "value": "5 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "not as described"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "71% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1124",
+      "merchant": "Bluecut Denim",
+      "vertical": "Fashion",
+      "customer": "CUST-91316",
+      "refund_amount": 1157,
+      "order_amount": 1529,
+      "margin_amount": 280,
+      "days_since_delivery": 3,
+      "reason": "empty box",
+      "refund_method": "wallet credit",
+      "label": 1,
+      "risk_score": 91,
+      "confidence": 85,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 1325,
+      "prevented_loss": 636,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 28,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 16.5,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 8.6,
+          "direction": "raises"
+        },
+        {
+          "name": "Weak item evidence",
+          "impact": 5.2,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 9,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,529"
+        },
+        {
+          "step": "Delivered",
+          "value": "3 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "empty box"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "44% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1038",
+      "merchant": "Orbit Gadgets",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-27837",
+      "refund_amount": 395,
+      "order_amount": 625,
+      "margin_amount": 83,
+      "days_since_delivery": 7,
+      "reason": "duplicate order",
+      "refund_method": "instant refund",
+      "label": 1,
+      "risk_score": 91,
+      "confidence": 85,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 444,
+      "prevented_loss": 213,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 24.2,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 19.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 15,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 4,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 625"
+        },
+        {
+          "step": "Delivered",
+          "value": "7 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "duplicate order"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "86% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1049",
+      "merchant": "Terra Home",
+      "vertical": "Home goods",
+      "customer": "CUST-98272",
+      "refund_amount": 1149,
+      "order_amount": 1678,
+      "margin_amount": 187,
+      "days_since_delivery": 7,
+      "reason": "duplicate order",
+      "refund_method": "instant refund",
+      "label": 1,
+      "risk_score": 88,
+      "confidence": 82,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 1261,
+      "prevented_loss": 605,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 28,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 4.4,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 5,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 5,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 3,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,678"
+        },
+        {
+          "step": "Delivered",
+          "value": "7 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "duplicate order"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "73% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1388",
+      "merchant": "Nova Audio",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-75838",
+      "refund_amount": 503,
+      "order_amount": 1119,
+      "margin_amount": 136,
+      "days_since_delivery": 7,
+      "reason": "size fit",
+      "refund_method": "instant refund",
+      "label": 0,
+      "risk_score": 87,
+      "confidence": 82,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 25,
+      "prevented_loss": 12,
+      "review_cost": 35,
+      "false_positive_cost": 80,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 21.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 18,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 14.8,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 3,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,119"
+        },
+        {
+          "step": "Delivered",
+          "value": "7 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "67% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1258",
+      "merchant": "Orbit Gadgets",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-65393",
+      "refund_amount": 1986,
+      "order_amount": 2766,
+      "margin_amount": 369,
+      "days_since_delivery": 0,
+      "reason": "late delivery",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 86,
+      "confidence": 81,
+      "action": "Manual review",
+      "status": "High risk",
+      "expected_loss": 2207,
+      "prevented_loss": 1809,
+      "review_cost": 95,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 28,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 21.5,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 11.6,
+          "direction": "raises"
+        },
+        {
+          "name": "Legitimate reason relief",
+          "impact": -8,
+          "direction": "lowers"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 7,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 4,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 2,766"
+        },
+        {
+          "step": "Delivered",
+          "value": "0 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "late delivery"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "83% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1470",
+      "merchant": "Nova Audio",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-98842",
+      "refund_amount": 359,
+      "order_amount": 682,
+      "margin_amount": 83,
+      "days_since_delivery": 5,
+      "reason": "size fit",
+      "refund_method": "wallet credit",
+      "label": 1,
+      "risk_score": 86,
+      "confidence": 81,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 408,
+      "prevented_loss": 195,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 22,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 17.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 13.4,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 4,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 682"
+        },
+        {
+          "step": "Delivered",
+          "value": "5 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "64% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1018",
+      "merchant": "Nava Streetwear",
+      "vertical": "Fashion",
+      "customer": "CUST-20820",
+      "refund_amount": 1754,
+      "order_amount": 2334,
+      "margin_amount": 353,
+      "days_since_delivery": 4,
+      "reason": "changed mind",
+      "refund_method": "original payment",
+      "label": 0,
+      "risk_score": 85,
+      "confidence": 81,
+      "action": "Manual review",
+      "status": "High risk",
+      "expected_loss": 87,
+      "prevented_loss": 71,
+      "review_cost": 95,
+      "false_positive_cost": 252,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 19.9,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 15.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 9,
+          "direction": "raises"
+        },
+        {
+          "name": "Weak item evidence",
+          "impact": 8.2,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 2,334"
+        },
+        {
+          "step": "Delivered",
+          "value": "4 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "33% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1514",
+      "merchant": "Sole Circuit",
+      "vertical": "Sneakers",
+      "customer": "CUST-34821",
+      "refund_amount": 1633,
+      "order_amount": 1656,
+      "margin_amount": 364,
+      "days_since_delivery": 4,
+      "reason": "empty box",
+      "refund_method": "manual bank transfer",
+      "label": 1,
+      "risk_score": 84,
+      "confidence": 80,
+      "action": "Manual review",
+      "status": "High risk",
+      "expected_loss": 1851,
+      "prevented_loss": 1517,
+      "review_cost": 95,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 24,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 17.9,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 14.4,
+          "direction": "raises"
+        },
+        {
+          "name": "New account",
+          "impact": 9,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 5,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,656"
+        },
+        {
+          "step": "Delivered",
+          "value": "4 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "empty box"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "97% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1198",
+      "merchant": "Terra Home",
+      "vertical": "Home goods",
+      "customer": "CUST-18415",
+      "refund_amount": 1583,
+      "order_amount": 1887,
+      "margin_amount": 211,
+      "days_since_delivery": 22,
+      "reason": "changed mind",
+      "refund_method": "manual bank transfer",
+      "label": 0,
+      "risk_score": 84,
+      "confidence": 79,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 79,
+      "prevented_loss": 37,
+      "review_cost": 35,
+      "false_positive_cost": 177,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 20.1,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Late request",
+          "impact": 8,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,887"
+        },
+        {
+          "step": "Delivered",
+          "value": "22 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "70% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    },
+    {
+      "case_id": "RF-1226",
+      "merchant": "Sole Circuit",
+      "vertical": "Sneakers",
+      "customer": "CUST-87277",
+      "refund_amount": 400,
+      "order_amount": 1331,
+      "margin_amount": 293,
+      "days_since_delivery": 8,
+      "reason": "not as described",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 84,
+      "confidence": 79,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 575,
+      "prevented_loss": 276,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 23,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 22.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 5.5,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 4,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 4,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 3,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,331"
+        },
+        {
+          "step": "Delivered",
+          "value": "8 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "not as described"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "81% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1086",
+      "merchant": "Kosha Beauty",
+      "vertical": "Beauty",
+      "customer": "CUST-67434",
+      "refund_amount": 384,
+      "order_amount": 649,
+      "margin_amount": 89,
+      "days_since_delivery": 4,
+      "reason": "duplicate order",
+      "refund_method": "wallet credit",
+      "label": 1,
+      "risk_score": 84,
+      "confidence": 79,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 437,
+      "prevented_loss": 209,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 26.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 17.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Weak item evidence",
+          "impact": 11.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 649"
+        },
+        {
+          "step": "Delivered",
+          "value": "4 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "duplicate order"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "22% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    },
+    {
+      "case_id": "RF-1248",
+      "merchant": "Kosha Beauty",
+      "vertical": "Beauty",
+      "customer": "CUST-28707",
+      "refund_amount": 1210,
+      "order_amount": 1368,
+      "margin_amount": 189,
+      "days_since_delivery": 3,
+      "reason": "late delivery",
+      "refund_method": "instant refund",
+      "label": 1,
+      "risk_score": 83,
+      "confidence": 79,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 1323,
+      "prevented_loss": 635,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 21,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        },
+        {
+          "name": "Legitimate reason relief",
+          "impact": -8,
+          "direction": "lowers"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 4.9,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 5,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,368"
+        },
+        {
+          "step": "Delivered",
+          "value": "3 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "late delivery"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "74% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1443",
+      "merchant": "Nova Audio",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-54941",
+      "refund_amount": 1537,
+      "order_amount": 2158,
+      "margin_amount": 263,
+      "days_since_delivery": 11,
+      "reason": "changed mind",
+      "refund_method": "instant refund",
+      "label": 1,
+      "risk_score": 82,
+      "confidence": 78,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 1694,
+      "prevented_loss": 813,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 25,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 13.4,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 6,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 2,158"
+        },
+        {
+          "step": "Delivered",
+          "value": "11 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "54% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1371",
+      "merchant": "Nova Audio",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-55958",
+      "refund_amount": 908,
+      "order_amount": 1369,
+      "margin_amount": 167,
+      "days_since_delivery": 8,
+      "reason": "changed mind",
+      "refund_method": "manual bank transfer",
+      "label": 0,
+      "risk_score": 82,
+      "confidence": 78,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 45,
+      "prevented_loss": 21,
+      "review_cost": 35,
+      "false_positive_cost": 116,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 26.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 21.7,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 5,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,369"
+        },
+        {
+          "step": "Delivered",
+          "value": "8 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "77% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1192",
+      "merchant": "Kosha Beauty",
+      "vertical": "Beauty",
+      "customer": "CUST-87286",
+      "refund_amount": 807,
+      "order_amount": 870,
+      "margin_amount": 120,
+      "days_since_delivery": 7,
+      "reason": "late delivery",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 81,
+      "confidence": 77,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 879,
+      "prevented_loss": 421,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 19.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        },
+        {
+          "name": "Legitimate reason relief",
+          "impact": -8,
+          "direction": "lowers"
+        },
+        {
+          "name": "Entity links",
+          "impact": 5,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 6,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 870"
+        },
+        {
+          "step": "Delivered",
+          "value": "7 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "late delivery"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "72% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1398",
+      "merchant": "Nova Audio",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-74908",
+      "refund_amount": 679,
+      "order_amount": 753,
+      "margin_amount": 91,
+      "days_since_delivery": 8,
+      "reason": "changed mind",
+      "refund_method": "manual bank transfer",
+      "label": 1,
+      "risk_score": 81,
+      "confidence": 77,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 733,
+      "prevented_loss": 351,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 23,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 16.6,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 4,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 3,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 753"
+        },
+        {
+          "step": "Delivered",
+          "value": "8 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "99% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1298",
+      "merchant": "Kosha Beauty",
+      "vertical": "Beauty",
+      "customer": "CUST-16359",
+      "refund_amount": 1592,
+      "order_amount": 1637,
+      "margin_amount": 226,
+      "days_since_delivery": 1,
+      "reason": "changed mind",
+      "refund_method": "instant refund",
+      "label": 0,
+      "risk_score": 80,
+      "confidence": 76,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 79,
+      "prevented_loss": 37,
+      "review_cost": 35,
+      "false_positive_cost": 178,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 26,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 11.2,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 5,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,637"
+        },
+        {
+          "step": "Delivered",
+          "value": "1 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "57% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1481",
+      "merchant": "Bluecut Denim",
+      "vertical": "Fashion",
+      "customer": "CUST-32458",
+      "refund_amount": 457,
+      "order_amount": 541,
+      "margin_amount": 99,
+      "days_since_delivery": 13,
+      "reason": "duplicate order",
+      "refund_method": "instant refund",
+      "label": 1,
+      "risk_score": 78,
+      "confidence": 74,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 516,
+      "prevented_loss": 247,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 24,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 18.5,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 16.4,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 5,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 541"
+        },
+        {
+          "step": "Delivered",
+          "value": "13 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "duplicate order"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "69% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1019",
+      "merchant": "Nova Audio",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-79488",
+      "refund_amount": 3084,
+      "order_amount": 3084,
+      "margin_amount": 376,
+      "days_since_delivery": 4,
+      "reason": "size fit",
+      "refund_method": "manual bank transfer",
+      "label": 1,
+      "risk_score": 77,
+      "confidence": 73,
+      "action": "Manual review",
+      "status": "High risk",
+      "expected_loss": 3309,
+      "prevented_loss": 2713,
+      "review_cost": 95,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 21.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 3,084"
+        },
+        {
+          "step": "Delivered",
+          "value": "4 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "71% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    },
+    {
+      "case_id": "RF-1278",
+      "merchant": "Kosha Beauty",
+      "vertical": "Beauty",
+      "customer": "CUST-22850",
+      "refund_amount": 2016,
+      "order_amount": 2016,
+      "margin_amount": 278,
+      "days_since_delivery": 7,
+      "reason": "not as described",
+      "refund_method": "wallet credit",
+      "label": 1,
+      "risk_score": 77,
+      "confidence": 73,
+      "action": "Manual review",
+      "status": "High risk",
+      "expected_loss": 2182,
+      "prevented_loss": 1789,
+      "review_cost": 95,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 28,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 7.2,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 5,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 3,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 2,016"
+        },
+        {
+          "step": "Delivered",
+          "value": "7 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "not as described"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "82% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1154",
+      "merchant": "Orbit Gadgets",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-72008",
+      "refund_amount": 906,
+      "order_amount": 1148,
+      "margin_amount": 153,
+      "days_since_delivery": 5,
+      "reason": "size fit",
+      "refund_method": "wallet credit",
+      "label": 0,
+      "risk_score": 77,
+      "confidence": 73,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 45,
+      "prevented_loss": 21,
+      "review_cost": 35,
+      "false_positive_cost": 116,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 20,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 9,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 5.3,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 4,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,148"
+        },
+        {
+          "step": "Delivered",
+          "value": "5 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "58% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1276",
+      "merchant": "Kosha Beauty",
+      "vertical": "Beauty",
+      "customer": "CUST-89067",
+      "refund_amount": 757,
+      "order_amount": 1456,
+      "margin_amount": 201,
+      "days_since_delivery": 3,
+      "reason": "not as described",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 77,
+      "confidence": 74,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 877,
+      "prevented_loss": 420,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 15.1,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 9,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 7.2,
+          "direction": "raises"
+        },
+        {
+          "name": "Weak item evidence",
+          "impact": 2.8,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,456"
+        },
+        {
+          "step": "Delivered",
+          "value": "3 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "not as described"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "52% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1448",
+      "merchant": "Juniper Bags",
+      "vertical": "Accessories",
+      "customer": "CUST-77645",
+      "refund_amount": 1002,
+      "order_amount": 1096,
+      "margin_amount": 222,
+      "days_since_delivery": 1,
+      "reason": "damaged",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 76,
+      "confidence": 73,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 1135,
+      "prevented_loss": 544,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 19,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 18.1,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 14.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Legitimate reason relief",
+          "impact": -8,
+          "direction": "lowers"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 4,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 5,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,096"
+        },
+        {
+          "step": "Delivered",
+          "value": "1 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "damaged"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "82% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1230",
+      "merchant": "Juniper Bags",
+      "vertical": "Accessories",
+      "customer": "CUST-70435",
+      "refund_amount": 3509,
+      "order_amount": 3782,
+      "margin_amount": 767,
+      "days_since_delivery": 5,
+      "reason": "changed mind",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 75,
+      "confidence": 72,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 3969,
+      "prevented_loss": 1905,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 18.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 17,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 6.9,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 4,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 3,782"
+        },
+        {
+          "step": "Delivered",
+          "value": "5 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "99% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1196",
+      "merchant": "Kosha Beauty",
+      "vertical": "Beauty",
+      "customer": "CUST-82414",
+      "refund_amount": 1427,
+      "order_amount": 1838,
+      "margin_amount": 254,
+      "days_since_delivery": 36,
+      "reason": "changed mind",
+      "refund_method": "manual bank transfer",
+      "label": 0,
+      "risk_score": 75,
+      "confidence": 72,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 71,
+      "prevented_loss": 34,
+      "review_cost": 35,
+      "false_positive_cost": 163,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 26.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Late request",
+          "impact": 8,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,838"
+        },
+        {
+          "step": "Delivered",
+          "value": "36 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "80% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    },
+    {
+      "case_id": "RF-1362",
+      "merchant": "Sole Circuit",
+      "vertical": "Sneakers",
+      "customer": "CUST-67642",
+      "refund_amount": 647,
+      "order_amount": 867,
+      "margin_amount": 191,
+      "days_since_delivery": 19,
+      "reason": "not as described",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 75,
+      "confidence": 72,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 761,
+      "prevented_loss": 365,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 28,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 13.5,
+          "direction": "raises"
+        },
+        {
+          "name": "Late request",
+          "impact": 8,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 6.5,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 7,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 867"
+        },
+        {
+          "step": "Delivered",
+          "value": "19 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "not as described"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "78% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1032",
+      "merchant": "Bluecut Denim",
+      "vertical": "Fashion",
+      "customer": "CUST-38711",
+      "refund_amount": 619,
+      "order_amount": 730,
+      "margin_amount": 133,
+      "days_since_delivery": 2,
+      "reason": "wardrobe return",
+      "refund_method": "original payment",
+      "label": 0,
+      "risk_score": 75,
+      "confidence": 72,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 30,
+      "prevented_loss": 14,
+      "review_cost": 35,
+      "false_positive_cost": 90,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 18.6,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 16.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 9,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 730"
+        },
+        {
+          "step": "Delivered",
+          "value": "2 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "wardrobe return"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "56% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1166",
+      "merchant": "Bluecut Denim",
+      "vertical": "Fashion",
+      "customer": "CUST-62193",
+      "refund_amount": 2118,
+      "order_amount": 3003,
+      "margin_amount": 550,
+      "days_since_delivery": 1,
+      "reason": "changed mind",
+      "refund_method": "instant refund",
+      "label": 0,
+      "risk_score": 74,
+      "confidence": 71,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 105,
+      "prevented_loss": 50,
+      "review_cost": 35,
+      "false_positive_cost": 225,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 20,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 15.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 5.4,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 5,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 3,003"
+        },
+        {
+          "step": "Delivered",
+          "value": "1 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "60% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster. Customer refund history is materially above merchant baseline."
+    },
+    {
+      "case_id": "RF-1467",
+      "merchant": "Bluecut Denim",
+      "vertical": "Fashion",
+      "customer": "CUST-45789",
+      "refund_amount": 2409,
+      "order_amount": 2528,
+      "margin_amount": 463,
+      "days_since_delivery": 6,
+      "reason": "late delivery",
+      "refund_method": "instant refund",
+      "label": 1,
+      "risk_score": 73,
+      "confidence": 71,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 2686,
+      "prevented_loss": 1289,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 25,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 20.8,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 16.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Legitimate reason relief",
+          "impact": -8,
+          "direction": "lowers"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 6,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 2,528"
+        },
+        {
+          "step": "Delivered",
+          "value": "6 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "late delivery"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "88% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1128",
+      "merchant": "Nava Streetwear",
+      "vertical": "Fashion",
+      "customer": "CUST-21193",
+      "refund_amount": 441,
+      "order_amount": 491,
+      "margin_amount": 74,
+      "days_since_delivery": 20,
+      "reason": "changed mind",
+      "refund_method": "manual bank transfer",
+      "label": 1,
+      "risk_score": 73,
+      "confidence": 70,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 485,
+      "prevented_loss": 232,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 23.1,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Late request",
+          "impact": 8,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 491"
+        },
+        {
+          "step": "Delivered",
+          "value": "20 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "96% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    },
+    {
+      "case_id": "RF-1465",
+      "merchant": "Nova Audio",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-33765",
+      "refund_amount": 2422,
+      "order_amount": 3042,
+      "margin_amount": 371,
+      "days_since_delivery": 9,
+      "reason": "damaged",
+      "refund_method": "wallet credit",
+      "label": 0,
+      "risk_score": 72,
+      "confidence": 69,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 121,
+      "prevented_loss": 58,
+      "review_cost": 35,
+      "false_positive_cost": 252,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 15,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 9.5,
+          "direction": "raises"
+        },
+        {
+          "name": "Legitimate reason relief",
+          "impact": -8,
+          "direction": "lowers"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 4,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 3,042"
+        },
+        {
+          "step": "Delivered",
+          "value": "9 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "damaged"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "73% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1255",
+      "merchant": "Bluecut Denim",
+      "vertical": "Fashion",
+      "customer": "CUST-85536",
+      "refund_amount": 2155,
+      "order_amount": 2202,
+      "margin_amount": 403,
+      "days_since_delivery": 7,
+      "reason": "not as described",
+      "refund_method": "wallet credit",
+      "label": 1,
+      "risk_score": 72,
+      "confidence": 70,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 2396,
+      "prevented_loss": 1150,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 21.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 20,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 11.7,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 2,202"
+        },
+        {
+          "step": "Delivered",
+          "value": "7 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "not as described"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "74% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    },
+    {
+      "case_id": "RF-1370",
+      "merchant": "Juniper Bags",
+      "vertical": "Accessories",
+      "customer": "CUST-28931",
+      "refund_amount": 258,
+      "order_amount": 632,
+      "margin_amount": 128,
+      "days_since_delivery": 15,
+      "reason": "changed mind",
+      "refund_method": "wallet credit",
+      "label": 1,
+      "risk_score": 72,
+      "confidence": 70,
+      "action": "Verify evidence",
+      "status": "High risk",
+      "expected_loss": 334,
+      "prevented_loss": 160,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 26.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 9,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 8.1,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 632"
+        },
+        {
+          "step": "Delivered",
+          "value": "15 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "98% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1178",
+      "merchant": "Sole Circuit",
+      "vertical": "Sneakers",
+      "customer": "CUST-83115",
+      "refund_amount": 1950,
+      "order_amount": 2236,
+      "margin_amount": 492,
+      "days_since_delivery": 2,
+      "reason": "size fit",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 71,
+      "confidence": 69,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 2245,
+      "prevented_loss": 1077,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 26.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 15.9,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 10,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 2,236"
+        },
+        {
+          "step": "Delivered",
+          "value": "2 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "71% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1373",
+      "merchant": "Nova Audio",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-15477",
+      "refund_amount": 1794,
+      "order_amount": 3122,
+      "margin_amount": 381,
+      "days_since_delivery": 6,
+      "reason": "size fit",
+      "refund_method": "wallet credit",
+      "label": 1,
+      "risk_score": 71,
+      "confidence": 69,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 2022,
+      "prevented_loss": 970,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 18.8,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 8.2,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 3,122"
+        },
+        {
+          "step": "Delivered",
+          "value": "6 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "58% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    },
+    {
+      "case_id": "RF-1165",
+      "merchant": "Orbit Gadgets",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-58828",
+      "refund_amount": 1188,
+      "order_amount": 1369,
+      "margin_amount": 182,
+      "days_since_delivery": 14,
+      "reason": "size fit",
+      "refund_method": "original payment",
+      "label": 0,
+      "risk_score": 71,
+      "confidence": 69,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 59,
+      "prevented_loss": 28,
+      "review_cost": 35,
+      "false_positive_cost": 141,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 19.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,369"
+        },
+        {
+          "step": "Delivered",
+          "value": "14 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "72% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    },
+    {
+      "case_id": "RF-1318",
+      "merchant": "Orbit Gadgets",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-85294",
+      "refund_amount": 450,
+      "order_amount": 450,
+      "margin_amount": 60,
+      "days_since_delivery": 4,
+      "reason": "empty box",
+      "refund_method": "original payment",
+      "label": 0,
+      "risk_score": 71,
+      "confidence": 69,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 22,
+      "prevented_loss": 10,
+      "review_cost": 35,
+      "false_positive_cost": 75,
+      "evidence": [
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 19.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 450"
+        },
+        {
+          "step": "Delivered",
+          "value": "4 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "empty box"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "78% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    },
+    {
+      "case_id": "RF-1500",
+      "merchant": "Sole Circuit",
+      "vertical": "Sneakers",
+      "customer": "CUST-80383",
+      "refund_amount": 387,
+      "order_amount": 681,
+      "margin_amount": 150,
+      "days_since_delivery": 6,
+      "reason": "size fit",
+      "refund_method": "wallet credit",
+      "label": 1,
+      "risk_score": 71,
+      "confidence": 68,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 477,
+      "prevented_loss": 228,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 22.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 10.3,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 5,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 681"
+        },
+        {
+          "step": "Delivered",
+          "value": "6 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "83% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1093",
+      "merchant": "Juniper Bags",
+      "vertical": "Accessories",
+      "customer": "CUST-61474",
+      "refund_amount": 1498,
+      "order_amount": 2015,
+      "margin_amount": 408,
+      "days_since_delivery": 4,
+      "reason": "size fit",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 70,
+      "confidence": 68,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 1742,
+      "prevented_loss": 836,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 18.8,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 14.7,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Weak item evidence",
+          "impact": 3.1,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 2,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 2,015"
+        },
+        {
+          "step": "Delivered",
+          "value": "4 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "51% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1183",
+      "merchant": "Sole Circuit",
+      "vertical": "Sneakers",
+      "customer": "CUST-37525",
+      "refund_amount": 1422,
+      "order_amount": 1826,
+      "margin_amount": 402,
+      "days_since_delivery": 3,
+      "reason": "late delivery",
+      "refund_method": "original payment",
+      "label": 1,
+      "risk_score": 70,
+      "confidence": 68,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 1663,
+      "prevented_loss": 798,
+      "review_cost": 35,
+      "false_positive_cost": 0,
+      "evidence": [
+        {
+          "name": "Entity links",
+          "impact": 28,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 14.1,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        },
+        {
+          "name": "Legitimate reason relief",
+          "impact": -8,
+          "direction": "lowers"
+        },
+        {
+          "name": "Customer refund history",
+          "impact": 6.5,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 6,
+          "severity": "high"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 2,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 4,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,826"
+        },
+        {
+          "step": "Delivered",
+          "value": "3 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "late delivery"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "67% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1482",
+      "merchant": "Nava Streetwear",
+      "vertical": "Fashion",
+      "customer": "CUST-58012",
+      "refund_amount": 1303,
+      "order_amount": 1527,
+      "margin_amount": 231,
+      "days_since_delivery": 7,
+      "reason": "wrong item",
+      "refund_method": "manual bank transfer",
+      "label": 0,
+      "risk_score": 70,
+      "confidence": 68,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 65,
+      "prevented_loss": 31,
+      "review_cost": 35,
+      "false_positive_cost": 152,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 23.1,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 22.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Entity links",
+          "impact": 13,
+          "direction": "raises"
+        },
+        {
+          "name": "Legitimate reason relief",
+          "impact": -8,
+          "direction": "lowers"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 2,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 3,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 3,
+          "severity": "high"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,527"
+        },
+        {
+          "step": "Delivered",
+          "value": "7 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "wrong item"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "76% consistency"
+        }
+      ],
+      "notes": "Account links into a repeated refund cluster."
+    },
+    {
+      "case_id": "RF-1037",
+      "merchant": "Juniper Bags",
+      "vertical": "Accessories",
+      "customer": "CUST-90068",
+      "refund_amount": 818,
+      "order_amount": 1054,
+      "margin_amount": 213,
+      "days_since_delivery": 1,
+      "reason": "changed mind",
+      "refund_method": "manual bank transfer",
+      "label": 0,
+      "risk_score": 70,
+      "confidence": 68,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 40,
+      "prevented_loss": 19,
+      "review_cost": 35,
+      "false_positive_cost": 108,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 26.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 15.4,
+          "direction": "raises"
+        },
+        {
+          "name": "Prior disputes",
+          "impact": 10,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 1,054"
+        },
+        {
+          "step": "Delivered",
+          "value": "1 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "changed mind"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "99% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    },
+    {
+      "case_id": "RF-1106",
+      "merchant": "Orbit Gadgets",
+      "vertical": "Consumer electronics",
+      "customer": "CUST-45672",
+      "refund_amount": 266,
+      "order_amount": 735,
+      "margin_amount": 98,
+      "days_since_delivery": 13,
+      "reason": "size fit",
+      "refund_method": "manual bank transfer",
+      "label": 0,
+      "risk_score": 70,
+      "confidence": 68,
+      "action": "Verify evidence",
+      "status": "Needs verification",
+      "expected_loss": 13,
+      "prevented_loss": 6,
+      "review_cost": 35,
+      "false_positive_cost": 58,
+      "evidence": [
+        {
+          "name": "Customer refund history",
+          "impact": 26.0,
+          "direction": "raises"
+        },
+        {
+          "name": "Velocity",
+          "impact": 14,
+          "direction": "raises"
+        },
+        {
+          "name": "Refund economics",
+          "impact": 10.9,
+          "direction": "raises"
+        }
+      ],
+      "linked_entities": [
+        {
+          "label": "Shared devices",
+          "value": 1,
+          "severity": "medium"
+        },
+        {
+          "label": "Shared addresses",
+          "value": 1,
+          "severity": "low"
+        },
+        {
+          "label": "Shared payment tokens",
+          "value": 1,
+          "severity": "low"
+        }
+      ],
+      "timeline": [
+        {
+          "step": "Order placed",
+          "value": "INR 735"
+        },
+        {
+          "step": "Delivered",
+          "value": "13 days ago"
+        },
+        {
+          "step": "Refund requested",
+          "value": "size fit"
+        },
+        {
+          "step": "Evidence checked",
+          "value": "74% consistency"
+        }
+      ],
+      "notes": "Decision is driven by economics and ordinary behavior drift."
+    }
+  ],
+  "metrics": [
+    {
+      "threshold": 42,
+      "precision": 0.314,
+      "recall": 0.933,
+      "tp": 112,
+      "fp": 245,
+      "fn": 8,
+      "tn": 155,
+      "prevented_loss": 64253,
+      "false_positive_cost": 29981,
+      "review_cost": 5005,
+      "net_savings": 29267
+    },
+    {
+      "threshold": 50,
+      "precision": 0.439,
+      "recall": 0.833,
+      "tp": 100,
+      "fp": 128,
+      "fn": 20,
+      "tn": 272,
+      "prevented_loss": 62240,
+      "false_positive_cost": 17263,
+      "review_cost": 5005,
+      "net_savings": 39972
+    },
+    {
+      "threshold": 58,
+      "precision": 0.526,
+      "recall": 0.6,
+      "tp": 72,
+      "fp": 65,
+      "fn": 48,
+      "tn": 335,
+      "prevented_loss": 58728,
+      "false_positive_cost": 9864,
+      "review_cost": 5005,
+      "net_savings": 43859
+    },
+    {
+      "threshold": 66,
+      "precision": 0.597,
+      "recall": 0.383,
+      "tp": 46,
+      "fp": 31,
+      "fn": 74,
+      "tn": 369,
+      "prevented_loss": 39664,
+      "false_positive_cost": 4504,
+      "review_cost": 3115,
+      "net_savings": 32045
+    },
+    {
+      "threshold": 74,
+      "precision": 0.727,
+      "recall": 0.2,
+      "tp": 24,
+      "fp": 9,
+      "fn": 96,
+      "tn": 391,
+      "prevented_loss": 23148,
+      "false_positive_cost": 1397,
+      "review_cost": 1575,
+      "net_savings": 20176
+    }
+  ],
+  "summary": {
+    "total_cases": 520,
+    "refund_exposure": 625815,
+    "prevented_loss": 65859,
+    "false_positive_cost": 41533,
+    "review_cost": 5005,
+    "high_risk_cases": 38,
+    "by_action": {
+      "Approve with monitoring": 366,
+      "Fast approve": 23,
+      "Manual review": 7,
+      "Verify evidence": 124
+    },
+    "by_vertical": [
+      {
+        "vertical": "Consumer electronics",
+        "refund_amount": 184092,
+        "prevented_loss": 21643
+      },
+      {
+        "vertical": "Fashion",
+        "refund_amount": 136809,
+        "prevented_loss": 15575
+      },
+      {
+        "vertical": "Accessories",
+        "refund_amount": 91382,
+        "prevented_loss": 10218
+      },
+      {
+        "vertical": "Beauty",
+        "refund_amount": 89236,
+        "prevented_loss": 8749
+      },
+      {
+        "vertical": "Sneakers",
+        "refund_amount": 76617,
+        "prevented_loss": 6663
+      },
+      {
+        "vertical": "Home goods",
+        "refund_amount": 47679,
+        "prevented_loss": 3011
+      }
+    ],
+    "risk_bands": {
+      "low": 50,
+      "watch": 242,
+      "verify": 190,
+      "high": 38
+    },
+    "top_reasons": {
+      "changed mind": 120,
+      "size fit": 110,
+      "not as described": 69,
+      "late delivery": 56,
+      "damaged": 52,
+      "wrong item": 35
+    }
+  },
+  "assumptions": [
+    "Labels are synthetic and must be replaced by merchant-confirmed abuse outcomes in production.",
+    "The score is intentionally interpretable: every decision exposes the evidence that moved it.",
+    "Actions optimize merchant loss, customer friction, and review workload together."
+  ]
+}

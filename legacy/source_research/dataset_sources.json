@@ -1,0 +1,94 @@
+{
+  "sources": [
+    {
+      "key": "olist",
+      "name": "Brazilian E-Commerce Public Dataset by Olist",
+      "url": "https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce",
+      "license": "CC BY-NC-SA 4.0",
+      "role": "Commerce structure, order value shape, product category, delivery and review behavior",
+      "integration": "distribution_calibration",
+      "redistributes_source_rows": false,
+      "status": "integrated"
+    },
+    {
+      "key": "fraudecom",
+      "name": "Fraud E-Commerce",
+      "url": "https://www.kaggle.com/datasets/vbinh002/fraud-ecommerce",
+      "license": "No license declared by upstream dataset",
+      "role": "Account age, device reuse, identity velocity and e-commerce fraud calibration",
+      "integration": "aggregate_calibration_only",
+      "redistributes_source_rows": false,
+      "status": "integrated_with_license_warning"
+    },
+    {
+      "key": "baf",
+      "name": "Bank Account Fraud Dataset Suite",
+      "url": "https://www.kaggle.com/datasets/sgpjesus/bank-account-fraud-dataset-neurips-2022",
+      "license": "CC BY-NC-ND 4.0 in the official datasheet; Kaggle metadata reports CC-BY-NC-SA-4.0",
+      "role": "Velocity, identity consistency, device and account-risk feature calibration",
+      "integration": "aggregate_calibration_only",
+      "redistributes_source_rows": false,
+      "status": "integrated_under_stricter_license_interpretation"
+    },
+    {
+      "key": "fifar",
+      "name": "Financial Fraud Alert Review Dataset",
+      "url": "https://doi.org/10.6084/m9.figshare.28351172",
+      "license": "CC BY 4.0",
+      "role": "Alert prevalence, analyst accuracy dispersion, uncertainty and defer-to-human behavior",
+      "integration": "aggregate_calibration_only",
+      "redistributes_source_rows": false,
+      "status": "integrated"
+    },
+    {
+      "key": "graphreturns",
+      "name": "ASOS GraphReturns",
+      "url": "https://osf.io/c793h/",
+      "license": "Unverified from currently accessible metadata",
+      "role": "Customer-product graph semantics and return-versus-non-return task framing",
+      "integration": "paper_level_design_reference",
+      "redistributes_source_rows": false,
+      "status": "adapter_pending_osf_access"
+    },
+    {
+      "key": "ieee_cis",
+      "name": "IEEE-CIS Fraud Detection",
+      "url": "https://www.kaggle.com/competitions/ieee-fraud-detection/data",
+      "license": "Subject to Kaggle competition rules",
+      "role": "Transaction, identity, address, email and device feature-group design",
+      "integration": "schema_reference_only",
+      "redistributes_source_rows": false,
+      "status": "blocked_until_competition_rules_are_accepted"
+    },
+    {
+      "key": "amazon_fdb",
+      "name": "Amazon Fraud Dataset Benchmark",
+      "url": "https://github.com/amazon-science/fraud-dataset-benchmark",
+      "license": "Per-source licenses apply",
+      "role": "Provenance-aware adapters and consistent fraud benchmark conventions",
+      "integration": "pipeline_design_reference",
+      "redistributes_source_rows": false,
+      "status": "integrated_as_methodology"
+    },
+    {
+      "key": "fraud_detection_handbook",
+      "name": "Fraud Detection Handbook simulator",
+      "url": "https://github.com/Fraud-Detection-Handbook/fraud-detection-handbook",
+      "license": "See upstream repository",
+      "role": "Temporal customer baselines, burst scenarios and time-aware splitting",
+      "integration": "simulation_methodology",
+      "redistributes_source_rows": false,
+      "status": "integrated_as_methodology"
+    },
+    {
+      "key": "amlsim",
+      "name": "IBM AMLSim",
+      "url": "https://github.com/IBM/AMLSim",
+      "license": "Apache 2.0",
+      "role": "Coordinated graph motifs and linked-entity scenario design",
+      "integration": "graph_simulation_methodology",
+      "redistributes_source_rows": false,
+      "status": "integrated_as_methodology"
+    }
+  ]
+}

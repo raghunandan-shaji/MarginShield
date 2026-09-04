@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "checks": {
+    "mandatory_columns_present": true,
+    "unique_case_ids": true,
+    "all_rows_marked_synthetic": true,
+    "one_loss_class_target": true,
+    "chronological_split": true,
+    "no_target_columns_in_feature_contract": true,
+    "three_entity_links_per_case": true,
+    "ring_events_have_ids": true,
+    "benign_shared_identity_negatives": true,
+    "test_rings_are_temporally_slower": true,
+    "test_topology_label_is_honest": true,
+    "feature_contract_excludes_latent_metadata": true
+  },
+  "rows": {
+    "refund_cases": 75000,
+    "entity_links": 225000,
+    "review_samples": 4269
+  },
+  "target": {
+    "ring_rate": 0.02104,
+    "by_split": {
+      "test": 0.023428520908849792,
+      "train": 0.019979029644457153,
+      "validation": 0.02358910450418373
+    }
+  },
+  "scenarios": {
+    "independent_legitimate": 69785,
+    "coordinated_refund_abuse": 1578,
+    "benign_household": 1234,
+    "benign_office": 1202,
+    "benign_hostel": 1201
+  },
+  "feature_contract": [
+    "vertical",
+    "payment_method",
+    "refund_amount_inr",
+    "refund_share",
+    "account_age_days",
+    "refund_velocity_24h",
+    "refund_velocity_7d",
+    "merchant_refund_volume_index_30d",
+    "shared_device_accounts_30d",
+    "shared_address_accounts_90d",
+    "shared_identifier_types_30d",
+    "device_payment_pair_accounts_30d",
+    "linked_refund_burst_72h",
+    "linked_merchants_30d",
+    "graph_overlap_surprisal"
+  ],
+  "target_only_columns": [
+    "ring_label",
+    "ring_id",
+    "scenario_type",
+    "ring_topology",
+    "loss_sequence_position",
+    "simulator_internal_score"
+  ]
+}

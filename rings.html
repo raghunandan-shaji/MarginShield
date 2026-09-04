@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MarginShield | Abuse Rings</title>
+    <meta name="description" content="Live connected-entity investigation for suspected refund abuse rings." />
+    <link rel="stylesheet" href="styles.css?v=20260904-6" />
+  </head>
+  <body class="rings-body">
+    <header class="masthead">
+      <a class="wordmark" href="index.html" aria-label="MarginShield home">
+        <span class="wordmark-symbol" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>MarginShield</span>
+      </a>
+      <nav class="product-nav" aria-label="Primary navigation">
+        <a class="nav-tab nav-link" href="index.html">Casework</a>
+        <a class="nav-tab nav-link is-active" href="rings.html">Abuse rings</a>
+      </nav>
+      <div class="masthead-meta"><span class="live-status"><i></i> Graph monitor online</span></div>
+    </header>
+
+    <main class="page ring-page">
+      <section class="page-intro ring-intro" aria-labelledby="ring-title">
+        <div>
+          <p class="kicker">Relationship intelligence / point-in-time entity graph</p>
+          <h1 id="ring-title">Abuse ring investigations</h1>
+        </div>
+        <div class="intro-aside">
+          <p>Held-out operational window</p>
+          <span id="asOfText">Loading current graph...</span>
+        </div>
+      </section>
+
+      <section class="portfolio-strip ring-summary" aria-label="Ring monitoring summary">
+        <article><span>Candidate rings</span><strong id="ringCount">...</strong><small>Shared-entity components</small></article>
+        <article><span>Policy-linked requests</span><strong id="linkedReviewCases">...</strong><small>Above manual-review threshold</small></article>
+        <article><span>Largest account link</span><strong id="largestLink">...</strong><small>Accounts behind one identifier</small></article>
+        <article><span>Graph window</span><strong id="windowDays">...</strong><small>Held-out relationship history</small></article>
+      </section>
+
+      <section class="ring-workbench" aria-label="Abuse ring investigation">
+        <aside class="ring-list-pane">
+          <div class="section-title ring-list-title"><div><p>Investigation queue</p><h2>Candidate clusters <span id="ringListCount">0</span></h2></div></div>
+          <p id="rankingMethod" class="ranking-method"></p>
+          <div id="ringList" class="ring-list" aria-live="polite"></div>
+        </aside>
+        <article class="ring-detail-pane">
+          <div class="ring-detail-head">
+            <div><p id="ringLabel">Candidate cluster</p><h2 id="ringHeading">Loading graph</h2></div>
+            <span id="ringRank" class="ring-rank">Queue rank ...</span>
+          </div>
+          <div id="ringFacts" class="ring-facts"></div>
+          <section class="network-canvas-section" aria-labelledby="network-title">
+            <div class="section-title"><div><p>Entity connections</p><h2 id="network-title">Relationship graph</h2></div><span class="text-meta">Cases are scored; entities are links</span></div>
+            <div class="graph-stage"><svg id="ringGraph" viewBox="0 0 1000 560" role="img" aria-label="Selected shared-entity graph"></svg></div>
+          </section>
+          <div class="ring-detail-grid">
+            <section class="ring-reasons"><div class="section-title"><div><p>Why it surfaced</p><h2>Investigation basis</h2></div></div><ol id="ringReasons"></ol></section>
+            <section class="ring-cases"><div class="section-title"><div><p>Connected requests</p><h2>Case exposure</h2></div></div><div id="ringCases"></div></section>
+          </div>
+        </article>
+      </section>
+    </main>
+    <script src="rings.js?v=20260904-6"></script>
+  </body>
+</html>

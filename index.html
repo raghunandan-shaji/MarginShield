@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MarginShield | Refund Risk Operations</title>
+    <meta
+      name="description"
+      content="A cost-aware refund abuse verifier for merchant risk teams."
+    />
+    <link rel="stylesheet" href="styles.css?v=20260904-6" />
+  </head>
+  <body>
+    <header class="masthead">
+      <a class="wordmark" href="#top" aria-label="MarginShield home">
+        <span class="wordmark-symbol" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>MarginShield</span>
+      </a>
+
+      <nav class="product-nav" aria-label="Primary navigation">
+        <button class="nav-tab is-active" data-view="casework" type="button">Casework</button>
+        <button class="nav-tab" data-view="portfolio" type="button">Portfolio</button>
+        <button class="nav-tab" data-view="policy" type="button">Policy lab</button>
+        <a class="nav-tab nav-link" href="rings.html">Abuse rings</a>
+      </nav>
+
+      <div class="masthead-meta">
+        <span class="live-status"><i></i> Model online</span>
+        <button id="reviewBtn" class="header-command" type="button">Create review packet</button>
+      </div>
+    </header>
+
+    <main id="top" class="page">
+      <section class="page-intro" aria-labelledby="page-title">
+        <div>
+          <p class="kicker">Razorpay / AI Risk Manager / Coordinated refund-abuse rings</p>
+          <h1 id="page-title">Refund risk operations</h1>
+        </div>
+        <div class="intro-aside">
+          <p>Coordinated refund-abuse ring casework</p>
+          <span>As of <strong id="lastScored">loading...</strong></span>
+        </div>
+      </section>
+
+      <section class="portfolio-strip" aria-label="Refund portfolio summary">
+        <article>
+          <span>Queue refund exposure</span>
+          <strong id="refundExposure">...</strong>
+          <small>Top-ranked held-out requests</small>
+        </article>
+        <article>
+          <span>Flagged loss exposure</span>
+          <strong id="flaggedLoss">...</strong>
+          <small>Conditional synthetic estimate</small>
+        </article>
+        <article>
+          <span>Verify-evidence cases</span>
+          <strong id="highRiskCases">...</strong>
+          <small>Above the evidence threshold</small>
+        </article>
+        <article>
+          <span>Manual-review threshold</span>
+          <strong id="activeThreshold">58</strong>
+          <small>Locked on validation</small>
+        </article>
+      </section>
+
+      <section id="caseworkView" class="view is-visible" aria-label="Casework view">
+        <div class="workbench">
+          <aside id="queue" class="queue-pane">
+            <div class="section-title queue-title">
+              <div>
+                <p>Incoming work</p>
+                <h2>Refund queue <span id="queueCount">0</span></h2>
+              </div>
+              <button id="sortBtn" class="square-button" type="button" aria-label="Reverse case order" title="Reverse case order">&#8645;</button>
+            </div>
+
+            <label class="search-control">
+              <span>Search</span>
+              <input id="caseSearch" type="search" placeholder="Case, merchant or customer" autocomplete="off" />
+              <kbd>/</kbd>
+            </label>
+
+            <div id="caseFilter" class="segmented" role="group" aria-label="Filter cases">
+              <button class="is-active" type="button" data-filter="all">All</button>
+              <button type="button" data-filter="Manual review">Review</button>
+              <button type="button" data-filter="Verify evidence">Verify</button>
+            </div>
+
+            <div class="queue-columns" aria-hidden="true">
+              <span>Case</span><span>Exposure</span><span>Ring risk</span>
+            </div>
+            <div id="caseList" class="case-list" aria-live="polite"></div>
+          </aside>
+
+          <article id="decision" class="case-pane">
+            <div class="case-toolbar">
+              <div>
+                <p id="caseMerchant">Merchant</p>
+                <h2 id="caseTitle">Loading case</h2>
+              </div>
+              <div class="case-toolbar-actions">
+                <button id="previousCase" class="square-button" type="button" aria-label="Previous case" title="Previous case">&#8592;</button>
+                <button id="nextCase" class="square-button" type="button" aria-label="Next case" title="Next case">&#8594;</button>
+              </div>
+            </div>
+
+            <section class="decision-stage" aria-label="Recommended decision">
+              <div class="score-column">
+                <span>Ring probability</span>
+                <strong id="scoreText">0</strong>
+                <div class="risk-scale" aria-hidden="true">
+                  <i id="scoreMarker"></i>
+                </div>
+                <small id="confidenceText">...</small>
+              </div>
+
+              <div class="decision-copy">
+                <div class="decision-labels">
+                  <span id="caseStatus" class="risk-label">...</span>
+                  <span id="caseReason">...</span>
+                </div>
+                <p>Recommended action</p>
+                <h3 id="actionText">...</h3>
+                <p id="caseNotes" class="decision-note">...</p>
+                <div class="decision-actions">
+                  <button id="acceptAction" class="primary-action" type="button">Accept recommendation</button>
+                  <button id="overrideAction" class="secondary-action" type="button">Send to analyst</button>
+                </div>
+              </div>
+
+              <dl class="case-facts">
+                <div><dt>Refund requested</dt><dd id="refundAmount">...</dd></div>
+                <div><dt>Loss if ring</dt><dd id="expectedLoss">...</dd></div>
+                <div><dt>Est. false-positive cost</dt><dd id="fpCost">...</dd></div>
+                <div><dt>Refund rail</dt><dd id="refundMethod">...</dd></div>
+              </dl>
+            </section>
+
+            <div class="case-grid">
+              <section id="evidence" class="evidence-section">
+                <div class="section-title">
+                  <div>
+                    <p>Model explanation</p>
+                    <h2>Directional log-odds contribution</h2>
+                  </div>
+                  <div class="evidence-key"><span class="risk-dot"></span>Risk <span class="relief-dot"></span>Relief</div>
+                </div>
+                <div class="evidence-axis" aria-hidden="true"><span>Lowers</span><i></i><span>Raises</span></div>
+                <div id="evidenceList" class="evidence-list"></div>
+              </section>
+
+              <aside class="context-section">
+                <div class="section-title">
+                  <div>
+                    <p>Relationship context</p>
+                    <h2>Entity exposure</h2>
+                  </div>
+                </div>
+                <div id="networkList" class="network-list"></div>
+                <div class="network-note">
+                  <span>Cluster interpretation</span>
+                  <p id="networkSummary">...</p>
+                </div>
+              </aside>
+            </div>
+
+            <section class="history-section">
+              <div class="section-title">
+                <div>
+                  <p>Case history</p>
+                  <h2>Decision trace</h2>
+                </div>
+                <span id="caseAge" class="text-meta">...</span>
+              </div>
+              <div id="timeline" class="timeline"></div>
+            </section>
+          </article>
+        </div>
+      </section>
+
+      <section id="portfolioView" class="view" aria-label="Portfolio view">
+        <div class="view-heading">
+          <p>Portfolio intelligence</p>
+          <h2>Where refund loss is concentrating</h2>
+        </div>
+        <div class="portfolio-layout">
+          <section class="portfolio-table-section">
+            <div class="section-title"><div><p>Merchant verticals</p><h2>Exposure by category</h2></div></div>
+            <div class="portfolio-table-head"><span>Vertical</span><span>Refund exposure</span><span>Flagged loss exposure</span></div>
+            <div id="verticalTable" class="portfolio-table"></div>
+          </section>
+          <section class="distribution-section">
+            <div class="section-title"><div><p>Queue composition</p><h2>Risk distribution</h2></div></div>
+            <div id="riskDistribution" class="risk-distribution"></div>
+            <div id="actionMix" class="action-mix"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="policyView" class="view" aria-label="Policy lab view">
+        <div class="view-heading policy-heading">
+          <div><p>Validation policy analysis</p><h2>Threshold trade-offs</h2></div>
+          <p>Scenarios use only the later validation window. The final test split is not used for threshold selection.</p>
+        </div>
+
+        <div class="threshold-control">
+          <span>Fewer reviews</span>
+          <div id="thresholdButtons" class="threshold-buttons" role="group" aria-label="Policy threshold"></div>
+          <span>More reviews</span>
+        </div>
+
+        <section class="policy-result">
+          <div class="policy-number"><span>Net synthetic value</span><strong id="policySavings">...</strong><small id="policyDelta">...</small></div>
+          <div id="metricCards" class="metric-cards"></div>
+        </section>
+
+        <section class="chart-section">
+          <div class="section-title"><div><p>Threshold curve</p><h2>Value after friction and review cost</h2></div><span class="text-meta">Later validation window</span></div>
+          <div class="chart-wrap"><canvas id="metricsChart" width="1180" height="360"></canvas></div>
+        </section>
+      </section>
+    </main>
+
+    <dialog id="packetDialog" class="packet-dialog">
+      <form method="dialog">
+        <div class="dialog-head">
+          <div><p>Analyst handoff</p><h2>Review packet</h2></div>
+          <button class="square-button" value="cancel" aria-label="Close review packet" title="Close">&#215;</button>
+        </div>
+        <div id="packetBody" class="packet-body"></div>
+        <div class="dialog-actions">
+          <button value="cancel" class="secondary-action">Close</button>
+          <button id="downloadPacket" value="cancel" class="primary-action">Download JSON</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="app.js?v=20260904-6"></script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+
+# Raw source datasets are staged temporarily and must not be committed.
+data/raw/
+data/staging/

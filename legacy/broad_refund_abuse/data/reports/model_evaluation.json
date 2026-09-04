@@ -1,0 +1,1998 @@
+{
+  "model_name": "regularized_logistic_regression",
+  "selection_rule": "Highest validation net benefit subject to minimum precision",
+  "minimum_validation_precision": 0.6,
+  "target": "abuse_label",
+  "features": [
+    "vertical",
+    "order_amount_inr",
+    "refund_amount_inr",
+    "refund_share",
+    "margin_amount_inr",
+    "freight_amount_inr",
+    "item_count",
+    "payment_method",
+    "payment_installments",
+    "refund_reason",
+    "refund_method",
+    "account_age_days",
+    "days_since_delivery",
+    "delivery_delay_days",
+    "review_score",
+    "lifetime_orders",
+    "lifetime_refunds",
+    "lifetime_refund_rate",
+    "merchant_baseline_return_rate",
+    "prior_disputes",
+    "support_contacts_30d",
+    "refund_velocity_24h",
+    "refund_velocity_7d",
+    "identity_velocity_percentile",
+    "session_length_minutes",
+    "foreign_request",
+    "device_distinct_emails_8w",
+    "shared_device_accounts_30d",
+    "shared_address_accounts_90d",
+    "shared_payment_accounts_30d",
+    "item_evidence_consistency",
+    "photo_metadata_consistency",
+    "package_weight_delta_pct",
+    "carrier_anomaly",
+    "tracking_status"
+  ],
+  "forbidden_features": [
+    "abuse_label",
+    "abuse_pattern",
+    "label_delay_days",
+    "expected_loss_if_abuse_inr",
+    "false_positive_cost_inr",
+    "latent_alert_score",
+    "ring_id",
+    "ring_size"
+  ],
+  "split_strategy": "Existing chronological train/validation/test split",
+  "evaluation": {
+    "validation": {
+      "rows": 11335,
+      "abuse_rate": 0.08734009704455227,
+      "pr_auc": 0.3426352970844954,
+      "roc_auc": 0.7487477969643267,
+      "brier_score": 0.06822063783476642,
+      "threshold": 0.3820901750212084,
+      "precision": 0.6019900497512438,
+      "recall": 0.24444444444444444,
+      "flag_rate": 0.035465372739303044,
+      "confusion_matrix": {
+        "tn": 10185,
+        "fp": 160,
+        "fn": 748,
+        "tp": 242
+      },
+      "costs": {
+        "prevented_loss_inr": 866249.0,
+        "false_positive_cost_inr": 63009.0,
+        "missed_abuse_loss_inr": 2613184.0,
+        "net_benefit_inr": 803240.0
+      }
+    },
+    "test": {
+      "rows": 11078,
+      "abuse_rate": 0.0906300776313414,
+      "pr_auc": 0.4003575915121531,
+      "roc_auc": 0.7535740500376892,
+      "brier_score": 0.06694516781096811,
+      "threshold": 0.3820901750212084,
+      "precision": 0.656641604010025,
+      "recall": 0.26095617529880477,
+      "flag_rate": 0.036017331648311966,
+      "confusion_matrix": {
+        "tn": 9937,
+        "fp": 137,
+        "fn": 742,
+        "tp": 262
+      },
+      "costs": {
+        "prevented_loss_inr": 906001.0,
+        "false_positive_cost_inr": 52311.0,
+        "missed_abuse_loss_inr": 2499441.0,
+        "net_benefit_inr": 853690.0
+      }
+    },
+    "threshold_curve": [
+      {
+        "threshold": 0.988579850807553,
+        "precision": 1.0,
+        "recall": 0.00101010101010101,
+        "flag_rate": 8.82223202470225e-05,
+        "net_benefit_inr": 1198.0
+      },
+      {
+        "threshold": 0.7423799084724765,
+        "precision": 0.6578947368421053,
+        "recall": 0.07575757575757576,
+        "flag_rate": 0.010057344508160565,
+        "net_benefit_inr": 265450.0
+      },
+      {
+        "threshold": 0.5806113573623332,
+        "precision": 0.6299559471365639,
+        "recall": 0.14444444444444443,
+        "flag_rate": 0.020026466696074108,
+        "net_benefit_inr": 466863.0
+      },
+      {
+        "threshold": 0.450780195604665,
+        "precision": 0.6187683284457478,
+        "recall": 0.21313131313131314,
+        "flag_rate": 0.030083811204234673,
+        "net_benefit_inr": 686074.0
+      },
+      {
+        "threshold": 0.3431290497109561,
+        "precision": 0.5682819383259912,
+        "recall": 0.2606060606060606,
+        "flag_rate": 0.040052933392148216,
+        "net_benefit_inr": 840905.0
+      },
+      {
+        "threshold": 0.2696125581368349,
+        "precision": 0.5114638447971781,
+        "recall": 0.29292929292929293,
+        "flag_rate": 0.05002205558006176,
+        "net_benefit_inr": 920380.0
+      },
+      {
+        "threshold": 0.23504452302211898,
+        "precision": 0.461086637298091,
+        "recall": 0.31717171717171716,
+        "flag_rate": 0.06007940008822232,
+        "net_benefit_inr": 957134.0
+      },
+      {
+        "threshold": 0.2103189253945779,
+        "precision": 0.43198992443324935,
+        "recall": 0.3464646464646465,
+        "flag_rate": 0.07004852227613587,
+        "net_benefit_inr": 1043659.0
+      },
+      {
+        "threshold": 0.18975509719802675,
+        "precision": 0.3980154355016538,
+        "recall": 0.36464646464646466,
+        "flag_rate": 0.08001764446404941,
+        "net_benefit_inr": 1082815.0
+      },
+      {
+        "threshold": 0.17418278632219705,
+        "precision": 0.3594515181194907,
+        "recall": 0.3707070707070707,
+        "flag_rate": 0.09007498897220997,
+        "net_benefit_inr": 1052601.0
+      },
+      {
+        "threshold": 0.16171386132398866,
+        "precision": 0.3377425044091711,
+        "recall": 0.38686868686868686,
+        "flag_rate": 0.10004411116012352,
+        "net_benefit_inr": 1098269.0
+      },
+      {
+        "threshold": 0.1529370647414372,
+        "precision": 0.3191659983961508,
+        "recall": 0.402020202020202,
+        "flag_rate": 0.11001323334803706,
+        "net_benefit_inr": 1100464.0
+      },
+      {
+        "threshold": 0.14562899514240465,
+        "precision": 0.3085966201322557,
+        "recall": 0.42424242424242425,
+        "flag_rate": 0.12007057785619762,
+        "net_benefit_inr": 1152333.0
+      },
+      {
+        "threshold": 0.13890964863666125,
+        "precision": 0.2937584803256445,
+        "recall": 0.43737373737373736,
+        "flag_rate": 0.13003970004411117,
+        "net_benefit_inr": 1155485.0
+      },
+      {
+        "threshold": 0.13336497926329308,
+        "precision": 0.28166351606805295,
+        "recall": 0.45151515151515154,
+        "flag_rate": 0.1400088222320247,
+        "net_benefit_inr": 1159859.0
+      },
+      {
+        "threshold": 0.12707084076375677,
+        "precision": 0.27336860670194,
+        "recall": 0.4696969696969697,
+        "flag_rate": 0.15006616674018528,
+        "net_benefit_inr": 1190197.0
+      },
+      {
+        "threshold": 0.1214326729750049,
+        "precision": 0.2624035281146637,
+        "recall": 0.4808080808080808,
+        "flag_rate": 0.16003528892809882,
+        "net_benefit_inr": 1218839.0
+      },
+      {
+        "threshold": 0.11691300705342411,
+        "precision": 0.2511676180591593,
+        "recall": 0.4888888888888889,
+        "flag_rate": 0.17000441111601236,
+        "net_benefit_inr": 1177832.0
+      },
+      {
+        "threshold": 0.11238747745037815,
+        "precision": 0.24154826065654092,
+        "recall": 0.49797979797979797,
+        "flag_rate": 0.18006175562417293,
+        "net_benefit_inr": 1186854.0
+      },
+      {
+        "threshold": 0.10863345130333504,
+        "precision": 0.23769730733519034,
+        "recall": 0.5171717171717172,
+        "flag_rate": 0.19003087781208647,
+        "net_benefit_inr": 1214910.0
+      },
+      {
+        "threshold": 0.10492584183005624,
+        "precision": 0.23026025584472873,
+        "recall": 0.5272727272727272,
+        "flag_rate": 0.2,
+        "net_benefit_inr": 1203667.0
+      },
+      {
+        "threshold": 0.10201887390606336,
+        "precision": 0.2246955060898782,
+        "recall": 0.5404040404040404,
+        "flag_rate": 0.21005734450816058,
+        "net_benefit_inr": 1201836.0
+      },
+      {
+        "threshold": 0.09889492081645516,
+        "precision": 0.21892542101042503,
+        "recall": 0.5515151515151515,
+        "flag_rate": 0.22002646669607412,
+        "net_benefit_inr": 1225386.0
+      },
+      {
+        "threshold": 0.09615139031673733,
+        "precision": 0.2155734560797852,
+        "recall": 0.5676767676767677,
+        "flag_rate": 0.22999558888398766,
+        "net_benefit_inr": 1251662.0
+      },
+      {
+        "threshold": 0.09331723563177054,
+        "precision": 0.21131936787945607,
+        "recall": 0.5808080808080808,
+        "flag_rate": 0.24005293339214823,
+        "net_benefit_inr": 1273412.0
+      },
+      {
+        "threshold": 0.09083133587430413,
+        "precision": 0.20465772759350742,
+        "recall": 0.5858585858585859,
+        "flag_rate": 0.25002205558006174,
+        "net_benefit_inr": 1242778.0
+      },
+      {
+        "threshold": 0.08872709182012556,
+        "precision": 0.20190023752969122,
+        "recall": 0.601010101010101,
+        "flag_rate": 0.2599911777679753,
+        "net_benefit_inr": 1263175.0
+      },
+      {
+        "threshold": 0.08658102869970721,
+        "precision": 0.19699444625939236,
+        "recall": 0.6090909090909091,
+        "flag_rate": 0.27004852227613585,
+        "net_benefit_inr": 1244557.0
+      },
+      {
+        "threshold": 0.08478089250330097,
+        "precision": 0.19124133585381223,
+        "recall": 0.6131313131313131,
+        "flag_rate": 0.2800176444640494,
+        "net_benefit_inr": 1210416.0
+      },
+      {
+        "threshold": 0.083006141204788,
+        "precision": 0.18801338606632187,
+        "recall": 0.6242424242424243,
+        "flag_rate": 0.28998676665196294,
+        "net_benefit_inr": 1216097.0
+      },
+      {
+        "threshold": 0.08129210878984237,
+        "precision": 0.18376947956483386,
+        "recall": 0.6313131313131313,
+        "flag_rate": 0.30004411116012353,
+        "net_benefit_inr": 1195818.0
+      },
+      {
+        "threshold": 0.07959675233742518,
+        "precision": 0.1807057484348321,
+        "recall": 0.6414141414141414,
+        "flag_rate": 0.31001323334803704,
+        "net_benefit_inr": 1178401.0
+      },
+      {
+        "threshold": 0.07795404772774542,
+        "precision": 0.17700578990901572,
+        "recall": 0.6484848484848484,
+        "flag_rate": 0.3199823555359506,
+        "net_benefit_inr": 1161731.0
+      },
+      {
+        "threshold": 0.07617768664301053,
+        "precision": 0.17455225875434377,
+        "recall": 0.6595959595959596,
+        "flag_rate": 0.33003970004411115,
+        "net_benefit_inr": 1167769.0
+      },
+      {
+        "threshold": 0.07446677799841264,
+        "precision": 0.17099117799688635,
+        "recall": 0.6656565656565656,
+        "flag_rate": 0.3400088222320247,
+        "net_benefit_inr": 1155920.0
+      },
+      {
+        "threshold": 0.07318211742280836,
+        "precision": 0.1688933703050164,
+        "recall": 0.6767676767676768,
+        "flag_rate": 0.34997794441993824,
+        "net_benefit_inr": 1146396.0
+      },
+      {
+        "threshold": 0.07172354909147108,
+        "precision": 0.16687086498407253,
+        "recall": 0.6878787878787879,
+        "flag_rate": 0.36003528892809883,
+        "net_benefit_inr": 1131313.0
+      },
+      {
+        "threshold": 0.0705216486713948,
+        "precision": 0.1642823080591321,
+        "recall": 0.695959595959596,
+        "flag_rate": 0.37000441111601234,
+        "net_benefit_inr": 1146903.0
+      },
+      {
+        "threshold": 0.06920381579869728,
+        "precision": 0.1609008590666357,
+        "recall": 0.7,
+        "flag_rate": 0.3799735333039259,
+        "net_benefit_inr": 1114581.0
+      },
+      {
+        "threshold": 0.06791209306166845,
+        "precision": 0.15856141144537436,
+        "recall": 0.7080808080808081,
+        "flag_rate": 0.39003087781208645,
+        "net_benefit_inr": 1120880.0
+      },
+      {
+        "threshold": 0.0666031904557283,
+        "precision": 0.15637406263784737,
+        "recall": 0.7161616161616161,
+        "flag_rate": 0.4,
+        "net_benefit_inr": 1115051.0
+      },
+      {
+        "threshold": 0.06536387695941563,
+        "precision": 0.15450828491499893,
+        "recall": 0.7252525252525253,
+        "flag_rate": 0.40996912218791354,
+        "net_benefit_inr": 1105030.0
+      },
+      {
+        "threshold": 0.06421182637479671,
+        "precision": 0.15206889308968705,
+        "recall": 0.7313131313131314,
+        "flag_rate": 0.42002646669607413,
+        "net_benefit_inr": 1086321.0
+      },
+      {
+        "threshold": 0.06309271657617675,
+        "precision": 0.15038982355354943,
+        "recall": 0.7404040404040404,
+        "flag_rate": 0.42999558888398765,
+        "net_benefit_inr": 1080285.0
+      },
+      {
+        "threshold": 0.062007800955049645,
+        "precision": 0.1481852817325045,
+        "recall": 0.7464646464646465,
+        "flag_rate": 0.4399647110719012,
+        "net_benefit_inr": 1058604.0
+      },
+      {
+        "threshold": 0.06096448728488677,
+        "precision": 0.14585375416584984,
+        "recall": 0.7515151515151515,
+        "flag_rate": 0.45002205558006175,
+        "net_benefit_inr": 1023716.0
+      },
+      {
+        "threshold": 0.05992757396882975,
+        "precision": 0.14288454161871883,
+        "recall": 0.7525252525252525,
+        "flag_rate": 0.4599911777679753,
+        "net_benefit_inr": 980964.0
+      },
+      {
+        "threshold": 0.05910346196369604,
+        "precision": 0.14041674488455042,
+        "recall": 0.7555555555555555,
+        "flag_rate": 0.46996029995588884,
+        "net_benefit_inr": 947214.0
+      },
+      {
+        "threshold": 0.05797895782363525,
+        "precision": 0.13857746737732035,
+        "recall": 0.7616161616161616,
+        "flag_rate": 0.48001764446404943,
+        "net_benefit_inr": 922578.0
+      },
+      {
+        "threshold": 0.05705698295196046,
+        "precision": 0.13665826431400793,
+        "recall": 0.7666666666666667,
+        "flag_rate": 0.48998676665196295,
+        "net_benefit_inr": 903271.0
+      },
+      {
+        "threshold": 0.05604156050423171,
+        "precision": 0.13585038814396613,
+        "recall": 0.7777777777777778,
+        "flag_rate": 0.5000441111601235,
+        "net_benefit_inr": 881054.0
+      },
+      {
+        "threshold": 0.05510441812646043,
+        "precision": 0.13423283169001904,
+        "recall": 0.7838383838383839,
+        "flag_rate": 0.510013233348037,
+        "net_benefit_inr": 870727.0
+      },
+      {
+        "threshold": 0.054202120236255195,
+        "precision": 0.1330166270783848,
+        "recall": 0.7919191919191919,
+        "flag_rate": 0.5199823555359506,
+        "net_benefit_inr": 867350.0
+      },
+      {
+        "threshold": 0.05334100431515702,
+        "precision": 0.1311584553928096,
+        "recall": 0.795959595959596,
+        "flag_rate": 0.5300397000441112,
+        "net_benefit_inr": 837233.0
+      },
+      {
+        "threshold": 0.05256898539121123,
+        "precision": 0.12955399444535207,
+        "recall": 0.8010101010101011,
+        "flag_rate": 0.5400088222320247,
+        "net_benefit_inr": 819727.0
+      },
+      {
+        "threshold": 0.051767314488429424,
+        "precision": 0.12848893166506256,
+        "recall": 0.8090909090909091,
+        "flag_rate": 0.5499779444199382,
+        "net_benefit_inr": 798328.0
+      },
+      {
+        "threshold": 0.05092345312926112,
+        "precision": 0.1266540642722117,
+        "recall": 0.8121212121212121,
+        "flag_rate": 0.5600352889280988,
+        "net_benefit_inr": 776107.0
+      },
+      {
+        "threshold": 0.050071650169242136,
+        "precision": 0.12552236495898467,
+        "recall": 0.8191919191919191,
+        "flag_rate": 0.5700044111160123,
+        "net_benefit_inr": 761917.0
+      },
+      {
+        "threshold": 0.0493294463634961,
+        "precision": 0.12488591420748403,
+        "recall": 0.8292929292929293,
+        "flag_rate": 0.5799735333039259,
+        "net_benefit_inr": 759977.0
+      },
+      {
+        "threshold": 0.04857480900055299,
+        "precision": 0.12335526315789473,
+        "recall": 0.8333333333333334,
+        "flag_rate": 0.5900308778120864,
+        "net_benefit_inr": 726907.0
+      },
+      {
+        "threshold": 0.04796708377956208,
+        "precision": 0.12233495074253786,
+        "recall": 0.8404040404040404,
+        "flag_rate": 0.6,
+        "net_benefit_inr": 714498.0
+      },
+      {
+        "threshold": 0.04736183688049997,
+        "precision": 0.12192652588949957,
+        "recall": 0.8515151515151516,
+        "flag_rate": 0.6099691221879135,
+        "net_benefit_inr": 711844.0
+      },
+      {
+        "threshold": 0.04664210694943641,
+        "precision": 0.12066021627774616,
+        "recall": 0.8565656565656565,
+        "flag_rate": 0.6200264666960741,
+        "net_benefit_inr": 690107.0
+      },
+      {
+        "threshold": 0.04583863878871928,
+        "precision": 0.11931102086542501,
+        "recall": 0.8606060606060606,
+        "flag_rate": 0.6299955888839877,
+        "net_benefit_inr": 665863.0
+      },
+      {
+        "threshold": 0.045108704114613055,
+        "precision": 0.11786600496277916,
+        "recall": 0.8636363636363636,
+        "flag_rate": 0.6399647110719012,
+        "net_benefit_inr": 641959.0
+      },
+      {
+        "threshold": 0.044488105013759736,
+        "precision": 0.11685667752442996,
+        "recall": 0.8696969696969697,
+        "flag_rate": 0.6500220555800618,
+        "net_benefit_inr": 628343.0
+      },
+      {
+        "threshold": 0.04378873447373372,
+        "precision": 0.11642828498863789,
+        "recall": 0.8797979797979798,
+        "flag_rate": 0.6599911777679753,
+        "net_benefit_inr": 617888.0
+      },
+      {
+        "threshold": 0.04313336050759804,
+        "precision": 0.11548590992889123,
+        "recall": 0.8858585858585859,
+        "flag_rate": 0.6699602999558888,
+        "net_benefit_inr": 596953.0
+      },
+      {
+        "threshold": 0.04243440876662732,
+        "precision": 0.1139076284379865,
+        "recall": 0.8868686868686869,
+        "flag_rate": 0.6800176444640494,
+        "net_benefit_inr": 563768.0
+      },
+      {
+        "threshold": 0.04176776289859697,
+        "precision": 0.11277330264672036,
+        "recall": 0.8909090909090909,
+        "flag_rate": 0.6899867666519629,
+        "net_benefit_inr": 549289.0
+      },
+      {
+        "threshold": 0.04116336437938963,
+        "precision": 0.11179732795563398,
+        "recall": 0.895959595959596,
+        "flag_rate": 0.6999558888398765,
+        "net_benefit_inr": 526734.0
+      },
+      {
+        "threshold": 0.040502204180285384,
+        "precision": 0.11071073558648112,
+        "recall": 0.9,
+        "flag_rate": 0.710013233348037,
+        "net_benefit_inr": 502338.0
+      },
+      {
+        "threshold": 0.03986439081973421,
+        "precision": 0.10942286484499449,
+        "recall": 0.902020202020202,
+        "flag_rate": 0.7199823555359506,
+        "net_benefit_inr": 482202.0
+      },
+      {
+        "threshold": 0.03936647088550089,
+        "precision": 0.10865361372975586,
+        "recall": 0.908080808080808,
+        "flag_rate": 0.7299514777238642,
+        "net_benefit_inr": 482104.0
+      },
+      {
+        "threshold": 0.0387392797873042,
+        "precision": 0.10777300906056271,
+        "recall": 0.9131313131313131,
+        "flag_rate": 0.7400088222320247,
+        "net_benefit_inr": 460478.0
+      },
+      {
+        "threshold": 0.038013129954256625,
+        "precision": 0.10692859663568992,
+        "recall": 0.9181818181818182,
+        "flag_rate": 0.7499779444199383,
+        "net_benefit_inr": 455577.0
+      },
+      {
+        "threshold": 0.03739871230896631,
+        "precision": 0.10587415834687718,
+        "recall": 0.9212121212121213,
+        "flag_rate": 0.7599470666078518,
+        "net_benefit_inr": 444657.0
+      },
+      {
+        "threshold": 0.03687894618390069,
+        "precision": 0.10460586617781852,
+        "recall": 0.9222222222222223,
+        "flag_rate": 0.7700044111160124,
+        "net_benefit_inr": 416119.0
+      },
+      {
+        "threshold": 0.036328816005316136,
+        "precision": 0.10394751724917996,
+        "recall": 0.9282828282828283,
+        "flag_rate": 0.7799735333039259,
+        "net_benefit_inr": 400727.0
+      },
+      {
+        "threshold": 0.035777973221058,
+        "precision": 0.10308242126423944,
+        "recall": 0.9323232323232323,
+        "flag_rate": 0.7899426554918394,
+        "net_benefit_inr": 380976.0
+      },
+      {
+        "threshold": 0.03519068093651385,
+        "precision": 0.10211733568592854,
+        "recall": 0.9353535353535354,
+        "flag_rate": 0.8,
+        "net_benefit_inr": 356939.0
+      },
+      {
+        "threshold": 0.03454907265022538,
+        "precision": 0.10140507569981483,
+        "recall": 0.9404040404040404,
+        "flag_rate": 0.8099691221879135,
+        "net_benefit_inr": 342426.0
+      },
+      {
+        "threshold": 0.033915888979482146,
+        "precision": 0.10017215407789971,
+        "recall": 0.9404040404040404,
+        "flag_rate": 0.8199382443758271,
+        "net_benefit_inr": 314533.0
+      },
+      {
+        "threshold": 0.03332591185221204,
+        "precision": 0.09938350340136054,
+        "recall": 0.9444444444444444,
+        "flag_rate": 0.8299955888839876,
+        "net_benefit_inr": 299185.0
+      },
+      {
+        "threshold": 0.032621786341983004,
+        "precision": 0.09851906312362146,
+        "recall": 0.9474747474747475,
+        "flag_rate": 0.8399647110719012,
+        "net_benefit_inr": 276201.0
+      },
+      {
+        "threshold": 0.03208420321288342,
+        "precision": 0.0976749013909072,
+        "recall": 0.9505050505050505,
+        "flag_rate": 0.8499338332598148,
+        "net_benefit_inr": 254287.0
+      },
+      {
+        "threshold": 0.03142518860285583,
+        "precision": 0.09714813295034878,
+        "recall": 0.9565656565656566,
+        "flag_rate": 0.8599911777679753,
+        "net_benefit_inr": 243237.0
+      },
+      {
+        "threshold": 0.030716340065295635,
+        "precision": 0.09633911368015415,
+        "recall": 0.9595959595959596,
+        "flag_rate": 0.8699602999558889,
+        "net_benefit_inr": 219774.0
+      },
+      {
+        "threshold": 0.029895246702047098,
+        "precision": 0.09564868658512131,
+        "recall": 0.9636363636363636,
+        "flag_rate": 0.8799294221438024,
+        "net_benefit_inr": 199356.0
+      },
+      {
+        "threshold": 0.029142091776229114,
+        "precision": 0.09486518636003172,
+        "recall": 0.9666666666666667,
+        "flag_rate": 0.889986766651963,
+        "net_benefit_inr": 177252.0
+      },
+      {
+        "threshold": 0.02839444520741922,
+        "precision": 0.09450053916282718,
+        "recall": 0.9737373737373738,
+        "flag_rate": 0.8999558888398765,
+        "net_benefit_inr": 167641.0
+      },
+      {
+        "threshold": 0.027688967569780815,
+        "precision": 0.09433779329067288,
+        "recall": 0.9828282828282828,
+        "flag_rate": 0.90992501102779,
+        "net_benefit_inr": 155344.0
+      },
+      {
+        "threshold": 0.026845416141902893,
+        "precision": 0.09369006520905256,
+        "recall": 0.9868686868686869,
+        "flag_rate": 0.9199823555359506,
+        "net_benefit_inr": 136054.0
+      },
+      {
+        "threshold": 0.025753613475606833,
+        "precision": 0.09297030642254056,
+        "recall": 0.98989898989899,
+        "flag_rate": 0.9299514777238641,
+        "net_benefit_inr": 117649.0
+      },
+      {
+        "threshold": 0.024616639116020963,
+        "precision": 0.09226581565609161,
+        "recall": 0.9929292929292929,
+        "flag_rate": 0.9399205999117777,
+        "net_benefit_inr": 94393.0
+      },
+      {
+        "threshold": 0.023284728410671248,
+        "precision": 0.09147473997028231,
+        "recall": 0.9949494949494949,
+        "flag_rate": 0.9499779444199382,
+        "net_benefit_inr": 70732.0
+      },
+      {
+        "threshold": 0.022100712680279137,
+        "precision": 0.09061667126183255,
+        "recall": 0.9959595959595959,
+        "flag_rate": 0.9599470666078518,
+        "net_benefit_inr": 45680.0
+      },
+      {
+        "threshold": 0.020588029819992675,
+        "precision": 0.08968528288157177,
+        "recall": 0.9959595959595959,
+        "flag_rate": 0.9699161887957654,
+        "net_benefit_inr": 15021.0
+      },
+      {
+        "threshold": 0.01881517745754531,
+        "precision": 0.0890349297803385,
+        "recall": 0.998989898989899,
+        "flag_rate": 0.9799735333039259,
+        "net_benefit_inr": 4046.0
+      },
+      {
+        "threshold": 0.015787666680492682,
+        "precision": 0.08813831209339631,
+        "recall": 0.998989898989899,
+        "flag_rate": 0.9899426554918395,
+        "net_benefit_inr": -22947.0
+      },
+      {
+        "threshold": 0.007702205880270759,
+        "precision": 0.08734009704455227,
+        "recall": 1.0,
+        "flag_rate": 1.0,
+        "net_benefit_inr": -46622.0
+      }
+    ]
+  },
+  "bootstrap_95pct_ci_test": {
+    "precision": [
+      0.6151673546302943,
+      0.7048312427604706
+    ],
+    "recall": [
+      0.23332367252302266,
+      0.28629686306102786
+    ],
+    "pr_auc": [
+      0.3687532947843534,
+      0.43402016636666707
+    ],
+    "net_benefit_inr": [
+      703530.425,
+      1009712.575
+    ]
+  },
+  "calibration_test": [
+    {
+      "cases": 1108,
+      "mean_score": 0.02302903377763496,
+      "observed_abuse_rate": 0.02256317689530686
+    },
+    {
+      "cases": 1108,
+      "mean_score": 0.03236008134989667,
+      "observed_abuse_rate": 0.036101083032490974
+    },
+    {
+      "cases": 1108,
+      "mean_score": 0.038383429200263004,
+      "observed_abuse_rate": 0.04693140794223827
+    },
+    {
+      "cases": 1107,
+      "mean_score": 0.04447750822043064,
+      "observed_abuse_rate": 0.03884372177055104
+    },
+    {
+      "cases": 1108,
+      "mean_score": 0.051782556141952596,
+      "observed_abuse_rate": 0.052346570397111915
+    },
+    {
+      "cases": 1108,
+      "mean_score": 0.06124269883975219,
+      "observed_abuse_rate": 0.06046931407942238
+    },
+    {
+      "cases": 1107,
+      "mean_score": 0.07335748451218395,
+      "observed_abuse_rate": 0.07226738934056007
+    },
+    {
+      "cases": 1108,
+      "mean_score": 0.09194851115262649,
+      "observed_abuse_rate": 0.09115523465703972
+    },
+    {
+      "cases": 1108,
+      "mean_score": 0.1286686715656899,
+      "observed_abuse_rate": 0.11371841155234658
+    },
+    {
+      "cases": 1108,
+      "mean_score": 0.3798784262293645,
+      "observed_abuse_rate": 0.37184115523465705
+    }
+  ],
+  "top_coefficients": [
+    {
+      "feature": "categorical__refund_method_manual_bank_transfer",
+      "coefficient": -0.38683999940967917,
+      "absolute_coefficient": 0.38683999940967917
+    },
+    {
+      "feature": "categorical__refund_method_store_credit",
+      "coefficient": -0.3619585677067389,
+      "absolute_coefficient": 0.3619585677067389
+    },
+    {
+      "feature": "categorical__tracking_status_delivered",
+      "coefficient": -0.35090988451481614,
+      "absolute_coefficient": 0.35090988451481614
+    },
+    {
+      "feature": "numeric__lifetime_refund_rate",
+      "coefficient": 0.3498305225983365,
+      "absolute_coefficient": 0.3498305225983365
+    },
+    {
+      "feature": "categorical__vertical_fashion",
+      "coefficient": -0.3367233215014667,
+      "absolute_coefficient": 0.3367233215014667
+    },
+    {
+      "feature": "categorical__tracking_status_return_received",
+      "coefficient": -0.3209479962462398,
+      "absolute_coefficient": 0.3209479962462398
+    },
+    {
+      "feature": "categorical__refund_reason_late_delivery",
+      "coefficient": -0.31683013526346676,
+      "absolute_coefficient": 0.31683013526346676
+    },
+    {
+      "feature": "categorical__refund_reason_wrong_item",
+      "coefficient": -0.30733411615133976,
+      "absolute_coefficient": 0.30733411615133976
+    },
+    {
+      "feature": "categorical__tracking_status_return_in_transit",
+      "coefficient": -0.293414768600614,
+      "absolute_coefficient": 0.293414768600614
+    },
+    {
+      "feature": "categorical__refund_method_original_rail",
+      "coefficient": -0.2892417050206789,
+      "absolute_coefficient": 0.2892417050206789
+    },
+    {
+      "feature": "categorical__payment_method_netbanking",
+      "coefficient": -0.2874444130523448,
+      "absolute_coefficient": 0.2874444130523448
+    },
+    {
+      "feature": "categorical__refund_reason_damaged",
+      "coefficient": -0.28682244794237405,
+      "absolute_coefficient": 0.28682244794237405
+    },
+    {
+      "feature": "categorical__refund_method_instant_refund",
+      "coefficient": -0.2863530902301139,
+      "absolute_coefficient": 0.2863530902301139
+    },
+    {
+      "feature": "numeric__refund_velocity_24h",
+      "coefficient": 0.2807714275903601,
+      "absolute_coefficient": 0.2807714275903601
+    },
+    {
+      "feature": "categorical__vertical_sports",
+      "coefficient": -0.26566642738502966,
+      "absolute_coefficient": 0.26566642738502966
+    },
+    {
+      "feature": "categorical__payment_method_wallet",
+      "coefficient": -0.26337431889345303,
+      "absolute_coefficient": 0.26337431889345303
+    },
+    {
+      "feature": "categorical__payment_method_upi",
+      "coefficient": -0.26092651281084694,
+      "absolute_coefficient": 0.26092651281084694
+    },
+    {
+      "feature": "categorical__payment_method_cod",
+      "coefficient": -0.2571388362491042,
+      "absolute_coefficient": 0.2571388362491042
+    },
+    {
+      "feature": "categorical__payment_method_card",
+      "coefficient": -0.2555092813614612,
+      "absolute_coefficient": 0.2555092813614612
+    },
+    {
+      "feature": "numeric__refund_amount_inr",
+      "coefficient": 0.25153784804970714,
+      "absolute_coefficient": 0.25153784804970714
+    },
+    {
+      "feature": "numeric__carrier_anomaly",
+      "coefficient": -0.24927108838101933,
+      "absolute_coefficient": 0.24927108838101933
+    },
+    {
+      "feature": "numeric__refund_velocity_7d",
+      "coefficient": 0.24751955489915695,
+      "absolute_coefficient": 0.24751955489915695
+    },
+    {
+      "feature": "categorical__refund_reason_empty_box",
+      "coefficient": 0.23732736169655966,
+      "absolute_coefficient": 0.23732736169655966
+    },
+    {
+      "feature": "categorical__refund_reason_not_as_described",
+      "coefficient": -0.2207902457903865,
+      "absolute_coefficient": 0.2207902457903865
+    },
+    {
+      "feature": "categorical__vertical_beauty",
+      "coefficient": -0.2153370563065242,
+      "absolute_coefficient": 0.2153370563065242
+    },
+    {
+      "feature": "categorical__vertical_home",
+      "coefficient": -0.2068327965849659,
+      "absolute_coefficient": 0.2068327965849659
+    },
+    {
+      "feature": "numeric__prior_disputes",
+      "coefficient": 0.20375463383264372,
+      "absolute_coefficient": 0.20375463383264372
+    },
+    {
+      "feature": "categorical__vertical_electronics",
+      "coefficient": -0.19681591383760566,
+      "absolute_coefficient": 0.19681591383760566
+    },
+    {
+      "feature": "categorical__tracking_status_carrier_exception",
+      "coefficient": -0.19561096358196392,
+      "absolute_coefficient": 0.19561096358196392
+    },
+    {
+      "feature": "categorical__refund_reason_changed_mind",
+      "coefficient": -0.17558822282509434,
+      "absolute_coefficient": 0.17558822282509434
+    },
+    {
+      "feature": "categorical__refund_reason_size_fit",
+      "coefficient": -0.1697866353401857,
+      "absolute_coefficient": 0.1697866353401857
+    },
+    {
+      "feature": "categorical__tracking_status_delivered_unverified",
+      "coefficient": -0.16350974942357765,
+      "absolute_coefficient": 0.16350974942357765
+    },
+    {
+      "feature": "numeric__order_amount_inr",
+      "coefficient": -0.16310638508511027,
+      "absolute_coefficient": 0.16310638508511027
+    },
+    {
+      "feature": "numeric__shared_address_accounts_90d",
+      "coefficient": 0.14927529249491778,
+      "absolute_coefficient": 0.14927529249491778
+    },
+    {
+      "feature": "categorical__refund_reason_duplicate_order",
+      "coefficient": -0.14915986655148147,
+      "absolute_coefficient": 0.14915986655148147
+    },
+    {
+      "feature": "numeric__shared_device_accounts_30d",
+      "coefficient": 0.1318284308624311,
+      "absolute_coefficient": 0.1318284308624311
+    },
+    {
+      "feature": "numeric__account_age_days",
+      "coefficient": -0.11663416072013548,
+      "absolute_coefficient": 0.11663416072013548
+    },
+    {
+      "feature": "numeric__refund_share",
+      "coefficient": 0.10931962031100538,
+      "absolute_coefficient": 0.10931962031100538
+    },
+    {
+      "feature": "categorical__vertical_general",
+      "coefficient": -0.10301784675161953,
+      "absolute_coefficient": 0.10301784675161953
+    },
+    {
+      "feature": "numeric__identity_velocity_percentile",
+      "coefficient": 0.08610374371036561,
+      "absolute_coefficient": 0.08610374371036561
+    }
+  ],
+  "ablations": {
+    "behaviour_only": {
+      "feature_count": 27,
+      "validation": {
+        "rows": 11335,
+        "abuse_rate": 0.08734009704455227,
+        "pr_auc": 0.3098308563202019,
+        "roc_auc": 0.7371305124712568,
+        "brier_score": 0.06999014555761293,
+        "threshold": 0.3995090614582599,
+        "precision": 0.6025641025641025,
+        "recall": 0.1898989898989899,
+        "flag_rate": 0.02752536391707102,
+        "confusion_matrix": {
+          "tn": 10221,
+          "fp": 124,
+          "fn": 802,
+          "tp": 188
+        },
+        "costs": {
+          "prevented_loss_inr": 749674.0,
+          "false_positive_cost_inr": 50768.0,
+          "missed_abuse_loss_inr": 2729759.0,
+          "net_benefit_inr": 698906.0
+        }
+      },
+      "test": {
+        "rows": 11078,
+        "abuse_rate": 0.0906300776313414,
+        "pr_auc": 0.3624593034936691,
+        "roc_auc": 0.740380546505659,
+        "brier_score": 0.06987993170682255,
+        "threshold": 0.3995090614582599,
+        "precision": 0.6518518518518519,
+        "recall": 0.1752988047808765,
+        "flag_rate": 0.024372630438707348,
+        "confusion_matrix": {
+          "tn": 9980,
+          "fp": 94,
+          "fn": 828,
+          "tp": 176
+        },
+        "costs": {
+          "prevented_loss_inr": 677217.0,
+          "false_positive_cost_inr": 34269.0,
+          "missed_abuse_loss_inr": 2728225.0,
+          "net_benefit_inr": 642948.0
+        }
+      }
+    },
+    "behaviour_plus_evidence": {
+      "feature_count": 32,
+      "validation": {
+        "rows": 11335,
+        "abuse_rate": 0.08734009704455227,
+        "pr_auc": 0.31144747160054725,
+        "roc_auc": 0.7390646923561375,
+        "brier_score": 0.06987937733427253,
+        "threshold": 0.4168083033459688,
+        "precision": 0.603448275862069,
+        "recall": 0.17676767676767677,
+        "flag_rate": 0.025584472871636524,
+        "confusion_matrix": {
+          "tn": 10230,
+          "fp": 115,
+          "fn": 815,
+          "tp": 175
+        },
+        "costs": {
+          "prevented_loss_inr": 672657.0,
+          "false_positive_cost_inr": 48142.0,
+          "missed_abuse_loss_inr": 2806776.0,
+          "net_benefit_inr": 624515.0
+        }
+      },
+      "test": {
+        "rows": 11078,
+        "abuse_rate": 0.0906300776313414,
+        "pr_auc": 0.36490676867002936,
+        "roc_auc": 0.7452561206434931,
+        "brier_score": 0.06973891201516853,
+        "threshold": 0.4168083033459688,
+        "precision": 0.6614785992217899,
+        "recall": 0.1693227091633466,
+        "flag_rate": 0.0231991334175844,
+        "confusion_matrix": {
+          "tn": 9987,
+          "fp": 87,
+          "fn": 834,
+          "tp": 170
+        },
+        "costs": {
+          "prevented_loss_inr": 638719.0,
+          "false_positive_cost_inr": 34690.0,
+          "missed_abuse_loss_inr": 2766723.0,
+          "net_benefit_inr": 604029.0
+        }
+      }
+    },
+    "behaviour_evidence_graph_counts": {
+      "feature_count": 35,
+      "validation": {
+        "rows": 11335,
+        "abuse_rate": 0.08734009704455227,
+        "pr_auc": 0.3426352970844954,
+        "roc_auc": 0.7487477969643267,
+        "brier_score": 0.06822063783476642,
+        "threshold": 0.3820901750212084,
+        "precision": 0.6019900497512438,
+        "recall": 0.24444444444444444,
+        "flag_rate": 0.035465372739303044,
+        "confusion_matrix": {
+          "tn": 10185,
+          "fp": 160,
+          "fn": 748,
+          "tp": 242
+        },
+        "costs": {
+          "prevented_loss_inr": 866249.0,
+          "false_positive_cost_inr": 63009.0,
+          "missed_abuse_loss_inr": 2613184.0,
+          "net_benefit_inr": 803240.0
+        }
+      },
+      "test": {
+        "rows": 11078,
+        "abuse_rate": 0.0906300776313414,
+        "pr_auc": 0.4003575915121531,
+        "roc_auc": 0.7535740500376892,
+        "brier_score": 0.06694516781096811,
+        "threshold": 0.3820901750212084,
+        "precision": 0.656641604010025,
+        "recall": 0.26095617529880477,
+        "flag_rate": 0.036017331648311966,
+        "confusion_matrix": {
+          "tn": 9937,
+          "fp": 137,
+          "fn": 742,
+          "tp": 262
+        },
+        "costs": {
+          "prevented_loss_inr": 906001.0,
+          "false_positive_cost_inr": 52311.0,
+          "missed_abuse_loss_inr": 2499441.0,
+          "net_benefit_inr": 853690.0
+        }
+      }
+    }
+  },
+  "challenger": {
+    "model_name": "histogram_gradient_boosting",
+    "evaluation": {
+      "validation": {
+        "rows": 11335,
+        "abuse_rate": 0.08734009704455227,
+        "pr_auc": 0.34254290033463364,
+        "roc_auc": 0.7507481777660607,
+        "brier_score": 0.06827565547692524,
+        "threshold": 0.47613223339705585,
+        "precision": 0.6035502958579881,
+        "recall": 0.20606060606060606,
+        "flag_rate": 0.029819144243493603,
+        "confusion_matrix": {
+          "tn": 10211,
+          "fp": 134,
+          "fn": 786,
+          "tp": 204
+        },
+        "costs": {
+          "prevented_loss_inr": 678461.0,
+          "false_positive_cost_inr": 51440.0,
+          "missed_abuse_loss_inr": 2800972.0,
+          "net_benefit_inr": 627021.0
+        }
+      },
+      "test": {
+        "rows": 11078,
+        "abuse_rate": 0.0906300776313414,
+        "pr_auc": 0.41573040574165737,
+        "roc_auc": 0.7608956668857625,
+        "brier_score": 0.0664627167287296,
+        "threshold": 0.47613223339705585,
+        "precision": 0.6876712328767123,
+        "recall": 0.25,
+        "flag_rate": 0.03294818559306734,
+        "confusion_matrix": {
+          "tn": 9960,
+          "fp": 114,
+          "fn": 753,
+          "tp": 251
+        },
+        "costs": {
+          "prevented_loss_inr": 852913.0,
+          "false_positive_cost_inr": 41897.0,
+          "missed_abuse_loss_inr": 2552529.0,
+          "net_benefit_inr": 811016.0
+        }
+      },
+      "threshold_curve": [
+        {
+          "threshold": 0.9247498681690736,
+          "precision": 1.0,
+          "recall": 0.00101010101010101,
+          "flag_rate": 8.82223202470225e-05,
+          "net_benefit_inr": 1779.0
+        },
+        {
+          "threshold": 0.7161787703208059,
+          "precision": 0.6929824561403509,
+          "recall": 0.0797979797979798,
+          "flag_rate": 0.010057344508160565,
+          "net_benefit_inr": 254547.0
+        },
+        {
+          "threshold": 0.5980517440754637,
+          "precision": 0.6696035242290749,
+          "recall": 0.15353535353535352,
+          "flag_rate": 0.020026466696074108,
+          "net_benefit_inr": 501459.0
+        },
+        {
+          "threshold": 0.4751082325943052,
+          "precision": 0.5982404692082112,
+          "recall": 0.20606060606060606,
+          "flag_rate": 0.030083811204234673,
+          "net_benefit_inr": 625702.0
+        },
+        {
+          "threshold": 0.36590755994783,
+          "precision": 0.5462555066079295,
+          "recall": 0.2505050505050505,
+          "flag_rate": 0.040052933392148216,
+          "net_benefit_inr": 777718.0
+        },
+        {
+          "threshold": 0.2955331907724017,
+          "precision": 0.5044091710758377,
+          "recall": 0.28888888888888886,
+          "flag_rate": 0.05002205558006176,
+          "net_benefit_inr": 867478.0
+        },
+        {
+          "threshold": 0.25293151656401475,
+          "precision": 0.4566813509544787,
+          "recall": 0.31414141414141417,
+          "flag_rate": 0.06007940008822232,
+          "net_benefit_inr": 959545.0
+        },
+        {
+          "threshold": 0.22149650199415985,
+          "precision": 0.41309823677581864,
+          "recall": 0.33131313131313134,
+          "flag_rate": 0.07004852227613587,
+          "net_benefit_inr": 1004345.0
+        },
+        {
+          "threshold": 0.1998719055825551,
+          "precision": 0.38588754134509373,
+          "recall": 0.35353535353535354,
+          "flag_rate": 0.08001764446404941,
+          "net_benefit_inr": 1048237.0
+        },
+        {
+          "threshold": 0.18186843473928188,
+          "precision": 0.3633692458374143,
+          "recall": 0.3747474747474748,
+          "flag_rate": 0.09007498897220997,
+          "net_benefit_inr": 1108006.0
+        },
+        {
+          "threshold": 0.16955452902071178,
+          "precision": 0.3386243386243386,
+          "recall": 0.3878787878787879,
+          "flag_rate": 0.10004411116012352,
+          "net_benefit_inr": 1110261.0
+        },
+        {
+          "threshold": 0.1559324161291626,
+          "precision": 0.3239775461106656,
+          "recall": 0.4080808080808081,
+          "flag_rate": 0.11001323334803706,
+          "net_benefit_inr": 1164074.0
+        },
+        {
+          "threshold": 0.14542989285952265,
+          "precision": 0.3100661278471712,
+          "recall": 0.4262626262626263,
+          "flag_rate": 0.12007057785619762,
+          "net_benefit_inr": 1179843.0
+        },
+        {
+          "threshold": 0.13656234300121833,
+          "precision": 0.2937584803256445,
+          "recall": 0.43737373737373736,
+          "flag_rate": 0.13003970004411117,
+          "net_benefit_inr": 1206286.0
+        },
+        {
+          "threshold": 0.12917649923775085,
+          "precision": 0.28166351606805295,
+          "recall": 0.45151515151515154,
+          "flag_rate": 0.1400088222320247,
+          "net_benefit_inr": 1189072.0
+        },
+        {
+          "threshold": 0.1234122776893061,
+          "precision": 0.27042915931804823,
+          "recall": 0.46464646464646464,
+          "flag_rate": 0.15006616674018528,
+          "net_benefit_inr": 1232732.0
+        },
+        {
+          "threshold": 0.11750243102066496,
+          "precision": 0.2618522601984565,
+          "recall": 0.4797979797979798,
+          "flag_rate": 0.16003528892809882,
+          "net_benefit_inr": 1244719.0
+        },
+        {
+          "threshold": 0.11275257694870756,
+          "precision": 0.2527244421380384,
+          "recall": 0.4919191919191919,
+          "flag_rate": 0.17000441111601236,
+          "net_benefit_inr": 1253443.0
+        },
+        {
+          "threshold": 0.10775240651797936,
+          "precision": 0.24791768740813327,
+          "recall": 0.5111111111111111,
+          "flag_rate": 0.18006175562417293,
+          "net_benefit_inr": 1297230.0
+        },
+        {
+          "threshold": 0.10404774736309051,
+          "precision": 0.2404828226555246,
+          "recall": 0.5232323232323233,
+          "flag_rate": 0.19003087781208647,
+          "net_benefit_inr": 1301705.0
+        },
+        {
+          "threshold": 0.10030432694906025,
+          "precision": 0.2329069254521394,
+          "recall": 0.5333333333333333,
+          "flag_rate": 0.2,
+          "net_benefit_inr": 1304617.0
+        },
+        {
+          "threshold": 0.09725137242019778,
+          "precision": 0.2251154976900462,
+          "recall": 0.5414141414141415,
+          "flag_rate": 0.21005734450816058,
+          "net_benefit_inr": 1279156.0
+        },
+        {
+          "threshold": 0.09375483360802439,
+          "precision": 0.22012830793905372,
+          "recall": 0.5545454545454546,
+          "flag_rate": 0.22002646669607412,
+          "net_benefit_inr": 1280465.0
+        },
+        {
+          "threshold": 0.09131840853702554,
+          "precision": 0.21480629075565785,
+          "recall": 0.5656565656565656,
+          "flag_rate": 0.22999558888398766,
+          "net_benefit_inr": 1273395.0
+        },
+        {
+          "threshold": 0.08895884347625256,
+          "precision": 0.20837927232635062,
+          "recall": 0.5727272727272728,
+          "flag_rate": 0.24005293339214823,
+          "net_benefit_inr": 1255853.0
+        },
+        {
+          "threshold": 0.08663086306341133,
+          "precision": 0.2057163020465773,
+          "recall": 0.5888888888888889,
+          "flag_rate": 0.25002205558006174,
+          "net_benefit_inr": 1275362.0
+        },
+        {
+          "threshold": 0.08427176531710996,
+          "precision": 0.2012215812690872,
+          "recall": 0.598989898989899,
+          "flag_rate": 0.2599911777679753,
+          "net_benefit_inr": 1266782.0
+        },
+        {
+          "threshold": 0.08195700159609141,
+          "precision": 0.19634106501143417,
+          "recall": 0.6070707070707071,
+          "flag_rate": 0.27004852227613585,
+          "net_benefit_inr": 1240193.0
+        },
+        {
+          "threshold": 0.07978681101440309,
+          "precision": 0.19313169502205418,
+          "recall": 0.6191919191919192,
+          "flag_rate": 0.2800176444640494,
+          "net_benefit_inr": 1253023.0
+        },
+        {
+          "threshold": 0.07775559810244133,
+          "precision": 0.18831761484636447,
+          "recall": 0.6252525252525253,
+          "flag_rate": 0.28998676665196294,
+          "net_benefit_inr": 1229143.0
+        },
+        {
+          "threshold": 0.07565716522511129,
+          "precision": 0.1831814172302264,
+          "recall": 0.6292929292929293,
+          "flag_rate": 0.30004411116012353,
+          "net_benefit_inr": 1211827.0
+        },
+        {
+          "threshold": 0.07383797388741259,
+          "precision": 0.17956744450768355,
+          "recall": 0.6373737373737374,
+          "flag_rate": 0.31001323334803704,
+          "net_benefit_inr": 1210683.0
+        },
+        {
+          "threshold": 0.07208722765017643,
+          "precision": 0.17700578990901572,
+          "recall": 0.6484848484848484,
+          "flag_rate": 0.3199823555359506,
+          "net_benefit_inr": 1201900.0
+        },
+        {
+          "threshold": 0.07046248236371226,
+          "precision": 0.17455225875434377,
+          "recall": 0.6595959595959596,
+          "flag_rate": 0.33003970004411115,
+          "net_benefit_inr": 1208182.0
+        },
+        {
+          "threshold": 0.06894474021237681,
+          "precision": 0.17202906071613908,
+          "recall": 0.6696969696969697,
+          "flag_rate": 0.3400088222320247,
+          "net_benefit_inr": 1194845.0
+        },
+        {
+          "threshold": 0.0674699183615654,
+          "precision": 0.17065792790521805,
+          "recall": 0.6838383838383838,
+          "flag_rate": 0.34997794441993824,
+          "net_benefit_inr": 1189542.0
+        },
+        {
+          "threshold": 0.06627749277797071,
+          "precision": 0.16834109286939475,
+          "recall": 0.693939393939394,
+          "flag_rate": 0.36003528892809883,
+          "net_benefit_inr": 1179557.0
+        },
+        {
+          "threshold": 0.0650590192203425,
+          "precision": 0.16571292322365283,
+          "recall": 0.702020202020202,
+          "flag_rate": 0.37000441111601234,
+          "net_benefit_inr": 1176565.0
+        },
+        {
+          "threshold": 0.06380319662477427,
+          "precision": 0.162526120269329,
+          "recall": 0.7070707070707071,
+          "flag_rate": 0.3799735333039259,
+          "net_benefit_inr": 1133417.0
+        },
+        {
+          "threshold": 0.06256294622502041,
+          "precision": 0.16082334313503732,
+          "recall": 0.7181818181818181,
+          "flag_rate": 0.39003087781208645,
+          "net_benefit_inr": 1133274.0
+        },
+        {
+          "threshold": 0.06151803170721372,
+          "precision": 0.1583590648434054,
+          "recall": 0.7252525252525253,
+          "flag_rate": 0.4,
+          "net_benefit_inr": 1108863.0
+        },
+        {
+          "threshold": 0.06045727553245179,
+          "precision": 0.15558424790187217,
+          "recall": 0.7303030303030303,
+          "flag_rate": 0.40996912218791354,
+          "net_benefit_inr": 1090511.0
+        },
+        {
+          "threshold": 0.0594318645005116,
+          "precision": 0.153959252257929,
+          "recall": 0.7404040404040404,
+          "flag_rate": 0.42002646669607413,
+          "net_benefit_inr": 1079596.0
+        },
+        {
+          "threshold": 0.05849768366167819,
+          "precision": 0.15182601559294215,
+          "recall": 0.7474747474747475,
+          "flag_rate": 0.42999558888398765,
+          "net_benefit_inr": 1068281.0
+        },
+        {
+          "threshold": 0.05746208738281871,
+          "precision": 0.1493884098656507,
+          "recall": 0.7525252525252525,
+          "flag_rate": 0.4399647110719012,
+          "net_benefit_inr": 1054906.0
+        },
+        {
+          "threshold": 0.056314458165026025,
+          "precision": 0.14624583415016662,
+          "recall": 0.7535353535353535,
+          "flag_rate": 0.45002205558006175,
+          "net_benefit_inr": 1017887.0
+        },
+        {
+          "threshold": 0.05547083761644496,
+          "precision": 0.14403528960490986,
+          "recall": 0.7585858585858586,
+          "flag_rate": 0.4599911777679753,
+          "net_benefit_inr": 999158.0
+        },
+        {
+          "threshold": 0.054552233270181945,
+          "precision": 0.14135535948939365,
+          "recall": 0.7606060606060606,
+          "flag_rate": 0.46996029995588884,
+          "net_benefit_inr": 964766.0
+        },
+        {
+          "threshold": 0.053824027401783575,
+          "precision": 0.1400477853335784,
+          "recall": 0.7696969696969697,
+          "flag_rate": 0.48001764446404943,
+          "net_benefit_inr": 946994.0
+        },
+        {
+          "threshold": 0.05291608729468057,
+          "precision": 0.13881886928339934,
+          "recall": 0.7787878787878788,
+          "flag_rate": 0.48998676665196295,
+          "net_benefit_inr": 930719.0
+        },
+        {
+          "threshold": 0.05204379350273292,
+          "precision": 0.13761467889908258,
+          "recall": 0.7878787878787878,
+          "flag_rate": 0.5000441111601235,
+          "net_benefit_inr": 920132.0
+        },
+        {
+          "threshold": 0.05133098170473861,
+          "precision": 0.13648157758173327,
+          "recall": 0.796969696969697,
+          "flag_rate": 0.510013233348037,
+          "net_benefit_inr": 915242.0
+        },
+        {
+          "threshold": 0.05057225828485489,
+          "precision": 0.1350525958601968,
+          "recall": 0.804040404040404,
+          "flag_rate": 0.5199823555359506,
+          "net_benefit_inr": 889279.0
+        },
+        {
+          "threshold": 0.04977900496466595,
+          "precision": 0.13382157123834887,
+          "recall": 0.8121212121212121,
+          "flag_rate": 0.5300397000441112,
+          "net_benefit_inr": 874548.0
+        },
+        {
+          "threshold": 0.04909465848898547,
+          "precision": 0.13216794641398463,
+          "recall": 0.8171717171717172,
+          "flag_rate": 0.5400088222320247,
+          "net_benefit_inr": 855866.0
+        },
+        {
+          "threshold": 0.048435552919370066,
+          "precision": 0.13025344882900225,
+          "recall": 0.8202020202020202,
+          "flag_rate": 0.5499779444199382,
+          "net_benefit_inr": 815026.0
+        },
+        {
+          "threshold": 0.04775246342043495,
+          "precision": 0.1285444234404537,
+          "recall": 0.8242424242424242,
+          "flag_rate": 0.5600352889280988,
+          "net_benefit_inr": 788497.0
+        },
+        {
+          "threshold": 0.04711797650209434,
+          "precision": 0.12707011298560594,
+          "recall": 0.8292929292929293,
+          "flag_rate": 0.5700044111160123,
+          "net_benefit_inr": 758987.0
+        },
+        {
+          "threshold": 0.046374612892379846,
+          "precision": 0.12549437176756922,
+          "recall": 0.8333333333333334,
+          "flag_rate": 0.5799735333039259,
+          "net_benefit_inr": 743665.0
+        },
+        {
+          "threshold": 0.04563955184405421,
+          "precision": 0.12395334928229665,
+          "recall": 0.8373737373737373,
+          "flag_rate": 0.5900308778120864,
+          "net_benefit_inr": 724204.0
+        },
+        {
+          "threshold": 0.04485500591906884,
+          "precision": 0.12248198794294957,
+          "recall": 0.8414141414141414,
+          "flag_rate": 0.6,
+          "net_benefit_inr": 691621.0
+        },
+        {
+          "threshold": 0.04413383517436643,
+          "precision": 0.12048018513161701,
+          "recall": 0.8414141414141414,
+          "flag_rate": 0.6099691221879135,
+          "net_benefit_inr": 649249.0
+        },
+        {
+          "threshold": 0.04341327246448509,
+          "precision": 0.11937962435970403,
+          "recall": 0.8474747474747475,
+          "flag_rate": 0.6200264666960741,
+          "net_benefit_inr": 637174.0
+        },
+        {
+          "threshold": 0.04274612911143227,
+          "precision": 0.11833076599915979,
+          "recall": 0.8535353535353535,
+          "flag_rate": 0.6299955888839877,
+          "net_benefit_inr": 622388.0
+        },
+        {
+          "threshold": 0.04200209087405496,
+          "precision": 0.11676316515026193,
+          "recall": 0.8555555555555555,
+          "flag_rate": 0.6399647110719012,
+          "net_benefit_inr": 592278.0
+        },
+        {
+          "threshold": 0.041402559854223926,
+          "precision": 0.11617806731813246,
+          "recall": 0.8646464646464647,
+          "flag_rate": 0.6500220555800618,
+          "net_benefit_inr": 608009.0
+        },
+        {
+          "threshold": 0.040815602669945154,
+          "precision": 0.11535890923673306,
+          "recall": 0.8717171717171717,
+          "flag_rate": 0.6599911777679753,
+          "net_benefit_inr": 588588.0
+        },
+        {
+          "threshold": 0.04015387846569276,
+          "precision": 0.11430076376086384,
+          "recall": 0.8767676767676768,
+          "flag_rate": 0.6699602999558888,
+          "net_benefit_inr": 561658.0
+        },
+        {
+          "threshold": 0.039656531141528166,
+          "precision": 0.11338868707836014,
+          "recall": 0.8828282828282829,
+          "flag_rate": 0.6800176444640494,
+          "net_benefit_inr": 550346.0
+        },
+        {
+          "threshold": 0.039074116911975355,
+          "precision": 0.11213399820994757,
+          "recall": 0.8858585858585859,
+          "flag_rate": 0.6899867666519629,
+          "net_benefit_inr": 521002.0
+        },
+        {
+          "threshold": 0.03844548587976747,
+          "precision": 0.11116712881270481,
+          "recall": 0.8909090909090909,
+          "flag_rate": 0.6999558888398765,
+          "net_benefit_inr": 503362.0
+        },
+        {
+          "threshold": 0.03785772237412682,
+          "precision": 0.11008946322067595,
+          "recall": 0.8949494949494949,
+          "flag_rate": 0.710013233348037,
+          "net_benefit_inr": 482430.0
+        },
+        {
+          "threshold": 0.037332087315528915,
+          "precision": 0.10893272883225096,
+          "recall": 0.897979797979798,
+          "flag_rate": 0.7199823555359506,
+          "net_benefit_inr": 456367.0
+        },
+        {
+          "threshold": 0.0367922415887109,
+          "precision": 0.10817017162194827,
+          "recall": 0.9040404040404041,
+          "flag_rate": 0.7299514777238642,
+          "net_benefit_inr": 461271.0
+        },
+        {
+          "threshold": 0.03621908027714253,
+          "precision": 0.1072961373390558,
+          "recall": 0.9090909090909091,
+          "flag_rate": 0.7400088222320247,
+          "net_benefit_inr": 444469.0
+        },
+        {
+          "threshold": 0.03576885920608836,
+          "precision": 0.10634043053758381,
+          "recall": 0.9131313131313131,
+          "flag_rate": 0.7499779444199383,
+          "net_benefit_inr": 426663.0
+        },
+        {
+          "threshold": 0.03521874184546508,
+          "precision": 0.10564197817506385,
+          "recall": 0.9191919191919192,
+          "flag_rate": 0.7599470666078518,
+          "net_benefit_inr": 406725.0
+        },
+        {
+          "threshold": 0.034748591723075366,
+          "precision": 0.10494958753437214,
+          "recall": 0.9252525252525252,
+          "flag_rate": 0.7700044111160124,
+          "net_benefit_inr": 397614.0
+        },
+        {
+          "threshold": 0.03425576530825193,
+          "precision": 0.10428684537948196,
+          "recall": 0.9313131313131313,
+          "flag_rate": 0.7799735333039259,
+          "net_benefit_inr": 379675.0
+        },
+        {
+          "threshold": 0.0337611966886726,
+          "precision": 0.10386419477328568,
+          "recall": 0.9393939393939394,
+          "flag_rate": 0.7899426554918394,
+          "net_benefit_inr": 362759.0
+        },
+        {
+          "threshold": 0.03324389864093187,
+          "precision": 0.1027790030877812,
+          "recall": 0.9414141414141414,
+          "flag_rate": 0.8,
+          "net_benefit_inr": 341422.0
+        },
+        {
+          "threshold": 0.032683364126066476,
+          "precision": 0.1019496786842392,
+          "recall": 0.9454545454545454,
+          "flag_rate": 0.8099691221879135,
+          "net_benefit_inr": 325523.0
+        },
+        {
+          "threshold": 0.03220672228316763,
+          "precision": 0.10167850225952227,
+          "recall": 0.9545454545454546,
+          "flag_rate": 0.8199382443758271,
+          "net_benefit_inr": 321419.0
+        },
+        {
+          "threshold": 0.03175749029572127,
+          "precision": 0.10087159863945579,
+          "recall": 0.9585858585858585,
+          "flag_rate": 0.8299955888839876,
+          "net_benefit_inr": 299075.0
+        },
+        {
+          "threshold": 0.031135670356694237,
+          "precision": 0.09977943493330532,
+          "recall": 0.9595959595959596,
+          "flag_rate": 0.8399647110719012,
+          "net_benefit_inr": 267893.0
+        },
+        {
+          "threshold": 0.030544480934970114,
+          "precision": 0.09881669088644385,
+          "recall": 0.9616161616161616,
+          "flag_rate": 0.8499338332598148,
+          "net_benefit_inr": 252055.0
+        },
+        {
+          "threshold": 0.029989735084018795,
+          "precision": 0.09766105867870332,
+          "recall": 0.9616161616161616,
+          "flag_rate": 0.8599911777679753,
+          "net_benefit_inr": 223902.0
+        },
+        {
+          "threshold": 0.029328451816114067,
+          "precision": 0.0971503904269344,
+          "recall": 0.9676767676767677,
+          "flag_rate": 0.8699602999558889,
+          "net_benefit_inr": 228545.0
+        },
+        {
+          "threshold": 0.02873055652592421,
+          "precision": 0.09635051132945659,
+          "recall": 0.9707070707070707,
+          "flag_rate": 0.8799294221438024,
+          "net_benefit_inr": 204143.0
+        },
+        {
+          "threshold": 0.027985783925144978,
+          "precision": 0.09526169706582077,
+          "recall": 0.9707070707070707,
+          "flag_rate": 0.889986766651963,
+          "net_benefit_inr": 174808.0
+        },
+        {
+          "threshold": 0.02721800795356452,
+          "precision": 0.09459856876776787,
+          "recall": 0.9747474747474747,
+          "flag_rate": 0.8999558888398765,
+          "net_benefit_inr": 150632.0
+        },
+        {
+          "threshold": 0.02644017867547123,
+          "precision": 0.09375605972464611,
+          "recall": 0.9767676767676767,
+          "flag_rate": 0.90992501102779,
+          "net_benefit_inr": 122964.0
+        },
+        {
+          "threshold": 0.02561242971150745,
+          "precision": 0.09311469121595704,
+          "recall": 0.9808080808080808,
+          "flag_rate": 0.9199823555359506,
+          "net_benefit_inr": 107410.0
+        },
+        {
+          "threshold": 0.02464259096861139,
+          "precision": 0.09240110046485153,
+          "recall": 0.9838383838383838,
+          "flag_rate": 0.9299514777238641,
+          "net_benefit_inr": 88605.0
+        },
+        {
+          "threshold": 0.023426119590828604,
+          "precision": 0.09170264689318566,
+          "recall": 0.9868686868686869,
+          "flag_rate": 0.9399205999117777,
+          "net_benefit_inr": 76389.0
+        },
+        {
+          "threshold": 0.021967500613910756,
+          "precision": 0.09110326894502228,
+          "recall": 0.990909090909091,
+          "flag_rate": 0.9499779444199382,
+          "net_benefit_inr": 59911.0
+        },
+        {
+          "threshold": 0.020540548767816722,
+          "precision": 0.09034096130870324,
+          "recall": 0.9929292929292929,
+          "flag_rate": 0.9599470666078518,
+          "net_benefit_inr": 35603.0
+        },
+        {
+          "threshold": 0.018758250645393323,
+          "precision": 0.08950336547207567,
+          "recall": 0.9939393939393939,
+          "flag_rate": 0.9699161887957654,
+          "net_benefit_inr": 8853.0
+        },
+        {
+          "threshold": 0.01677080656529982,
+          "precision": 0.08867482895210659,
+          "recall": 0.9949494949494949,
+          "flag_rate": 0.9799735333039259,
+          "net_benefit_inr": -9304.0
+        },
+        {
+          "threshold": 0.014833714495032405,
+          "precision": 0.08822743071027538,
+          "recall": 1.0,
+          "flag_rate": 0.9899426554918395,
+          "net_benefit_inr": -22812.0
+        },
+        {
+          "threshold": 0.007908958048165564,
+          "precision": 0.08734009704455227,
+          "recall": 1.0,
+          "flag_rate": 1.0,
+          "net_benefit_inr": -46622.0
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "All refund-abuse labels are simulated; metrics measure recovery of the simulator's patterns, not production performance.",
+    "False-positive cost and expected-loss fields are explicit assumptions and need merchant calibration.",
+    "Graph inputs are entity-reuse counts, not yet multi-hop or community features.",
+    "A flagged case means verify or review; it is not an automatic accusation or refund denial."
+  ]
+}

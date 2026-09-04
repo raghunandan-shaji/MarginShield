@@ -1,0 +1,415 @@
+{
+  "dataset_version": "0.3.0",
+  "target": "abuse_label",
+  "target_definition": "Any simulated refund abuse. Ring risk is separately surfaced through graph analysis.",
+  "feature_contract": [
+    "vertical",
+    "order_amount_inr",
+    "refund_amount_inr",
+    "refund_share",
+    "margin_amount_inr",
+    "freight_amount_inr",
+    "item_count",
+    "payment_method",
+    "payment_installments",
+    "refund_reason",
+    "refund_method",
+    "account_age_days",
+    "days_since_delivery",
+    "delivery_delay_days",
+    "review_score",
+    "lifetime_orders",
+    "lifetime_refunds",
+    "lifetime_refund_rate",
+    "merchant_baseline_return_rate",
+    "prior_disputes",
+    "support_contacts_30d",
+    "refund_velocity_24h",
+    "refund_velocity_7d",
+    "identity_velocity_percentile",
+    "session_length_minutes",
+    "foreign_request",
+    "device_distinct_emails_8w",
+    "shared_device_accounts_30d",
+    "shared_address_accounts_90d",
+    "shared_payment_accounts_30d",
+    "item_evidence_consistency",
+    "photo_metadata_consistency",
+    "package_weight_delta_pct",
+    "carrier_anomaly",
+    "tracking_status"
+  ],
+  "forbidden_features": [
+    "abuse_label",
+    "abuse_pattern",
+    "label_delay_days",
+    "expected_loss_if_abuse_inr",
+    "false_positive_cost_inr",
+    "latent_alert_score",
+    "ring_id",
+    "ring_size"
+  ],
+  "tournament": {
+    "rolling_folds": [
+      {
+        "fold": 1,
+        "train_rows": 35058,
+        "validation_rows": 5843,
+        "train_end": "2025-03-25 13:58:15+00:00",
+        "validation_end": "2025-04-08 18:34:12+00:00"
+      },
+      {
+        "fold": 2,
+        "train_rows": 40901,
+        "validation_rows": 5843,
+        "train_end": "2025-04-08 18:34:12+00:00",
+        "validation_end": "2025-04-23 00:43:54+00:00"
+      },
+      {
+        "fold": 3,
+        "train_rows": 46744,
+        "validation_rows": 5843,
+        "train_end": "2025-04-23 00:43:54+00:00",
+        "validation_end": "2025-05-06 23:51:24+00:00"
+      }
+    ],
+    "candidates": {
+      "logistic_l2_c0.10": {
+        "folds": [
+          {
+            "pr_auc": 0.14183574133256108,
+            "roc_auc": 0.6466782915697925,
+            "brier_score": 0.06090808578908332,
+            "precision_constrained_recall": 0.007653061224489796,
+            "threshold": 0.5317426583307376
+          },
+          {
+            "pr_auc": 0.13908826934757468,
+            "roc_auc": 0.6257571521759389,
+            "brier_score": 0.06838500734623122,
+            "precision_constrained_recall": 0.006802721088435374,
+            "threshold": 0.5225926262695277
+          },
+          {
+            "pr_auc": 0.14915074871651263,
+            "roc_auc": 0.6590465535053701,
+            "brier_score": 0.06090625802222832,
+            "precision_constrained_recall": 0.030456852791878174,
+            "threshold": 0.31806844000806395
+          }
+        ],
+        "mean_pr_auc": 0.14335825313221612,
+        "mean_roc_auc": 0.6438273324170338,
+        "mean_brier_score": 0.06339978371918095,
+        "mean_precision_constrained_recall": 0.014970878368267779
+      },
+      "logistic_l2_c0.50": {
+        "folds": [
+          {
+            "pr_auc": 0.14231721800976896,
+            "roc_auc": 0.6469642342352461,
+            "brier_score": 0.06089289662128014,
+            "precision_constrained_recall": 0.007653061224489796,
+            "threshold": 0.5237893006180897
+          },
+          {
+            "pr_auc": 0.13942823915081318,
+            "roc_auc": 0.6260963227695127,
+            "brier_score": 0.06838303445718488,
+            "precision_constrained_recall": 0.006802721088435374,
+            "threshold": 0.5602577707066981
+          },
+          {
+            "pr_auc": 0.14889052544786785,
+            "roc_auc": 0.6583227211624543,
+            "brier_score": 0.06090836218912146,
+            "precision_constrained_recall": 0.025380710659898477,
+            "threshold": 0.3355410329670668
+          }
+        ],
+        "mean_pr_auc": 0.14354532753614999,
+        "mean_roc_auc": 0.6437944260557377,
+        "mean_brier_score": 0.06339476442252882,
+        "mean_precision_constrained_recall": 0.013278830990941215
+      },
+      "histogram_boosting_compact": {
+        "folds": [
+          {
+            "pr_auc": 0.12662257564965446,
+            "roc_auc": 0.6414246215822598,
+            "brier_score": 0.06141037668835743,
+            "precision_constrained_recall": 0.0,
+            "threshold": null
+          },
+          {
+            "pr_auc": 0.1399639234829291,
+            "roc_auc": 0.6253411644801077,
+            "brier_score": 0.06848192695068236,
+            "precision_constrained_recall": 0.011337868480725623,
+            "threshold": 0.4142265690233083
+          },
+          {
+            "pr_auc": 0.15260915230206895,
+            "roc_auc": 0.6650174716545577,
+            "brier_score": 0.06075170877857673,
+            "precision_constrained_recall": 0.007614213197969543,
+            "threshold": 0.4415492656207497
+          }
+        ],
+        "mean_pr_auc": 0.13973188381155086,
+        "mean_roc_auc": 0.6439277525723085,
+        "mean_brier_score": 0.06354800413920551,
+        "mean_precision_constrained_recall": 0.006317360559565055
+      },
+      "histogram_boosting_deep": {
+        "folds": [
+          {
+            "pr_auc": 0.1212740805797677,
+            "roc_auc": 0.6336040194834126,
+            "brier_score": 0.06178297903020945,
+            "precision_constrained_recall": 0.0,
+            "threshold": null
+          },
+          {
+            "pr_auc": 0.1278789041491456,
+            "roc_auc": 0.6167435257454826,
+            "brier_score": 0.06910187016926062,
+            "precision_constrained_recall": 0.006802721088435374,
+            "threshold": 0.47830820940871077
+          },
+          {
+            "pr_auc": 0.14794246260015564,
+            "roc_auc": 0.6526839088437035,
+            "brier_score": 0.06101897046536569,
+            "precision_constrained_recall": 0.007614213197969543,
+            "threshold": 0.42516932501659804
+          }
+        ],
+        "mean_pr_auc": 0.13236514910968963,
+        "mean_roc_auc": 0.6343438180241996,
+        "mean_brier_score": 0.06396793988827859,
+        "mean_precision_constrained_recall": 0.004805644762134972
+      },
+      "catboost_depth5": {
+        "folds": [
+          {
+            "pr_auc": 0.14178848821283174,
+            "roc_auc": 0.6437060790193898,
+            "brier_score": 0.06089515561563968,
+            "precision_constrained_recall": 0.007653061224489796,
+            "threshold": 0.521884638828022
+          },
+          {
+            "pr_auc": 0.1381108037090707,
+            "roc_auc": 0.6384361717042735,
+            "brier_score": 0.06848073685873116,
+            "precision_constrained_recall": 0.0,
+            "threshold": null
+          },
+          {
+            "pr_auc": 0.15999041000172765,
+            "roc_auc": 0.6803642078414238,
+            "brier_score": 0.06048204282494846,
+            "precision_constrained_recall": 0.007614213197969543,
+            "threshold": 0.5241357821634941
+          }
+        ],
+        "mean_pr_auc": 0.14662990064121004,
+        "mean_roc_auc": 0.6541688195216957,
+        "mean_brier_score": 0.06328597843310643,
+        "mean_precision_constrained_recall": 0.005089091474153113
+      },
+      "catboost_depth7": {
+        "folds": [
+          {
+            "pr_auc": 0.13983113983721512,
+            "roc_auc": 0.643619032643327,
+            "brier_score": 0.060943873689573325,
+            "precision_constrained_recall": 0.01020408163265306,
+            "threshold": 0.528385230289435
+          },
+          {
+            "pr_auc": 0.13437145276055457,
+            "roc_auc": 0.6343237282571921,
+            "brier_score": 0.06851412118789149,
+            "precision_constrained_recall": 0.0045351473922902496,
+            "threshold": 0.4641511914904983
+          },
+          {
+            "pr_auc": 0.16191515150551505,
+            "roc_auc": 0.6795369708780916,
+            "brier_score": 0.06044986431784618,
+            "precision_constrained_recall": 0.012690355329949238,
+            "threshold": 0.39882130674938104
+          }
+        ],
+        "mean_pr_auc": 0.14537258136776157,
+        "mean_roc_auc": 0.6524932439262036,
+        "mean_brier_score": 0.06330261973177033,
+        "mean_precision_constrained_recall": 0.009143194784964183
+      }
+    },
+    "selection_rule": "Highest mean rolling validation PR-AUC, then recall at the precision constraint, then lower Brier score",
+    "winner": "catboost_depth5"
+  },
+  "winner": "catboost_depth5",
+  "calibration": {
+    "method": "Platt scaling on the early validation window",
+    "calibration_rows": 5668,
+    "policy_rows": 5667,
+    "policy_threshold": 0.11780106315734347,
+    "policy_selection": "Highest simulated net benefit on the later validation window",
+    "minimum_precision_reporting_constraint": 0.6
+  },
+  "policy_validation": {
+    "rows": 5667,
+    "abuse_rate": 0.06581965766719605,
+    "pr_auc": 0.1327024417649095,
+    "roc_auc": 0.6413386189636505,
+    "brier_score": 0.06008459675550796,
+    "threshold": 0.11780106315734347,
+    "precision": 0.16083916083916083,
+    "recall": 0.24664879356568364,
+    "flag_rate": 0.10093523910358214,
+    "confusion_matrix": {
+      "tn": 4814,
+      "fp": 480,
+      "fn": 281,
+      "tp": 92
+    },
+    "costs": {
+      "prevented_loss_inr": 487959.0,
+      "false_positive_cost_inr": 226743.0,
+      "missed_abuse_loss_inr": 846952.0,
+      "net_benefit_inr": 261216.0
+    }
+  },
+  "test": {
+    "rows": 11078,
+    "abuse_rate": 0.06833363423000542,
+    "pr_auc": 0.13722278059041915,
+    "roc_auc": 0.6570575926241877,
+    "brier_score": 0.062016627889792175,
+    "threshold": 0.11780106315734347,
+    "precision": 0.16832579185520363,
+    "recall": 0.24570673712021135,
+    "flag_rate": 0.09974724679545044,
+    "confusion_matrix": {
+      "tn": 9402,
+      "fp": 919,
+      "fn": 571,
+      "tp": 186
+    },
+    "costs": {
+      "prevented_loss_inr": 930395.0,
+      "false_positive_cost_inr": 473092.0,
+      "missed_abuse_loss_inr": 1805247.0,
+      "net_benefit_inr": 457303.0
+    }
+  },
+  "test_temporal_bootstrap_95pct_ci": {
+    "precision": [
+      0.1511627906976744,
+      0.1805042881646655
+    ],
+    "recall": [
+      0.2361111111111111,
+      0.2592137592137592
+    ],
+    "pr_auc": [
+      0.12247445221762512,
+      0.15899302603333584
+    ],
+    "net_benefit_inr": [
+      353548.0,
+      589985.8749999993
+    ]
+  },
+  "feature_summary": [
+    {
+      "feature": "refund_share",
+      "importance": 10.471421089231098
+    },
+    {
+      "feature": "account_age_days",
+      "importance": 7.175329124824417
+    },
+    {
+      "feature": "lifetime_refund_rate",
+      "importance": 6.970088975558606
+    },
+    {
+      "feature": "carrier_anomaly",
+      "importance": 5.4890598766070795
+    },
+    {
+      "feature": "package_weight_delta_pct",
+      "importance": 5.052858755432449
+    },
+    {
+      "feature": "item_evidence_consistency",
+      "importance": 4.664436805388321
+    },
+    {
+      "feature": "merchant_baseline_return_rate",
+      "importance": 4.401761903284987
+    },
+    {
+      "feature": "prior_disputes",
+      "importance": 4.125587202862544
+    },
+    {
+      "feature": "shared_payment_accounts_30d",
+      "importance": 3.9469887155783394
+    },
+    {
+      "feature": "identity_velocity_percentile",
+      "importance": 3.5666414762714487
+    },
+    {
+      "feature": "refund_reason",
+      "importance": 3.318003639335771
+    },
+    {
+      "feature": "delivery_delay_days",
+      "importance": 3.215905656810001
+    },
+    {
+      "feature": "photo_metadata_consistency",
+      "importance": 3.0063754583835527
+    },
+    {
+      "feature": "session_length_minutes",
+      "importance": 2.9254824096472314
+    },
+    {
+      "feature": "refund_amount_inr",
+      "importance": 2.8990148045353217
+    },
+    {
+      "feature": "margin_amount_inr",
+      "importance": 2.764970198936464
+    },
+    {
+      "feature": "review_score",
+      "importance": 2.7517527681581075
+    },
+    {
+      "feature": "freight_amount_inr",
+      "importance": 2.5680536985097167
+    },
+    {
+      "feature": "order_amount_inr",
+      "importance": 2.299377711743527
+    },
+    {
+      "feature": "shared_address_accounts_90d",
+      "importance": 2.2993534045169692
+    }
+  ],
+  "limitations": [
+    "All labels remain synthetic; the model is a reproducible benchmark, not evidence of production performance.",
+    "The policy cost function is a binary flagging approximation and does not yet model separate verify and review effectiveness.",
+    "Graph features are point-in-time entity counts. Multi-hop cluster features are handled by the separate ring detector."
+  ]
+}
