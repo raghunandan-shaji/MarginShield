@@ -18,7 +18,7 @@ function renderSummary() {
   $("#windowDays").textContent = `${state.meta.window_days}d`;
   $("#ringListCount").textContent = rings.length;
   $("#asOfText").textContent = `As of ${new Date(state.meta.as_of).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}`;
-  $("#rankingMethod").textContent = state.meta.ranking_note;
+  $("#rankingMethod").textContent = `${state.meta.ranking_note} ${state.meta.data_scope}`;
 }
 
 function renderList() {
@@ -98,4 +98,10 @@ async function init() {
 init().catch((error) => {
   console.error(error);
   $("#ringHeading").textContent = "Graph monitor unavailable";
+});
+
+window.marginShieldChatContext = () => ({
+  view: "abuse_rings",
+  case_id: null,
+  ring_id: state.selected,
 });

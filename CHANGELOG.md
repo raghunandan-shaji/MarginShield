@@ -1,5 +1,25 @@
 # Changelog
 
+## Interface and workflow corrections - 2026-09-05
+
+- Split the frontend into explicit casework, final-test portfolio, validation policy,
+  and mixed current-graph data contracts; removed the last stale held-out graph label.
+- Added caught/missed request and early-ring coverage to Portfolio and exact confusion
+  counts to every Policy Lab scenario.
+- Restored distinct editorial deck copy for every product view.
+- Added a plaintext grounded assistant with an optional Gemini free-tier backend and
+  a deterministic local fallback.
+- Disabled caching for app shell assets so the complete four-tab navigation is not
+  masked by a stale browser copy.
+- Added explicit queue sorting by ring probability or refund exposure in either direction.
+- Replaced operational-signal text in queue rows with merchant verticals.
+- Persisted analyst dispositions now restore into Casework and change button/status state.
+- Replaced verbose policy badges with concise action states and corrected badge spacing.
+- Removed the duplicated portfolio action list and added a compact colour legend.
+- Ordered Policy Lab thresholds from low to high and documented the validation lock rule.
+- Restored Casework, Portfolio, Policy Lab, and Abuse Rings navigation on both pages.
+- Isolated API tests from the runtime SQLite database.
+
 ## 3.0.0-locked - 2026-09-05
 
 - Fixed pandas timestamp-resolution dependence that could make windows 1000x too long.
@@ -26,4 +46,3 @@ already-shared identities separated the target too easily. Artifacts remain unde
 
 Introduced the coordinated-ring target and graph investigation UI. Earlier broad
 refund-abuse experiments remain isolated from the active application.
-

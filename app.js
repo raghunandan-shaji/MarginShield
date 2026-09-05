@@ -3,14 +3,17 @@ const state = {
   selected: null,
   filter: "all",
   search: "",
-  reversed: false,
+  sort: "risk_desc",
   threshold: null,
+  activeView: "casework",
 };
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const fmtInr = (value) => `INR ${Number(value).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 const pct = (value) => `${Math.round(Number(value) * 100)}%`;
+const fmtThreshold = (value) => `${Number(value).toFixed(2).replace(/0+$/, "").replace(/\.$/, "")}%`;
+const fmtMetricPct = (value) => `${(Number(value) * 100).toFixed(1)}%`;
 const fmtRisk = (value) => {
   const percent = Number(value);
   if (percent >= 99.95) return ">99.9%";
@@ -21,6 +24,7 @@ const fmtRisk = (value) => {
 };
 const fmtTimestamp = (value) => new Date(value).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 const cssClass = (text) => String(text).toLowerCase().replaceAll(" ", "-");
+const titleCase = (text) => String(text).replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 const esc = (value) => String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 
 function showToast(message) {
@@ -34,20 +38,71 @@ function visibleCases() {
   const query = state.search.trim().toLowerCase();
   let cases = state.data.cases.filter((item) => {
     const filterMatch = state.filter === "all" || item.action === state.filter;
-    const textMatch = !query || [item.case_id, item.merchant, item.customer, item.reason].join(" ").toLowerCase().includes(query);
+    const textMatch = !query || [item.case_id, item.merchant, item.customer, item.vertical, item.reason].join(" ").toLowerCase().includes(query);
     return filterMatch && textMatch;
   });
-  if (state.reversed) cases = [...cases].reverse();
-  return cases;
+  const [field, direction] = state.sort.split("_");
+  const value = field === "exposure" ? (item) => Number(item.refund_amount) : (item) => Number(item.ring_probability);
+  return [...cases].sort((left, right) => {
+    const difference = value(left) - value(right);
+    if (difference !== 0) return direction === "asc" ? difference : -difference;
+    return left.case_id.localeCompare(right.case_id);
+  });
 }
 
 function renderSummary() {
   const summary = state.data.summary;
-  $("#refundExposure").textContent = fmtInr(summary.queue_refund_exposure);
-  $("#flaggedLoss").textContent = fmtInr(summary.flagged_loss_exposure);
-  $("#highRiskCases").textContent = summary.verify_evidence_cases;
-  $("#activeThreshold").textContent = fmtRisk(state.data.active_threshold_percent);
-  $("#lastScored").textContent = fmtTimestamp(state.data.as_of);
+  const validation = state.data.evaluation.validation;
+  const test = state.data.evaluation.test;
+  const chrome = {
+    casework: {
+      kicker: "Decision operations / coordinated refund-abuse rings",
+      title: "Refund risk operations",
+      deck: "<em>Signals are cheap.</em> Defensible intervention is not.",
+      aside: "High-confidence refund triage",
+      cards: [
+        ["Scored queue", state.data.cases.length.toLocaleString("en-IN"), "Highest-ranked final-test requests"],
+        ["Queue exposure", fmtInr(summary.queue_refund_exposure), "Requested refunds in the visible queue"],
+        ["Review candidates", summary.flagged_requests, "Locked-policy flags in final test"],
+        ["Review threshold", fmtThreshold(state.data.active_threshold_percent), "Locked on validation only"],
+      ],
+    },
+    portfolio: {
+      kicker: "Portfolio intelligence / final synthetic test",
+      title: "Refund exposure and coverage",
+      deck: "<em>Confidence without coverage is incomplete.</em> Both are reported here.",
+      aside: "Untouched chronological benchmark",
+      cards: [
+        ["Held-out requests", summary.held_out_requests.toLocaleString("en-IN"), "Final synthetic test window"],
+        ["Refund exposure", fmtInr(summary.held_out_refund_exposure), "All final-test refund requests"],
+        ["Conditional loss on flags", fmtInr(summary.flagged_loss_exposure), "Synthetic, conditional estimate"],
+        ["Review rate", fmtMetricPct(test.flag_rate), `${test.review_volume} of ${test.rows.toLocaleString("en-IN")} requests`],
+      ],
+    },
+    policy: {
+      kicker: "Policy design / later validation window",
+      title: "Precision, recall, and review capacity",
+      deck: "<em>A threshold is a business decision.</em> The model only supplies probabilities.",
+      aside: "Validation-locked operating policy",
+      cards: [
+        ["Validation requests", validation.rows.toLocaleString("en-IN"), "Later validation policy window"],
+        ["Abuse requests", validation.positive_requests, "Synthetic positives in this window"],
+        ["Locked-policy flags", validation.review_volume, `${validation.false_positives} false alerts`],
+        ["Precision floor", ">=85%", "Declared before final-test evaluation"],
+      ],
+    },
+  }[state.activeView];
+  $("#pageKicker").textContent = chrome.kicker;
+  $("#page-title").textContent = chrome.title;
+  $("#pageDeck").innerHTML = chrome.deck;
+  $("#viewAsideTitle").textContent = chrome.aside;
+  $("#viewAsideMeta").innerHTML = `As of <strong>${fmtTimestamp(state.data.as_of)}</strong>`;
+  chrome.cards.forEach(([label, value, note], index) => {
+    $(`#summaryLabel${index}`).textContent = label;
+    $(`#summaryValue${index}`).textContent = value;
+    $(`#summaryNote${index}`).textContent = note;
+  });
+  $("#reviewBtn").hidden = state.activeView !== "casework";
 }
 
 function renderQueue() {
@@ -67,7 +122,7 @@ function renderQueue() {
     button.className = `case-card ${state.selected?.case_id === item.case_id ? "is-active" : ""}`;
     const riskClass = item.action === "Verify evidence" ? "high" : item.action === "Manual review" ? "medium" : "";
     button.innerHTML = `
-      <span class="case-identity"><strong>${esc(item.case_id)}</strong><span>${esc(item.merchant)} / ${esc(item.reason)}</span></span>
+      <span class="case-identity"><strong>${esc(item.case_id)}</strong><span>${esc(item.merchant)} / ${esc(titleCase(item.vertical))}</span></span>
       <span class="case-money">${fmtInr(item.refund_amount).replace("INR ", "")}</span>
       <span class="case-score ${riskClass}">${fmtRisk(item.risk_percent)}</span>
     `;
@@ -82,13 +137,16 @@ function renderQueue() {
 
 function renderDecision() {
   const item = state.selected;
+  const accepted = item.analyst_action === "accepted_recommendation";
+  const escalated = item.analyst_action === "escalated";
+  const statusLabel = accepted ? "Recommendation accepted" : escalated ? "Sent to analyst" : item.action === "Verify evidence" ? "Evidence required" : item.action === "Manual review" ? "Review threshold met" : "Below review threshold";
   $("#caseMerchant").textContent = `${item.merchant} / ${item.vertical}`;
   $("#caseTitle").textContent = `${item.case_id} / ${item.customer}`;
   $("#scoreText").textContent = fmtRisk(item.risk_percent);
   $("#scoreMarker").style.left = `calc(${item.risk_percent}% - 1px)`;
   $("#confidenceText").textContent = "Calibrated coordinated-ring probability";
-  $("#caseStatus").textContent = item.status;
-  $("#caseStatus").className = `risk-label ${cssClass(item.status)}`;
+  $("#caseStatus").textContent = statusLabel;
+  $("#caseStatus").className = `risk-label ${accepted ? "accepted" : escalated ? "escalated" : cssClass(item.action)}`;
   $("#caseReason").textContent = item.reason;
   $("#actionText").textContent = item.action;
   $("#caseNotes").textContent = item.notes;
@@ -97,6 +155,15 @@ function renderDecision() {
   $("#fpCost").textContent = fmtInr(item.estimated_false_positive_cost);
   $("#refundMethod").textContent = item.refund_method;
   $("#caseAge").textContent = `Scored ${fmtTimestamp(item.event_timestamp)}`;
+  $("#acceptAction").textContent = accepted ? "Accepted" : "Accept recommendation";
+  $("#overrideAction").textContent = escalated ? "Sent to analyst" : "Send to analyst";
+  $("#acceptAction").disabled = accepted || escalated;
+  $("#overrideAction").disabled = accepted || escalated;
+  const outcome = $("#actionOutcome");
+  outcome.hidden = !item.analyst_action;
+  outcome.textContent = accepted
+    ? `Recommendation accepted${item.analyst_action_at ? ` · ${fmtTimestamp(item.analyst_action_at)}` : ""}`
+    : escalated ? `Sent to analyst${item.analyst_action_at ? ` · ${fmtTimestamp(item.analyst_action_at)}` : ""}` : "";
 }
 
 function renderEvidence() {
@@ -150,9 +217,17 @@ function renderPortfolio() {
   `).join("");
 
   const labels = { approve: "Approve", manual_review: "Manual review", verify_evidence: "Verify evidence" };
-  const legend = `<div class="distribution-legend">${Object.entries(bands).map(([name, count]) => `<div><span>${labels[name]}</span><strong>${count}</strong></div>`).join("")}</div>`;
-  const actions = Object.entries(state.data.summary.by_action).map(([name, count]) => `<div class="action-row"><span>${esc(name)}</span><strong>${count}</strong></div>`).join("");
-  $("#actionMix").innerHTML = legend + actions;
+  $("#actionMix").innerHTML = `<div class="distribution-legend">${Object.entries(bands).map(([name, count]) => `<div><span><i class="legend-swatch ${name}"></i>${labels[name]}</span><strong>${count}</strong></div>`).join("")}</div>`;
+
+  const test = state.data.evaluation.test;
+  const metrics = [
+    ["Precision", fmtMetricPct(test.precision)],
+    ["Request recall", fmtMetricPct(test.recall)],
+    ["Early ring recall", fmtMetricPct(test.early_ring_recall)],
+    ["Review rate", fmtMetricPct(test.flag_rate)],
+  ];
+  $("#portfolioEvaluation").innerHTML = metrics.map(([label, value]) => `<div><span>${label}</span><strong>${value}</strong></div>`).join("");
+  $("#coverageNarrative").textContent = `${test.true_positives} of ${test.positive_requests} abuse requests were flagged; ${test.false_negatives} were missed. ${test.early_detected_rings} of ${test.actual_rings} simulated rings were detected before half their loss. These are synthetic benchmark results, not production performance.`;
 }
 
 function selectedMetric() {
@@ -161,7 +236,7 @@ function selectedMetric() {
 
 function renderPolicyControls() {
   $("#thresholdButtons").innerHTML = state.data.metrics.map((metric) => `
-    <button type="button" class="${Math.abs(metric.threshold - state.threshold) < 1e-7 ? "is-active" : ""} ${metric.is_locked ? "locked" : ""}" data-threshold="${metric.threshold}">${fmtRisk(metric.threshold_percent)}</button>
+    <button type="button" class="${Math.abs(metric.threshold - state.threshold) < 1e-7 ? "is-active" : ""} ${metric.is_locked ? "locked" : ""}" data-threshold="${metric.threshold}">${fmtThreshold(metric.threshold_percent)}</button>
   `).join("");
   $$("#thresholdButtons button").forEach((button) => button.addEventListener("click", () => {
     state.threshold = Number(button.dataset.threshold);
@@ -174,15 +249,23 @@ function renderPolicy() {
   renderPolicyControls();
   const metric = selectedMetric();
   const locked = state.data.metrics.find((item) => item.is_locked);
+  const metadata = state.data.policy_metadata;
+  $("#thresholdLockNote").textContent = `Locked at ${fmtThreshold(locked.threshold_percent)} on ${metadata.source}: maximize recall subject to at least ${pct(metadata.precision_floor)} precision and ${metadata.minimum_flags}+ flags.`;
   $("#policySavings").textContent = fmtInr(metric.net_value);
   const delta = metric.net_value - locked.net_value;
-  $("#policyDelta").textContent = metric.is_locked ? "Validation-locked operating point" : `${delta >= 0 ? "+" : ""}${fmtInr(delta)} vs locked policy`;
+  $("#policyDelta").textContent = metric.is_locked
+    ? "Locked: meets the declared precision floor"
+    : `${metric.meets_precision_floor ? "Meets" : "Fails"} 85% precision floor · ${delta >= 0 ? "+" : ""}${fmtInr(delta)} vs locked`;
+  $("#policyDelta").className = metric.meets_precision_floor ? "policy-pass" : "policy-fail";
+  $("#policyInterpretation").textContent = `${metric.true_positives} of ${metric.positive_requests} abuse requests caught; ${metric.false_negatives} missed; ${metric.false_positives} false alerts. Synthetic validation scenario.`;
 
   const cards = [
-    ["Precision", pct(metric.precision)],
-    ["Recall", pct(metric.recall)],
+    ["Precision", fmtMetricPct(metric.precision)],
+    ["Request recall", fmtMetricPct(metric.recall)],
+    ["Caught", `${metric.true_positives} / ${metric.positive_requests}`],
+    ["Missed abuse requests", metric.false_negatives],
     ["False-positive cost", fmtInr(metric.false_positive_cost)],
-    [`Review cost · ${metric.review_volume} cases`, fmtInr(metric.review_cost)],
+    [`Review load · ${metric.review_volume} flags`, fmtInr(metric.review_cost)],
   ];
   $("#metricCards").innerHTML = cards.map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${value}</strong></div>`).join("");
   drawChart();
@@ -303,14 +386,22 @@ async function recordAnalystAction(action, successMessage) {
     showToast("Could not record analyst action.");
     return;
   }
+  const result = await response.json();
+  state.selected.analyst_action = result.action;
+  state.selected.analyst_action_at = result.created_at;
+  renderDecision();
+  renderQueue();
   showToast(successMessage);
 }
 
-function switchView(viewName) {
+function switchView(viewName, updateHash = true) {
   if (!viewName || !$(`#${viewName}View`)) return;
+  state.activeView = viewName;
   $$(".nav-tab").forEach((button) => button.classList.toggle("is-active", button.dataset.view === viewName));
   $$(".view").forEach((view) => view.classList.remove("is-visible"));
   $(`#${viewName}View`).classList.add("is-visible");
+  renderSummary();
+  if (updateHash) window.history.replaceState(null, "", `#${viewName}`);
   if (viewName === "policy") requestAnimationFrame(drawChart);
 }
 
@@ -324,7 +415,7 @@ function bindEvents() {
     renderQueue(); renderCase();
   }));
   $("#caseSearch").addEventListener("input", (event) => { state.search = event.target.value; renderQueue(); });
-  $("#sortBtn").addEventListener("click", () => { state.reversed = !state.reversed; renderQueue(); });
+  $("#caseSort").addEventListener("change", (event) => { state.sort = event.target.value; renderQueue(); });
   $("#previousCase").addEventListener("click", () => moveSelection(-1));
   $("#nextCase").addEventListener("click", () => moveSelection(1));
   $("#reviewBtn").addEventListener("click", showPacket);
@@ -343,13 +434,20 @@ async function init() {
   state.data = await response.json();
   state.threshold = state.data.active_threshold;
   state.selected = state.data.cases[0];
-  renderSummary();
   renderQueue();
   renderCase();
   renderPortfolio();
   renderPolicy();
   bindEvents();
+  const requestedView = window.location.hash.slice(1);
+  switchView(["casework", "portfolio", "policy"].includes(requestedView) ? requestedView : "casework", false);
 }
+
+window.marginShieldChatContext = () => ({
+  view: state.activeView,
+  case_id: state.activeView === "casework" ? state.selected?.case_id ?? null : null,
+  ring_id: null,
+});
 
 init().catch((error) => {
   console.error(error);

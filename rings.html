@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>MarginShield | Abuse Rings</title>
     <meta name="description" content="Live connected-entity investigation for suspected refund abuse rings." />
-    <link rel="stylesheet" href="styles.css?v=20260905-1" />
+    <link rel="stylesheet" href="styles.css?v=20260905-3" />
   </head>
   <body class="rings-body">
     <header class="masthead">
@@ -14,10 +14,15 @@
         <span>MarginShield</span>
       </a>
       <nav class="product-nav" aria-label="Primary navigation">
-        <a class="nav-tab nav-link" href="index.html">Casework</a>
+        <a class="nav-tab nav-link" href="index.html#casework">Casework</a>
+        <a class="nav-tab nav-link" href="index.html#portfolio">Portfolio</a>
+        <a class="nav-tab nav-link" href="index.html#policy">Policy lab</a>
         <a class="nav-tab nav-link is-active" href="rings.html">Abuse rings</a>
       </nav>
-      <div class="masthead-meta"><span class="live-status"><i></i> Graph monitor online</span></div>
+      <div class="masthead-meta">
+        <span class="live-status"><i></i> Graph monitor online</span>
+        <button class="header-command assistant-command" data-chat-open type="button">Ask MarginShield</button>
+      </div>
     </header>
 
     <main class="page ring-page">
@@ -25,9 +30,10 @@
         <div>
           <p class="kicker">Relationship intelligence / point-in-time entity graph</p>
           <h1 id="ring-title">Abuse ring investigations</h1>
+          <p class="page-deck"><em>One request is a case.</em> Repeated relationships reveal the network.</p>
         </div>
         <div class="intro-aside">
-          <p>Held-out operational window</p>
+          <p>Current scored relationship window</p>
           <span id="asOfText">Loading current graph...</span>
         </div>
       </section>
@@ -36,7 +42,7 @@
         <article><span>Candidate rings</span><strong id="ringCount">...</strong><small>Shared-entity components</small></article>
         <article><span>Policy-linked requests</span><strong id="linkedReviewCases">...</strong><small>Above manual-review threshold</small></article>
         <article><span>Largest account link</span><strong id="largestLink">...</strong><small>Accounts behind one identifier</small></article>
-        <article><span>Graph window</span><strong id="windowDays">...</strong><small>Held-out relationship history</small></article>
+        <article><span>Graph window</span><strong id="windowDays">...</strong><small>Current scored relationship history</small></article>
       </section>
 
       <section class="ring-workbench" aria-label="Abuse ring investigation">
@@ -62,6 +68,7 @@
         </article>
       </section>
     </main>
-    <script src="rings.js?v=20260905-1"></script>
+    <script src="rings.js?v=20260905-3"></script>
+    <script src="chat.js?v=20260905-3"></script>
   </body>
 </html>

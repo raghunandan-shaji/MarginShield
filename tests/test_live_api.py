@@ -3,20 +3,33 @@ from __future__ import annotations
 import unittest
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-from server import app, service
+import server
+from server import MarginShieldService, app
 
 
 class LiveApiTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        cls.temp_dir = TemporaryDirectory()
+        cls.original_service = server.service
+        cls.service = MarginShieldService(Path(cls.temp_dir.name) / "decisions.sqlite")
+        server.service = cls.service
         cls.client = TestClient(app)
 
+    @classmethod
+    def tearDownClass(cls) -> None:
+        server.service = cls.original_service
+        cls.temp_dir.cleanup()
+
     def feature_payload(self) -> dict:
-        row = service.cases.iloc[-1]
-        return {name: row[name].item() if hasattr(row[name], "item") else row[name] for name in service.bundle.features}
+        row = self.service.cases.iloc[-1]
+        return {name: row[name].item() if hasattr(row[name], "item") else row[name] for name in self.service.bundle.features}
 
     def test_health_and_model_scope(self) -> None:
         response = self.client.get("/api/health")
@@ -27,8 +40,13 @@ class LiveApiTests(unittest.TestCase):
         self.assertEqual(model["dataset_version"], "3.0.0-locked")
 
     def test_static_routes_do_not_expose_project_artifacts(self) -> None:
-        for path in ("/", "/index.html", "/rings.html", "/styles.css", "/app.js", "/rings.js"):
-            self.assertEqual(self.client.get(path).status_code, 200, path)
+        for path in ("/", "/index.html", "/rings.html", "/styles.css", "/app.js", "/rings.js", "/chat.js"):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+            self.assertIn("no-store", response.headers["cache-control"])
+        rings_html = self.client.get("/rings.html").text
+        for label in ("Casework", "Portfolio", "Policy lab", "Abuse rings"):
+            self.assertIn(label, rings_html)
         for path in (
             "/server.py",
             "/requirements-ml.txt",
@@ -58,7 +76,7 @@ class LiveApiTests(unittest.TestCase):
         response = self.client.post("/api/score", json={"features": {}})
         self.assertEqual(response.status_code, 422)
         missing = {item["loc"][-1] for item in response.json()["detail"] if item["type"] == "missing"}
-        self.assertEqual(missing, set(service.bundle.features))
+        self.assertEqual(missing, set(self.service.bundle.features))
 
     def test_dashboard_exposes_probability_and_percentage_separately(self) -> None:
         body = self.client.get("/api/dashboard").json()
@@ -69,8 +87,31 @@ class LiveApiTests(unittest.TestCase):
         self.assertNotIn("impact", case["evidence"][0])
         self.assertIn("contribution", case["evidence"][0])
         self.assertFalse(body["policy_metadata"]["test_labels_used"])
+        self.assertEqual(body["policy_metadata"]["precision_floor"], 0.85)
+        self.assertEqual(body["policy_metadata"]["minimum_flags"], 30)
         self.assertEqual(len(body["metrics"]), len({item["threshold"] for item in body["metrics"]}))
         self.assertEqual(1, sum(item["is_locked"] for item in body["metrics"]))
+        self.assertEqual([item["threshold"] for item in body["metrics"]], sorted(item["threshold"] for item in body["metrics"]))
+        validation = body["evaluation"]["validation"]
+        test = body["evaluation"]["test"]
+        self.assertEqual(validation["true_positives"] + validation["false_negatives"], validation["positive_requests"])
+        self.assertEqual(test["true_positives"] + test["false_negatives"], test["positive_requests"])
+        self.assertEqual(validation["window"], "later validation policy window")
+        self.assertEqual(test["window"], "final synthetic test")
+        self.assertAlmostEqual(validation["precision"], 29 / 33)
+        self.assertAlmostEqual(validation["recall"], 29 / 127)
+
+    def test_dashboard_returns_latest_persisted_analyst_action(self) -> None:
+        case_id = self.client.get("/api/dashboard").json()["cases"][0]["case_id"]
+        action = self.client.post(
+            f"/api/decisions/{case_id}/action",
+            json={"action": "escalated", "note": "dashboard state test"},
+        )
+        self.assertEqual(action.status_code, 200, action.text)
+        cases = self.client.get("/api/dashboard").json()["cases"]
+        persisted = next(item for item in cases if item["case_id"] == case_id)
+        self.assertEqual(persisted["analyst_action"], "escalated")
+        self.assertEqual(persisted["analyst_action_at"], action.json()["created_at"])
 
     def test_ring_endpoints_expose_only_suspected_graph_data(self) -> None:
         response = self.client.get("/api/rings")
@@ -85,6 +126,8 @@ class LiveApiTests(unittest.TestCase):
         self.assertEqual(exposures, sorted(exposures, reverse=True))
         self.assertTrue(all(ring["entity_count"] >= 1 for ring in body["rings"]))
         self.assertIn("P1 is the highest queue rank", body["method"])
+        self.assertIn("final synthetic test and replayed live or demo events", body["data_scope"])
+        self.assertGreaterEqual(body["live_event_count"], 0)
         self.assertNotIn("ring_id", body["rings"][0].get("reasons", []))
         detail = self.client.get(f"/api/rings/{body['rings'][0]['ring_id']}")
         self.assertEqual(detail.status_code, 200)
@@ -92,7 +135,7 @@ class LiveApiTests(unittest.TestCase):
 
     def test_raw_event_is_featured_scored_and_audited(self) -> None:
         suffix = uuid.uuid4().hex[:10]
-        latest = datetime.fromtimestamp(service.engine.last_seconds + 1, tz=timezone.utc)
+        latest = datetime.fromtimestamp(self.service.engine.last_seconds + 1, tz=timezone.utc)
         payload = {
             "case_id": f"LIVE-{suffix}", "event_timestamp": latest.isoformat(),
             "customer_id": f"CUS-{suffix}", "merchant_id": "MER-LIVE",
@@ -115,8 +158,31 @@ class LiveApiTests(unittest.TestCase):
         self.assertEqual(action.status_code, 200, action.text)
         audit = self.client.get(f"/api/audit/{payload['case_id']}")
         self.assertEqual(audit.status_code, 200)
-        self.assertEqual(audit.json()["decision"]["model_version"], service.bundle.version)
+        self.assertEqual(audit.json()["decision"]["model_version"], self.service.bundle.version)
         self.assertEqual(audit.json()["analyst_actions"][-1]["action"], "accepted_recommendation")
+
+    def test_chat_fallback_is_grounded_in_locked_report(self) -> None:
+        with patch.dict("os.environ", {"GEMINI_API_KEY": ""}):
+            response = self.client.post(
+                "/api/chat",
+                json={"message": "Why are precision and recall so different?", "view": "policy"},
+            )
+        self.assertEqual(response.status_code, 200, response.text)
+        body = response.json()
+        self.assertEqual(body["provider"], "local_grounded_fallback")
+        self.assertIn("29 of 127", body["answer"])
+        self.assertIn("low coverage", body["answer"])
+        self.assertIn("synthetic", body["answer"].lower())
+
+    def test_chat_uses_selected_case_context(self) -> None:
+        selected = self.client.get("/api/dashboard").json()["cases"][0]
+        with patch.dict("os.environ", {"GEMINI_API_KEY": ""}):
+            response = self.client.post(
+                "/api/chat",
+                json={"message": "Why this case?", "view": "casework", "case_id": selected["case_id"]},
+            )
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertIn(selected["case_id"], response.json()["answer"])
 
     def test_typed_feature_payload_rejects_impossible_values(self) -> None:
         payload = self.feature_payload()

@@ -45,7 +45,7 @@ Policy:
 - Tournament, calibration, policy, evaluation: `marginshield/tournament.py`
 - Label-free candidate graphs: `marginshield/rings.py`
 - Typed API, SQLite audit trail, dashboard payload: `server.py`
-- UI: `index.html`, `rings.html`, `app.js`, `rings.js`, `styles.css`
+- UI: `index.html`, `rings.html`, `app.js`, `rings.js`, `chat.js`, `styles.css`
 - Active model: `data/model/live_refund_ring_model.joblib`
 - Active report: `data/reports/ring_model_report.json`
 - Locked protocol: `SIMULATOR_V3_DESIGN.md`
@@ -182,9 +182,32 @@ Early ring recall by unseen test topology:
 The system is precise but conservative. It misses slow sparse structures; claiming
 comprehensive ring coverage would be false.
 
+The 85% precision floor was a pre-declared review-queue constraint, not evidence that
+recall is unimportant. Validation catches 29 of 127 positive requests and misses 98;
+the final synthetic test catches 34 of 262 and misses 228. Portfolio now makes these
+coverage counts explicit, while Policy Lab shows that lower thresholds recover more
+positives but fail the chosen precision floor. The product is therefore a selective
+triage layer, not a comprehensive detector.
+
+## Frontend Data Contract
+
+- Casework uses the top 520 scores from the final synthetic test.
+- Portfolio uses the entire final synthetic test and reports locked-policy coverage.
+- Policy Lab uses only the later validation policy window.
+- Abuse Rings uses a trailing 30-day graph over final-test and replayed live/demo
+  events; labels never form candidate components.
+- Every probability is formatted as a percentage. Queue ranking and ring queue rank
+  are distinct from probability and are never labelled as generic priority.
+- `Ask MarginShield` receives sanitized report, policy, portfolio, and selected-item
+  context from the server. It has a deterministic no-key fallback and an optional
+  Gemini 2.5 Flash free-tier mode. Free-tier data-use terms make that mode unsuitable
+  for real merchant data.
+
 ## Verification
 
-- `24/24` unit and API tests pass.
+- `27/27` unit and API tests pass.
+- Grounded-chat tests cover locked-report recall/precision answers and selected-case context.
+- Static app-shell responses use `no-store`; both pages expose the same four-view navigation.
 - Full-dataset offline/live feature replay passes.
 - Target-only metadata is excluded from the exact model contract.
 - Future entity mutations do not alter past features.

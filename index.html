@@ -8,7 +8,7 @@
       name="description"
       content="A cost-aware refund abuse verifier for merchant risk teams."
     />
-    <link rel="stylesheet" href="styles.css?v=20260905-1" />
+    <link rel="stylesheet" href="styles.css?v=20260905-3" />
   </head>
   <body>
     <header class="masthead">
@@ -26,6 +26,7 @@
 
       <div class="masthead-meta">
         <span class="live-status"><i></i> Model online</span>
+        <button class="header-command assistant-command" data-chat-open type="button">Ask MarginShield</button>
         <button id="reviewBtn" class="header-command" type="button">Create review packet</button>
       </div>
     </header>
@@ -33,35 +34,36 @@
     <main id="top" class="page">
       <section class="page-intro" aria-labelledby="page-title">
         <div>
-          <p class="kicker">Razorpay / AI Risk Manager / Coordinated refund-abuse rings</p>
+          <p id="pageKicker" class="kicker">Decision operations / coordinated refund-abuse rings</p>
           <h1 id="page-title">Refund risk operations</h1>
+          <p id="pageDeck" class="page-deck"><em>Signals are cheap.</em> Defensible intervention is not.</p>
         </div>
         <div class="intro-aside">
-          <p>Coordinated refund-abuse ring casework</p>
-          <span>As of <strong id="lastScored">loading...</strong></span>
+          <p id="viewAsideTitle">High-confidence refund triage</p>
+          <span id="viewAsideMeta">As of <strong id="lastScored">loading...</strong></span>
         </div>
       </section>
 
       <section class="portfolio-strip" aria-label="Refund portfolio summary">
         <article>
-          <span>Queue refund exposure</span>
-          <strong id="refundExposure">...</strong>
-          <small>Top-ranked held-out requests</small>
+          <span id="summaryLabel0">Scored queue</span>
+          <strong id="summaryValue0">...</strong>
+          <small id="summaryNote0">Top-ranked requests</small>
         </article>
         <article>
-          <span>Flagged loss exposure</span>
-          <strong id="flaggedLoss">...</strong>
-          <small>Conditional synthetic estimate</small>
+          <span id="summaryLabel1">Queue exposure</span>
+          <strong id="summaryValue1">...</strong>
+          <small id="summaryNote1">Refund amount requested</small>
         </article>
         <article>
-          <span>Verify-evidence cases</span>
-          <strong id="highRiskCases">...</strong>
-          <small>Above the evidence threshold</small>
+          <span id="summaryLabel2">Review candidates</span>
+          <strong id="summaryValue2">...</strong>
+          <small id="summaryNote2">Locked-policy flags</small>
         </article>
         <article>
-          <span>Manual-review threshold</span>
-          <strong id="activeThreshold">58</strong>
-          <small>Locked on validation</small>
+          <span id="summaryLabel3">Manual-review threshold</span>
+          <strong id="summaryValue3">...</strong>
+          <small id="summaryNote3">Locked on validation</small>
         </article>
       </section>
 
@@ -73,7 +75,15 @@
                 <p>Incoming work</p>
                 <h2>Refund queue <span id="queueCount">0</span></h2>
               </div>
-              <button id="sortBtn" class="square-button" type="button" aria-label="Reverse case order" title="Reverse case order">&#8645;</button>
+              <label class="sort-control">
+                <span>Sort queue</span>
+                <select id="caseSort" aria-label="Sort refund queue">
+                  <option value="risk_desc">Ring risk: high to low</option>
+                  <option value="exposure_desc">Exposure: high to low</option>
+                  <option value="risk_asc">Ring risk: low to high</option>
+                  <option value="exposure_asc">Exposure: low to high</option>
+                </select>
+              </label>
             </div>
 
             <label class="search-control">
@@ -128,6 +138,7 @@
                   <button id="acceptAction" class="primary-action" type="button">Accept recommendation</button>
                   <button id="overrideAction" class="secondary-action" type="button">Send to analyst</button>
                 </div>
+                <p id="actionOutcome" class="action-outcome" hidden></p>
               </div>
 
               <dl class="case-facts">
@@ -182,17 +193,24 @@
 
       <section id="portfolioView" class="view" aria-label="Portfolio view">
         <div class="view-heading">
-          <p>Portfolio intelligence</p>
-          <h2>Where refund loss is concentrating</h2>
+          <div>
+            <p>Final synthetic test</p>
+            <h2>Exposure and detection coverage</h2>
+            <p class="section-deck"><em>High confidence is useful.</em> Missed abuse still matters.</p>
+          </div>
+          <span class="window-chip">Locked policy / untouched test</span>
         </div>
         <div class="portfolio-layout">
           <section class="portfolio-table-section">
             <div class="section-title"><div><p>Merchant verticals</p><h2>Exposure by category</h2></div></div>
-            <div class="portfolio-table-head"><span>Vertical</span><span>Refund exposure</span><span>Flagged loss exposure</span></div>
+            <div class="portfolio-table-head"><span>Vertical</span><span>Refund exposure</span><span>Conditional loss on flags</span></div>
             <div id="verticalTable" class="portfolio-table"></div>
           </section>
           <section class="distribution-section">
-            <div class="section-title"><div><p>Queue composition</p><h2>Risk distribution</h2></div></div>
+            <div class="section-title"><div><p>Locked-policy performance</p><h2>Coverage, not just confidence</h2></div></div>
+            <div id="portfolioEvaluation" class="benchmark-grid"></div>
+            <p id="coverageNarrative" class="coverage-narrative"></p>
+            <div class="section-title compact-title"><div><p>Final-test actions</p><h2>Intervention mix</h2></div></div>
             <div id="riskDistribution" class="risk-distribution"></div>
             <div id="actionMix" class="action-mix"></div>
           </section>
@@ -201,18 +219,30 @@
 
       <section id="policyView" class="view" aria-label="Policy lab view">
         <div class="view-heading policy-heading">
-          <div><p>Validation policy analysis</p><h2>Threshold trade-offs</h2></div>
-          <p>Scenarios use only the later validation window. The final test split is not used for threshold selection.</p>
+          <div>
+            <p>Validation policy analysis</p>
+            <h2>Threshold trade-offs</h2>
+            <p class="section-deck"><em>Every extra detection spends attention.</em> The policy makes that cost visible.</p>
+          </div>
+          <div class="policy-note">
+            <p>Scenarios use only the later validation window. The final test split is not used for threshold selection.</p>
+            <small id="thresholdLockNote">Loading locked-policy rule...</small>
+          </div>
         </div>
 
         <div class="threshold-control">
-          <span>Fewer reviews</span>
-          <div id="thresholdButtons" class="threshold-buttons" role="group" aria-label="Policy threshold"></div>
           <span>More reviews</span>
+          <div id="thresholdButtons" class="threshold-buttons" role="group" aria-label="Policy threshold"></div>
+          <span>Fewer reviews</span>
         </div>
 
         <section class="policy-result">
-          <div class="policy-number"><span>Net synthetic value</span><strong id="policySavings">...</strong><small id="policyDelta">...</small></div>
+          <div class="policy-number">
+            <span>Net value under assumptions</span>
+            <strong id="policySavings">...</strong>
+            <small id="policyDelta">...</small>
+            <p id="policyInterpretation">...</p>
+          </div>
           <div id="metricCards" class="metric-cards"></div>
         </section>
 
@@ -238,6 +268,7 @@
     </dialog>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <script src="app.js?v=20260905-1"></script>
+    <script src="app.js?v=20260905-3"></script>
+    <script src="chat.js?v=20260905-3"></script>
   </body>
 </html>

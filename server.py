@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import copy
 import json
+import os
 import sqlite3
 import threading
 from datetime import datetime, timezone
@@ -8,11 +10,12 @@ from pathlib import Path
 from typing import Any, Literal
 
 import joblib
+import httpx
 import numpy as np
 import pandas as pd
 from catboost import Pool
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from marginshield.feature_engine import PointInTimeFeatureEngine, RawRefundEvent, apply_features_via_engine
@@ -84,6 +87,21 @@ class AnalystActionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     action: Literal["accepted_recommendation", "verified_legitimate", "confirmed_abuse", "escalated"]
     note: str = Field(default="", max_length=2_000)
+
+
+class ChatTurn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=2_000)
+
+
+class ChatRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    message: str = Field(min_length=1, max_length=2_000)
+    history: list[ChatTurn] = Field(default_factory=list, max_length=8)
+    view: Literal["casework", "portfolio", "policy", "abuse_rings"] = "casework"
+    case_id: str | None = Field(default=None, max_length=120)
+    ring_id: str | None = Field(default=None, max_length=120)
 
 
 def score_action(probability: float, features: dict[str, Any], bundle: LiveModelBundle) -> tuple[str, str, str]:
@@ -238,7 +256,7 @@ def build_policy_metrics(cases: pd.DataFrame, bundle: LiveModelBundle) -> tuple[
     thresholds = {float(bundle.threshold)}
     thresholds.update(float(ordered[min(volume - 1, len(ordered) - 1)]) for volume in review_volumes)
     metrics: list[dict[str, Any]] = []
-    for threshold in sorted(thresholds, reverse=True):
+    for threshold in sorted(thresholds):
         metric = classification_metrics(policy, scores, threshold, include_ring_metrics=False)
         metrics.append({
             "threshold": round(threshold, 6),
@@ -250,16 +268,52 @@ def build_policy_metrics(cases: pd.DataFrame, bundle: LiveModelBundle) -> tuple[
             "false_positive_cost": metric["costs"]["false_positive_cost_inr"],
             "review_cost": metric["costs"]["total_review_cost_inr"],
             "meets_precision_floor": metric["precision"] >= 0.85,
+            "true_positives": metric["confusion_matrix"]["tp"],
+            "false_positives": metric["confusion_matrix"]["fp"],
+            "false_negatives": metric["confusion_matrix"]["fn"],
+            "positive_requests": metric["confusion_matrix"]["tp"] + metric["confusion_matrix"]["fn"],
         })
     return metrics, {
         "source": "later half of validation split",
         "rows": len(policy),
         "cutoff": cutoff.isoformat(),
         "test_labels_used": False,
+        "selection_rule": "maximize recall subject to the validation precision floor and minimum flag count",
+        "precision_floor": 0.85,
+        "minimum_flags": 30,
     }
 
 
-def build_dashboard(cases: pd.DataFrame, bundle: LiveModelBundle) -> dict[str, Any]:
+def benchmark_payload(report: dict[str, Any]) -> dict[str, Any]:
+    payload: dict[str, Any] = {}
+    for source, name in (("policy_validation", "validation"), ("test", "test")):
+        metric = report[source]
+        confusion = metric["confusion_matrix"]
+        ring_level = metric["ring_level"]
+        payload[name] = {
+            "window": "later validation policy window" if name == "validation" else "final synthetic test",
+            "rows": metric["rows"],
+            "positive_requests": confusion["tp"] + confusion["fn"],
+            "true_positives": confusion["tp"],
+            "false_positives": confusion["fp"],
+            "false_negatives": confusion["fn"],
+            "precision": metric["precision"],
+            "recall": metric["recall"],
+            "pr_auc": metric["pr_auc"],
+            "roc_auc": metric["roc_auc"],
+            "brier_score": metric["brier_score"],
+            "flag_rate": metric["flag_rate"],
+            "review_volume": metric["review_volume"],
+            "net_preventable_value_inr": metric["costs"]["net_preventable_value_inr"],
+            "actual_rings": ring_level["actual_rings"],
+            "early_detected_rings": ring_level["detected_before_half_loss"],
+            "early_ring_recall": ring_level["ring_recall"],
+            "ring_candidate_precision": ring_level["ring_precision"],
+        }
+    return payload
+
+
+def build_dashboard(cases: pd.DataFrame, bundle: LiveModelBundle, report: dict[str, Any]) -> dict[str, Any]:
     held_out = cases.loc[cases["split"].eq("test")].copy().sort_values(["event_timestamp", "case_id"])
     held_out["ring_probability"] = score_live_bundle(bundle, held_out)
     actions = [
@@ -313,6 +367,9 @@ def build_dashboard(cases: pd.DataFrame, bundle: LiveModelBundle) -> dict[str, A
             "queue_refund_exposure": int(queue["refund_amount_inr"].sum()),
             "flagged_loss_exposure": int(queue.loc[queue["ring_probability"] >= bundle.threshold, "expected_loss_if_ring_inr"].sum()),
             "verify_evidence_cases": int(queue["action_key"].eq("verify_evidence").sum()),
+            "held_out_requests": len(held_out),
+            "held_out_refund_exposure": int(held_out["refund_amount_inr"].sum()),
+            "flagged_requests": int((held_out["ring_probability"] >= bundle.threshold).sum()),
             "by_vertical": sorted(by_vertical, key=lambda item: item["refund_exposure"], reverse=True),
             "risk_bands": {
                 "approve": int(held_out["action_key"].eq("approve").sum()),
@@ -322,6 +379,7 @@ def build_dashboard(cases: pd.DataFrame, bundle: LiveModelBundle) -> dict[str, A
             "by_action": held_out["action"].value_counts().to_dict(),
         },
         "metrics": policy_metrics,
+        "evaluation": benchmark_payload(report),
         "policy_metadata": policy_metadata,
         "active_threshold": round(float(bundle.threshold), 6),
         "active_threshold_percent": round(float(bundle.threshold) * 100, 1),
@@ -341,7 +399,7 @@ class MarginShieldService:
         self._init_database()
         self._replay_live_events()
         self.rings = build_ring_catalog(self.cases, self.bundle)
-        self.dashboard = build_dashboard(self.cases, self.bundle)
+        self.dashboard = build_dashboard(self.cases, self.bundle, self.report)
 
     def score(self, features: dict[str, Any]) -> dict[str, Any]:
         missing = sorted(set(self.bundle.features).difference(features))
@@ -503,6 +561,160 @@ class MarginShieldService:
             )
         return {"id": cursor.lastrowid, "case_id": case_id, "action": request.action, "note": request.note, "created_at": created_at}
 
+    def dashboard_payload(self) -> dict[str, Any]:
+        payload = copy.deepcopy(self.dashboard)
+        with self._connect() as connection:
+            rows = connection.execute("""
+                SELECT action.case_id, action.action, action.created_at
+                FROM analyst_actions AS action
+                INNER JOIN (
+                    SELECT case_id, MAX(id) AS latest_id
+                    FROM analyst_actions
+                    GROUP BY case_id
+                ) AS latest ON latest.latest_id = action.id
+            """).fetchall()
+        latest_actions = {row["case_id"]: dict(row) for row in rows}
+        for case in payload["cases"]:
+            latest = latest_actions.get(case["case_id"])
+            if latest:
+                case["analyst_action"] = latest["action"]
+                case["analyst_action_at"] = latest["created_at"]
+        return payload
+
+    def chat_context(self, request: ChatRequest) -> dict[str, Any]:
+        dashboard = self.dashboard_payload()
+        context: dict[str, Any] = {
+            "product": {
+                "name": "MarginShield",
+                "scope": dashboard["model_scope"],
+                "target": self.report["target_definition"],
+                "allowed_actions": ["approve", "manual review", "verify evidence"],
+                "auto_reject": False,
+            },
+            "current_view": request.view,
+            "policy": {
+                "threshold": dashboard["active_threshold"],
+                "selection": self.report["calibration"]["policy_selection"],
+                "source": dashboard["policy_metadata"]["source"],
+                "test_labels_used_for_selection": False,
+            },
+            "benchmark": dashboard["evaluation"],
+            "portfolio": dashboard["summary"],
+            "limitations": self.report["limitations"],
+        }
+        if request.case_id:
+            selected_case = next((item for item in dashboard["cases"] if item["case_id"] == request.case_id), None)
+            if selected_case:
+                context["selected_case"] = selected_case
+        if request.ring_id:
+            selected_ring = next((item for item in self.rings["candidate_rings"] if item["ring_id"] == request.ring_id), None)
+            if selected_ring:
+                context["selected_ring"] = selected_ring
+        return context
+
+    @staticmethod
+    def local_chat_answer(question: str, context: dict[str, Any]) -> str:
+        query = question.lower()
+        validation = context["benchmark"]["validation"]
+        test = context["benchmark"]["test"]
+        if "precision" in query or "recall" in query or "miss" in query or "performance" in query:
+            return (
+                f"On the validation policy window, precision is {validation['precision']:.1%} and request recall is "
+                f"{validation['recall']:.1%}: {validation['true_positives']} of {validation['positive_requests']} abuse requests "
+                f"were flagged and {validation['false_negatives']} were missed. On the final synthetic test, precision is "
+                f"{test['precision']:.1%} and recall is {test['recall']:.1%}. This is a high-confidence triage policy with low "
+                "coverage, not a comprehensive detector. All figures are synthetic benchmark results."
+            )
+        if "threshold" in query or "policy" in query:
+            return (
+                f"The manual-review threshold is {context['policy']['threshold']:.4f}. It was locked on the later validation "
+                f"window by this rule: {context['policy']['selection']} Final-test labels were not used to choose it. Lower "
+                "thresholds improve recall but fail the declared 85% validation precision constraint."
+            )
+        if "case" in query or "decision" in query or "why" in query:
+            case = context.get("selected_case")
+            if case:
+                evidence = "; ".join(
+                    f"{item['name']} ({item['contribution']:+.2f} log-odds)" for item in case["evidence"][:3]
+                )
+                return (
+                    f"{case['case_id']} has a calibrated coordinated-ring probability of {case['risk_percent']:.1f}% and the "
+                    f"recommended action is {case['action'].lower()}. The leading model contributions are {evidence}. The "
+                    f"operational rationale is: {case['notes']} This is evidence for review, not proof of fraud."
+                )
+        if "ring" in query or "cluster" in query or "graph" in query:
+            ring = context.get("selected_ring")
+            if ring:
+                return (
+                    f"{ring['ring_id']} contains {ring['case_count']} requests linked through {ring['entity_count']} shared "
+                    f"identifiers. {ring['high_risk_case_count']} requests meet the review policy. Its model-weighted conditional "
+                    f"exposure is INR {ring['model_weighted_exposure_inr']:,}. It is a candidate connected component, not a "
+                    "confirmed abuse ring."
+                )
+        if "data" in query or "synthetic" in query or "olist" in query or "real" in query:
+            return (
+                "The active 75,000-row benchmark and all fraud labels are synthetic. Olist has no refund-fraud labels and is not "
+                "used as fraud truth. The simulator contains coordinated rings and difficult legitimate sharing, but benchmark "
+                "performance is not real-world or production performance."
+            )
+        return (
+            "MarginShield estimates whether a refund request belongs to a coordinated multi-account abuse ring using only "
+            "pre-decision graph, velocity, account-history, merchant, product, and refund signals. Ask about the selected case or "
+            "ring, the threshold, precision and recall, costs, or synthetic-data limitations."
+        )
+
+    def chat(self, request: ChatRequest) -> dict[str, Any]:
+        context = self.chat_context(request)
+        api_key = os.getenv("GEMINI_API_KEY", "").strip()
+        if not api_key:
+            return {
+                "answer": self.local_chat_answer(request.message, context),
+                "provider": "local_grounded_fallback",
+                "grounded_in": sorted(context.keys()),
+                "note": "Set GEMINI_API_KEY to enable the optional free-tier Gemini conversation layer.",
+            }
+
+        system_instruction = (
+            "You are MarginShield's risk-analysis assistant. Answer only from the supplied JSON facts. Be concise, direct, and "
+            "plain text. Never invent a metric, event, label, cause, or Razorpay capability. Distinguish validation from final "
+            "synthetic test and from current operational data. Always disclose that benchmark labels are synthetic when discussing "
+            "performance. Treat candidate rings as suspicions, not confirmed fraud. Never recommend auto-rejection. If the facts do "
+            "not support an answer, say that the information is unavailable. Do not use markdown tables."
+        )
+        contents = [
+            {"role": "user" if turn.role == "user" else "model", "parts": [{"text": turn.content}]}
+            for turn in request.history
+        ]
+        contents.append({
+            "role": "user",
+            "parts": [{"text": f"Grounding facts:\n{json.dumps(context, sort_keys=True, default=str)}\n\nQuestion:\n{request.message}"}],
+        })
+        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip() or "gemini-2.5-flash"
+        try:
+            response = httpx.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+                headers={"x-goog-api-key": api_key, "Content-Type": "application/json"},
+                json={
+                    "systemInstruction": {"parts": [{"text": system_instruction}]},
+                    "contents": contents,
+                    "generationConfig": {"temperature": 0.1, "maxOutputTokens": 500},
+                },
+                timeout=25.0,
+            )
+            response.raise_for_status()
+            parts = response.json()["candidates"][0]["content"]["parts"]
+            answer = "".join(part.get("text", "") for part in parts).strip()
+            if not answer:
+                raise ValueError("Gemini returned no text")
+            return {"answer": answer, "provider": model, "grounded_in": sorted(context.keys())}
+        except (httpx.HTTPError, KeyError, IndexError, ValueError):
+            return {
+                "answer": self.local_chat_answer(request.message, context),
+                "provider": "local_grounded_fallback",
+                "grounded_in": sorted(context.keys()),
+                "note": "The configured Gemini request was unavailable; no ungrounded response was shown.",
+            }
+
     def audit(self, case_id: str) -> dict[str, Any]:
         with self._connect() as connection:
             decision = connection.execute("SELECT * FROM decisions WHERE case_id = ?", (case_id,)).fetchone()
@@ -525,6 +737,7 @@ def health() -> dict[str, Any]:
         "status": "online", "model": service.bundle.model_name, "version": service.bundle.version,
         "target": service.bundle.target, "candidate_rings": len(service.rings["candidate_rings"]),
         "latest_event_timestamp": datetime.fromtimestamp(service.engine.last_seconds, tz=timezone.utc).isoformat(),
+        "assistant": "gemini-2.5-flash" if os.getenv("GEMINI_API_KEY", "").strip() else "local_grounded_fallback",
     }
 
 
@@ -534,8 +747,8 @@ def model_card() -> dict[str, Any]:
 
 
 @app.get("/api/dashboard")
-def dashboard() -> dict[str, Any]:
-    return service.dashboard
+def dashboard() -> JSONResponse:
+    return JSONResponse(service.dashboard_payload(), headers={"Cache-Control": "no-store"})
 
 
 @app.post("/api/score")
@@ -553,6 +766,11 @@ def record_analyst_action(case_id: str, request: AnalystActionRequest) -> dict[s
     return service.record_action(case_id, request)
 
 
+@app.post("/api/chat")
+def grounded_chat(request: ChatRequest) -> dict[str, Any]:
+    return service.chat(request)
+
+
 @app.get("/api/audit/{case_id}")
 def audit_case(case_id: str) -> dict[str, Any]:
     return service.audit(case_id)
@@ -565,6 +783,8 @@ def list_rings() -> dict[str, Any]:
         "ranking_note": service.rings["ranking_note"], "method": service.rings["method"],
         "manual_review_threshold": service.bundle.threshold,
         "action_rule": "Verify evidence requires an above-threshold score plus multi-identifier overlap; other above-threshold cases go to manual review.",
+        "data_scope": "Trailing 30-day graph over final synthetic test and replayed live or demo events. Labels are never used to form candidate components.",
+        "live_event_count": int(service.cases["split"].eq("live").sum()),
         "rings": [{key: value for key, value in ring.items() if key not in {"nodes", "edges"}} for ring in service.rings["candidate_rings"]],
     }
 
@@ -580,24 +800,29 @@ def ring_detail(ring_id: str) -> dict[str, Any]:
 @app.get("/", include_in_schema=False)
 @app.get("/index.html", include_in_schema=False)
 def index_page() -> FileResponse:
-    return FileResponse(ROOT / "index.html")
+    return FileResponse(ROOT / "index.html", headers={"Cache-Control": "no-store, max-age=0"})
 
 
 @app.get("/rings.html", include_in_schema=False)
 def rings_page() -> FileResponse:
-    return FileResponse(ROOT / "rings.html")
+    return FileResponse(ROOT / "rings.html", headers={"Cache-Control": "no-store, max-age=0"})
 
 
 @app.get("/styles.css", include_in_schema=False)
 def stylesheet() -> FileResponse:
-    return FileResponse(ROOT / "styles.css", media_type="text/css")
+    return FileResponse(ROOT / "styles.css", media_type="text/css", headers={"Cache-Control": "no-store, max-age=0"})
 
 
 @app.get("/app.js", include_in_schema=False)
 def casework_script() -> FileResponse:
-    return FileResponse(ROOT / "app.js", media_type="text/javascript")
+    return FileResponse(ROOT / "app.js", media_type="text/javascript", headers={"Cache-Control": "no-store, max-age=0"})
 
 
 @app.get("/rings.js", include_in_schema=False)
 def rings_script() -> FileResponse:
-    return FileResponse(ROOT / "rings.js", media_type="text/javascript")
+    return FileResponse(ROOT / "rings.js", media_type="text/javascript", headers={"Cache-Control": "no-store, max-age=0"})
+
+
+@app.get("/chat.js", include_in_schema=False)
+def chat_script() -> FileResponse:
+    return FileResponse(ROOT / "chat.js", media_type="text/javascript", headers={"Cache-Control": "no-store, max-age=0"})
