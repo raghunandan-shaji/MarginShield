@@ -63,7 +63,7 @@ function renderSummary() {
       cards: [
         ["Scored queue", state.data.cases.length.toLocaleString("en-IN"), "Highest-ranked final-test requests"],
         ["Queue exposure", fmtInr(summary.queue_refund_exposure), "Requested refunds in the visible queue"],
-        ["Review candidates", summary.flagged_requests, "Locked-policy flags in final test"],
+        ["Review candidates", summary.flagged_requests, "Capacity-bounded flags in final test"],
         ["Review threshold", fmtThreshold(state.data.active_threshold_percent), "Locked on validation only"],
       ],
     },
@@ -82,13 +82,19 @@ function renderSummary() {
     policy: {
       kicker: "Policy design / later validation window",
       title: "Precision, recall, and review capacity",
-      deck: "<em>A threshold is a business decision.</em> The model only supplies probabilities.",
+      deck: "<em>A threshold is an operating decision.</em> The model only supplies probabilities.",
       aside: "Validation-locked operating policy",
       cards: [
         ["Validation requests", validation.rows.toLocaleString("en-IN"), "Later validation policy window"],
         ["Abuse requests", validation.positive_requests, "Synthetic positives in this window"],
-        ["Locked-policy flags", validation.review_volume, `${validation.false_positives} false alerts`],
-        ["Precision floor", ">=85%", "Declared before final-test evaluation"],
+        ["Manual-review capacity", `${state.data.policy_metadata.minimum_manual_reviews}-${state.data.policy_metadata.maximum_manual_reviews}`, "Flags in the validation policy window"],
+        [
+          "Verification tier",
+          validation.policy_tiers?.verify_evidence
+            ? `${validation.policy_tiers.verify_evidence.volume} flags`
+            : "Not locked",
+          "Value-optimal boundary plus structural-evidence condition",
+        ],
       ],
     },
   }[state.activeView];
@@ -250,14 +256,22 @@ function renderPolicy() {
   const metric = selectedMetric();
   const locked = state.data.metrics.find((item) => item.is_locked);
   const metadata = state.data.policy_metadata;
-  $("#thresholdLockNote").textContent = `Locked at ${fmtThreshold(locked.threshold_percent)} on ${metadata.source}: maximize recall subject to at least ${pct(metadata.precision_floor)} precision and ${metadata.minimum_flags}+ flags.`;
+  const comparison = metadata.precision_floor_comparison || {};
+  const floorNote = comparison.precision_floor_feasible
+    ? ` A fixed ${pct(comparison.compared_precision_floor)} precision floor would return ${fmtInr(comparison.precision_floor_net_value_inr)} instead of ${fmtInr(comparison.locked_net_value_inr)}.`
+    : comparison.compared_precision_floor
+      ? ` A fixed ${pct(comparison.compared_precision_floor)} precision floor is not even reachable on this window.`
+      : "";
+  $("#thresholdLockNote").textContent = `Locked at ${fmtThreshold(locked.threshold_percent)} on ${metadata.source}: maximise ${metadata.selection_objective} within ${metadata.minimum_manual_reviews}-${metadata.maximum_manual_reviews} manual reviews. No precision floor is applied, because the cost model defines the break-even point.${floorNote}`;
   $("#policySavings").textContent = fmtInr(metric.net_value);
   const delta = metric.net_value - locked.net_value;
   $("#policyDelta").textContent = metric.is_locked
-    ? "Locked: meets the declared precision floor"
-    : `${metric.meets_precision_floor ? "Meets" : "Fails"} 85% precision floor · ${delta >= 0 ? "+" : ""}${fmtInr(delta)} vs locked`;
-  $("#policyDelta").className = metric.meets_precision_floor ? "policy-pass" : "policy-fail";
-  $("#policyInterpretation").textContent = `${metric.true_positives} of ${metric.positive_requests} abuse requests caught; ${metric.false_negatives} missed; ${metric.false_positives} false alerts. Synthetic validation scenario.`;
+    ? "Locked: highest synthetic net value inside review capacity"
+    : `${metric.within_capacity ? "Within" : "Outside"} review capacity · ${delta >= 0 ? "+" : ""}${fmtInr(delta)} vs locked`;
+  $("#policyDelta").className = metric.within_capacity ? "policy-pass" : "policy-fail";
+  const verify = state.data.evaluation.validation.policy_tiers?.verify_evidence;
+  const verifyNote = verify ? ` Verification tier: ${verify.true_positives} caught at ${fmtMetricPct(verify.precision)} precision from ${verify.volume} structural-evidence flags.` : "";
+  $("#policyInterpretation").textContent = `${metric.true_positives} of ${metric.positive_requests} abuse requests caught; ${metric.false_negatives} missed; ${metric.false_positives} false alerts. Synthetic validation scenario.${verifyNote}`;
 
   const cards = [
     ["Precision", fmtMetricPct(metric.precision)],

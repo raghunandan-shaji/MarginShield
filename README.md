@@ -7,7 +7,7 @@ products, merchants, and timing patterns.
 
 It is not a broad fraud classifier. It never auto-rejects a customer. A request is
 either approved, sent to manual review, or sent for evidence verification when the
-model threshold and named multi-identifier evidence both exist.
+verification boundary and named multi-identifier evidence both exist.
 
 ## Problem Definition
 
@@ -30,9 +30,11 @@ abuse, merchant fraud, and broad payment fraud are deliberately outside the targ
 2. The incremental feature engine reads only events strictly before that request.
 3. The calibrated CatBoost model estimates coordinated-ring probability.
 4. The validation-locked policy maps the score to `approve` or `manual_review`.
-5. An above-threshold request becomes `verify_evidence` only when observable graph
-   structure also exists: at least two reused identifier types, or a neighbouring
-   account connected through multiple identifier types.
+5. A request becomes `verify_evidence` when it clears the verification boundary and
+   observable graph structure also exists: at least two reused identifier types, or a
+   neighbouring account connected through multiple identifier types. Verification is
+   the cheaper, lighter-touch action, so its boundary can sit below the manual-review
+   queue; the tiers are separated by action and evidence, not by a nested ordering.
 6. The event, exact feature vector, model version, threshold, recommendation,
    explanation, and prior linked state are recorded in SQLite.
 7. An analyst can accept the recommendation or send the case onward; the latest
@@ -48,11 +50,12 @@ and evidence collection, not by making an irreversible customer decision.
   decision trace.
 - **Portfolio:** final-test refund exposure by merchant vertical together with
   request recall, early ring recall, review rate, and explicit caught/missed counts.
-  This view prevents high precision from being mistaken for broad coverage.
+  This view prevents a headline number from being mistaken for broad coverage.
 - **Policy Lab:** validation-only threshold scenarios in ascending threshold order.
-  The locked threshold maximises recall subject to at least 85% validation precision
-  and at least 30 validation flags. Lower thresholds visibly recover more abuse but
-  fail that declared precision floor; final-test labels never select the policy.
+  The locked threshold maximises synthetic net preventable value within a review
+  capacity of 30-100 validation flags. No precision floor is applied. Other
+  thresholds recover more or less abuse but return less simulated value, and
+  final-test labels never select the policy.
 - **Abuse Rings:** label-free connected components built from trailing-window device,
   address, and payment-token links, ranked by model-weighted conditional exposure.
   The investigation queue may include replayed live/demo events as well as final-test
@@ -64,7 +67,7 @@ and evidence collection, not by making an irreversible customer decision.
 |---|---|---|
 | Casework | Top 520 final synthetic-test scores | Demonstrate a review decision and its pre-decision evidence |
 | Portfolio | Entire final synthetic test | Report exposure and locked-policy coverage honestly |
-| Policy Lab | Later validation policy window only | Explain why the 54.5% threshold was locked |
+| Policy Lab | Later validation policy window only | Explain why the 30.15% threshold was locked |
 | Abuse Rings | Trailing 30 days of final-test plus replayed live/demo events | Investigate label-free relationship components |
 
 These boundaries are deliberate. Policy Lab must not use final-test labels, and the
@@ -113,13 +116,11 @@ The audited environment is Python 3.10.5 with pinned dependencies.
 
 ```bash
 python3 -m pip install -r requirements-app.txt
-python3 build_dataset.py --rows 75000 --seed 20260905
+python3 build_dataset.py --rows 75000 --seed 20260907
 python3 train_live_model.py \
   --dataset data/processed/master_refund_cases.csv.gz \
   --model-dir data/model \
-  --report-dir data/reports \
-  --minimum-precision 0.85 \
-  --minimum-validation-flags 30
+  --report-dir data/reports
 python3 -m unittest discover -s tests -v
 python3 -m uvicorn server:app --host 127.0.0.1 --port 8003
 ```
@@ -222,56 +223,65 @@ commits state only after scoring succeeds.
 | `tests/` | Temporal leakage, feature parity, model policy, API, graph, and persistence tests |
 | `data/model/` | Active locked model bundle and preserved superseded model |
 | `data/reports/` | Active and superseded evaluation reports |
-| `SIMULATOR_V3_DESIGN.md` | Protocol fixed before the final synthetic test was evaluated |
+| `SIMULATOR_V4_DESIGN.md` | Protocol fixed before the final synthetic test was evaluated, plus Amendment 1 |
 
 Runtime analyst state lives in `data/decisions.sqlite` and is gitignored. API tests
 use a temporary SQLite database and cannot modify the demo's decision history.
 
-## Locked V3 Result
+## Locked V4 Result
 
-The simulator and model policy were fixed in [`SIMULATOR_V3_DESIGN.md`](SIMULATOR_V3_DESIGN.md)
+The simulator and both policy rules were fixed in [`SIMULATOR_V4_DESIGN.md`](SIMULATOR_V4_DESIGN.md)
 before the final test was scored. CatBoost won the chronological training tournament.
-The early validation half fitted Platt calibration; the later half selected the
-threshold by maximizing recall subject to at least 85% point precision and 30 flags.
+The early validation half fitted Platt calibration; the later half locked both
+intervention boundaries by maximizing synthetic net preventable value under an
+explicit review capacity of 30-100 flags.
 
 | Metric | Validation policy window | Final synthetic test |
 |---|---:|---:|
-| PR-AUC | 0.5635 | 0.3795 |
-| ROC-AUC | 0.9509 | 0.9164 |
-| Brier score | 0.0143 | 0.0181 |
-| Precision | 87.88% | 91.89% |
-| Request recall | 22.83% | 12.98% |
-| Review volume | 33 | 37 |
-| Ring-candidate precision | 78.57% | 85.00% |
-| Early ring recall | 47.83% | 38.46% |
-| Synthetic net preventable value | INR 69,018 | INR 80,609 |
+| PR-AUC | 0.5562 | 0.3068 |
+| ROC-AUC | 0.9542 | 0.9168 |
+| Brier score | 0.0137 | 0.0186 |
+| Precision | 59.60% | 38.46% |
+| Request recall | 49.58% | 17.05% |
+| Review volume | 99 | 117 |
+| Ring-candidate precision | 43.24% | 32.88% |
+| Early ring recall | 60.00% | 51.35% |
+| Synthetic net preventable value | INR 113,470 | INR 85,904 |
 
-Final-test precision has a day-block bootstrap 95% interval of 83.33%-100%; the
-point estimate clears 85%, but the interval does not guarantee it. Sparse
-address-payment chains have 0% early ring recall. Those are explicit limitations,
-not values to tune away after seeing test labels.
+There is no precision floor. V4 removed it because it was never derived from the
+cost model and it destroys value: a missed ring forfeits the full expected loss,
+around INR 2,100, while a false alert costs roughly INR 200, so break-even
+precision sits near 9%. On this validation window an 85% floor with 30 flags is not
+even reachable, and the model report publishes that comparison as
+`precision_floor_comparison` so the decision stays auditable. Amendment 1 of the
+V4 design records the change and the evidence behind it.
 
-Precision and recall are both important. The locked policy is intentionally a
-high-confidence, low-coverage triage queue: in validation it flags 29 of 127 positive
-requests and misses 98; in final test it flags 34 of 262 and misses 228. That is not
-"good recall." It is the direct consequence of the pre-declared requirement to keep
-validation precision at or above 85% with at least 30 flags. The lower-threshold
-Policy Lab scenarios show the alternative: substantially higher recall, but too many
-false alerts to satisfy that operating constraint. MarginShield should be presented
-as a focused escalation layer, not a replacement for a broad fraud stack.
+Final-test precision has a day-block bootstrap 95% interval of 30.77%-47.87%, and
+net preventable value of INR 56,673-120,648. Recall varies sharply by topology:
+token-fan address pairs reach 88.9% early ring recall, while rotating identifier
+cycles reach 22.2%. Those are explicit limitations, not values to tune away after
+seeing test labels.
+
+The policy is now a value-optimising triage queue rather than a high-confidence one.
+In validation it flags 59 of 119 positive requests and misses 60; in final test it
+flags 45 of 264 and misses 219, and catches 51.4% of simulated rings before half
+their loss. Precision is deliberately moderate: within the review capacity, accepting
+more false alerts recovers more preventable loss than a stricter queue would. The
+Policy Lab scenarios show both directions. MarginShield should still be presented as
+a focused escalation layer, not a replacement for a broad fraud stack.
 
 ## Simulator Audit
 
 The earlier v2.1 benchmark was superseded because identifier-reuse balance exposed a
-synthetic shortcut. V3 adds organic independent sharing and overlapping cluster
-context. On validation:
+synthetic shortcut. V3 added organic independent sharing and overlapping cluster
+context, and V4 keeps every one of those gates. On validation:
 
-- 376 independent legitimate requests exhibit cross-account identifier sharing;
-- a rule based on any sharing has 11.0% precision;
-- the best single feature among already-shared cases has AP only 1.30 times that
+- 358 independent legitimate requests exhibit cross-account identifier sharing;
+- a rule based on any sharing has 11.29% precision;
+- the best single feature among already-shared cases has AP only 1.23 times that
   subset's prevalence, below the locked 2.0 gate;
-- context-only PR-AUC is 0.0385;
-- the direct device-payment-pair rule has 13.68% precision.
+- context-only PR-AUC is 0.0438;
+- the direct device-payment-pair rule has 13.72% precision.
 
 These checks make the benchmark harder and more honest. They do not establish that
 the simulator matches Razorpay traffic.

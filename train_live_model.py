@@ -12,8 +12,18 @@ def main() -> None:
     parser.add_argument("--dataset", type=Path, required=True)
     parser.add_argument("--model-dir", type=Path, required=True)
     parser.add_argument("--report-dir", type=Path, required=True)
-    parser.add_argument("--minimum-precision", type=float, default=0.85)
-    parser.add_argument("--minimum-validation-flags", type=int, default=30)
+    parser.add_argument(
+        "--minimum-precision", type=float, default=0.85,
+        help="Reported comparison baseline only. Not a constraint: both tiers are selected by net value.",
+    )
+    parser.add_argument(
+        "--minimum-validation-flags", type=int, default=30,
+        help="Flag count used with --minimum-precision for the reported comparison baseline.",
+    )
+    parser.add_argument("--maximum-manual-reviews", type=int, default=100)
+    parser.add_argument("--minimum-manual-reviews", type=int, default=30)
+    parser.add_argument("--maximum-verifications", type=int, default=100)
+    parser.add_argument("--minimum-verifications", type=int, default=30)
     parser.add_argument("--bootstrap-samples", type=int, default=300)
     parser.add_argument("--tournament-only", action="store_true")
     parser.add_argument("--validation-only", action="store_true")
@@ -23,6 +33,10 @@ def main() -> None:
     config = TournamentConfig(
         minimum_precision=args.minimum_precision,
         minimum_validation_flags=args.minimum_validation_flags,
+        maximum_manual_reviews=args.maximum_manual_reviews,
+        minimum_manual_reviews=args.minimum_manual_reviews,
+        maximum_verifications=args.maximum_verifications,
+        minimum_verifications=args.minimum_verifications,
         bootstrap_samples=args.bootstrap_samples,
     )
     if args.tournament_only:

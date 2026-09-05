@@ -30,197 +30,197 @@
     "review_samples": 9000
   },
   "target": {
-    "ring_rate": 0.020933333333333335,
+    "ring_rate": 0.021013333333333332,
     "by_split": {
-      "test": 0.023061350233254115,
-      "train": 0.01999465281491101,
-      "validation": 0.023148558758314855
+      "test": 0.023060796645702306,
+      "train": 0.019912892980087107,
+      "validation": 0.024150186822199944
     }
   },
   "scenarios": {
-    "independent_legitimate": 63534,
-    "benign_hostel_kiosk": 1683,
-    "benign_family_wallet": 1683,
-    "benign_group_purchase": 1667,
-    "benign_corporate_card": 1628,
-    "benign_office_network": 1623,
-    "benign_support_migration": 1612,
-    "coordinated_refund_abuse": 1570
+    "independent_legitimate": 63528,
+    "benign_corporate_card": 1672,
+    "benign_family_wallet": 1670,
+    "benign_group_purchase": 1665,
+    "benign_office_network": 1633,
+    "benign_support_migration": 1632,
+    "benign_hostel_kiosk": 1624,
+    "coordinated_refund_abuse": 1576
   },
   "topologies": {
-    "none": 63534,
-    "hostel_kiosk": 1683,
-    "family_wallet": 1683,
-    "group_purchase": 1667,
-    "corporate_card": 1628,
-    "office_network": 1623,
-    "support_migration": 1612,
-    "payment_hub_rotating_device": 334,
-    "device_hub_rotating_payment": 331,
-    "alternating_device_payment_chain": 325,
-    "two_core_bridge": 318,
-    "partial_pair_mesh": 67,
-    "device_address_ladder": 67,
-    "rotating_two_hub_bridge": 65,
-    "sparse_address_payment_chain": 63
+    "none": 63528,
+    "corporate_card": 1672,
+    "family_wallet": 1670,
+    "group_purchase": 1665,
+    "office_network": 1633,
+    "support_migration": 1632,
+    "hostel_kiosk": 1624,
+    "device_hub_rotating_payment": 335,
+    "alternating_device_payment_chain": 334,
+    "payment_hub_rotating_device": 324,
+    "two_core_bridge": 319,
+    "token_fan_address_pairs": 70,
+    "staggered_device_address_bridge": 69,
+    "three_core_sparse_bridge": 66,
+    "rotating_identifier_cycle": 59
   },
   "shortcut_gate": {
-    "validation_pair_rule_precision": 0.13679245283018868,
-    "positive_pair_reuse_rows": 58,
-    "legitimate_pair_reuse_rows": 366,
-    "shared_identifier_rule_precision": 0.10952146028613714,
-    "shared_subset_rows": 2027,
-    "shared_subset_prevalence": 0.10952146028613714,
-    "maximum_within_shared_univariate_pr_auc": 0.1426012541908644,
-    "maximum_within_shared_univariate_ap_lift": 1.302039379481451,
+    "validation_pair_rule_precision": 0.1372093023255814,
+    "positive_pair_reuse_rows": 59,
+    "legitimate_pair_reuse_rows": 371,
+    "shared_identifier_rule_precision": 0.11294352823588207,
+    "shared_subset_rows": 2001,
+    "shared_subset_prevalence": 0.11294352823588207,
+    "maximum_within_shared_univariate_pr_auc": 0.13923645720792158,
+    "maximum_within_shared_univariate_ap_lift": 1.232797127756863,
     "within_shared_univariate_features": [
       {
         "feature": "shared_address_accounts_90d",
-        "best_pr_auc": 0.1426012541908644,
-        "direction": "low"
-      },
-      {
-        "feature": "merchant_refund_volume_index_30d",
-        "best_pr_auc": 0.14111999271766512,
-        "direction": "high"
-      },
-      {
-        "feature": "linked_merchants_30d",
-        "best_pr_auc": 0.1338928535575307,
-        "direction": "low"
-      },
-      {
-        "feature": "identifier_reuse_balance",
-        "best_pr_auc": 0.1323368432425765,
+        "best_pr_auc": 0.13923645720792158,
         "direction": "low"
       },
       {
         "feature": "linked_refund_burst_72h",
-        "best_pr_auc": 0.12740458595212892,
+        "best_pr_auc": 0.13738663668118356,
+        "direction": "high"
+      },
+      {
+        "feature": "linked_same_product_accounts_30d",
+        "best_pr_auc": 0.13590887810103985,
         "direction": "high"
       },
       {
         "feature": "multi_identifier_neighbor_accounts",
-        "best_pr_auc": 0.12718249990780386,
-        "direction": "low"
-      },
-      {
-        "feature": "linked_same_product_accounts_30d",
-        "best_pr_auc": 0.12602341964641284,
-        "direction": "high"
-      },
-      {
-        "feature": "refund_share",
-        "best_pr_auc": 0.1258171225382771,
-        "direction": "low"
-      },
-      {
-        "feature": "refund_amount_inr",
-        "best_pr_auc": 0.11854785455219177,
+        "best_pr_auc": 0.13200130925175643,
         "direction": "low"
       },
       {
         "feature": "account_age_days",
-        "best_pr_auc": 0.11791841539266266,
-        "direction": "high"
-      },
-      {
-        "feature": "device_payment_pair_accounts_30d",
-        "best_pr_auc": 0.1166463141940425,
-        "direction": "high"
+        "best_pr_auc": 0.13131123687863086,
+        "direction": "low"
       },
       {
         "feature": "connected_accounts_max_window",
-        "best_pr_auc": 0.11617128049941502,
+        "best_pr_auc": 0.13124275240726743,
+        "direction": "low"
+      },
+      {
+        "feature": "linked_merchants_30d",
+        "best_pr_auc": 0.12928146303707658,
+        "direction": "low"
+      },
+      {
+        "feature": "identifier_reuse_balance",
+        "best_pr_auc": 0.1270519429557856,
+        "direction": "low"
+      },
+      {
+        "feature": "merchant_refund_volume_index_30d",
+        "best_pr_auc": 0.12682752571506226,
         "direction": "low"
       },
       {
         "feature": "shared_identifier_types_30d",
-        "best_pr_auc": 0.11534140056797383,
+        "best_pr_auc": 0.12547855865577537,
         "direction": "high"
       },
       {
+        "feature": "refund_amount_inr",
+        "best_pr_auc": 0.12386026938585401,
+        "direction": "low"
+      },
+      {
         "feature": "graph_overlap_surprisal",
-        "best_pr_auc": 0.11259991079515613,
+        "best_pr_auc": 0.12067385841138642,
+        "direction": "low"
+      },
+      {
+        "feature": "device_payment_pair_accounts_30d",
+        "best_pr_auc": 0.11927839846283897,
+        "direction": "high"
+      },
+      {
+        "feature": "refund_share",
+        "best_pr_auc": 0.11552142963127754,
         "direction": "high"
       },
       {
         "feature": "refund_velocity_7d",
-        "best_pr_auc": 0.11132708694431487,
+        "best_pr_auc": 0.11421657272567273,
         "direction": "low"
       },
       {
         "feature": "shared_device_accounts_30d",
-        "best_pr_auc": 0.11107664288791905,
-        "direction": "high"
+        "best_pr_auc": 0.11405674854795558,
+        "direction": "low"
       },
       {
         "feature": "refund_velocity_24h",
-        "best_pr_auc": 0.11015424650106447,
+        "best_pr_auc": 0.1131812412377882,
         "direction": "high"
       },
       {
         "feature": "shared_payment_accounts_30d",
-        "best_pr_auc": 0.1070106001509464,
+        "best_pr_auc": 0.11137904766675596,
         "direction": "low"
       }
     ],
-    "independent_legitimate_shared_identity_rows": 389,
+    "independent_legitimate_shared_identity_rows": 358,
     "nuisance_mode_coverage": {
       "cluster_address_mode": {
         "hub": {
-          "positive": 97,
-          "negative": 947
+          "positive": 71,
+          "negative": 926
         },
         "pairs": {
-          "positive": 54,
-          "negative": 388
+          "positive": 133,
+          "negative": 361
         },
         "unique": {
-          "positive": 110,
-          "negative": 315
+          "positive": 61,
+          "negative": 363
         }
       },
       "cluster_merchant_mode": {
         "pool": {
-          "positive": 50,
-          "negative": 612
+          "positive": 80,
+          "negative": 594
         },
         "single": {
-          "positive": 112,
-          "negative": 555
+          "positive": 95,
+          "negative": 550
         },
         "spread": {
-          "positive": 99,
-          "negative": 483
+          "positive": 90,
+          "negative": 506
         }
       },
       "cluster_spacing_mode": {
         "bursty": {
-          "positive": 93,
-          "negative": 621
+          "positive": 53,
+          "negative": 498
         },
         "exponential": {
-          "positive": 111,
-          "negative": 595
+          "positive": 107,
+          "negative": 549
         },
         "uniform": {
-          "positive": 57,
-          "negative": 434
+          "positive": 105,
+          "negative": 603
         }
       },
       "cluster_product_mode": {
         "pairs": {
-          "positive": 98,
-          "negative": 446
+          "positive": 72,
+          "negative": 444
         },
         "same": {
-          "positive": 105,
-          "negative": 572
+          "positive": 149,
+          "negative": 670
         },
         "spread": {
-          "positive": 58,
-          "negative": 632
+          "positive": 44,
+          "negative": 536
         }
       }
     },

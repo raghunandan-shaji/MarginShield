@@ -1,4 +1,4 @@
-# MarginShield V3 Synthetic Benchmark
+# MarginShield V4 Synthetic Benchmark
 
 ## Unit And Target
 
@@ -58,7 +58,7 @@ or shortcut violations. The key shortcut gate conditions on requests that alread
 share at least one identifier, then requires the best single numeric feature's AP to
 remain below twice that subset's prevalence.
 
-For active v3 validation data:
+For active v4 validation data:
 
 - shared subset: 2,027 rows;
 - positive prevalence within subset: 10.95%;

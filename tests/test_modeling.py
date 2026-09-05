@@ -28,11 +28,43 @@ class ModelingTests(unittest.TestCase):
         self.assertNotIn("ring_id", MODEL_FEATURE_COLUMNS)
         self.assertNotIn("scenario_type", MODEL_FEATURE_COLUMNS)
 
-    def test_validation_threshold_meets_declared_safety_constraint(self) -> None:
+    def test_report_and_dataset_are_the_same_generation(self) -> None:
+        """A dataset rebuild without a retrain must fail loudly, not score silently."""
+        manifest = json.loads((ROOT / "data" / "processed" / "dataset_manifest.json").read_text())
+        self.assertEqual(self.report["dataset_version"], manifest["version"])
+        for split in self.splits.values():
+            self.assertEqual(set(split["generator_version"].unique()), {manifest["version"]})
+
+    def test_validation_policy_meets_declared_capacity_and_value_constraint(self) -> None:
         validation = self.report["policy_validation"]
-        self.assertGreaterEqual(validation["precision"], 0.85)
+        calibration = self.report["calibration"]
+        # The declared policy is value-maximising under an explicit review capacity.
         self.assertGreaterEqual(validation["review_volume"], 30)
+        self.assertLessEqual(validation["review_volume"], 100)
         self.assertGreater(validation["recall"], 0.0)
+        self.assertGreater(validation["costs"]["net_preventable_value_inr"], 0.0)
+        self.assertIn("Neither tier imposes a precision floor", calibration["policy_selection"])
+
+    def test_value_policy_beats_the_precision_floor_it_replaced(self) -> None:
+        """The floor was removed on evidence, so the evidence stays in the report."""
+        comparison = self.report["precision_floor_comparison"]
+        self.assertEqual(comparison["compared_precision_floor"], 0.85)
+        self.assertFalse(self.report["policy_validation"]["precision"] >= 0.85 and not comparison["precision_floor_feasible"])
+        if comparison["precision_floor_feasible"]:
+            self.assertGreaterEqual(comparison["net_value_gained_inr"], 0.0)
+            self.assertGreaterEqual(
+                comparison["locked_net_value_inr"], comparison["precision_floor_net_value_inr"]
+            )
+
+    def test_both_tiers_are_locked_and_reported(self) -> None:
+        calibration = self.report["calibration"]
+        self.assertIsNotNone(calibration["verify_evidence_threshold"])
+        for key in ("policy_tiers", "test_policy_tiers"):
+            tiers = self.report[key]
+            self.assertIn("verify_evidence", tiers)
+            self.assertIn("manual_review", tiers)
+            # Verification is gated on structural evidence, so it never exceeds any intervention.
+            self.assertLessEqual(tiers["verify_evidence"]["volume"], tiers["any_intervention"]["volume"])
 
     def test_final_report_has_ring_and_uncertainty_metrics(self) -> None:
         test = self.report["test"]

@@ -42,8 +42,8 @@ and product reuse. Chronological training folds selected CatBoost; the final tes
 not used to choose it.
 
 CatBoost's output is calibrated with Platt scaling on the earlier validation half.
-The later half chooses one review threshold. It maximizes recall while requiring at
-least 85% point precision and 30 flags. SHAP contributions explain which observed
+The later half locks both intervention boundaries. Each maximizes synthetic net
+preventable value inside a 30-100 flag review capacity, with no precision floor. SHAP contributions explain which observed
 features raised or lowered each case's calibrated log-odds. They are model
 explanations, not causal proof.
 
@@ -70,14 +70,16 @@ than eventual recognition.
 
 ## 7. How To Read The Result
 
-Final synthetic precision is 91.9%: 34 of 37 flagged requests are positive in this
-simulator. Recall is only 13.0%: 228 positive requests are missed. At ring level, 15
-of 39 rings are detected early, and 85% of generated candidate clusters correspond
-to a true simulated ring. The day-bootstrap precision interval is 83.3%-100%, so the
-85% bar is not guaranteed under resampling.
+Final synthetic precision is 38.5%: 45 of 117 flagged requests are positive in this
+simulator. Recall is 17.0%, so 219 positive requests are missed. At ring level, 19 of
+37 rings are detected early, and 32.9% of generated candidate clusters correspond to a
+true simulated ring. The day-bootstrap precision interval is 30.8%-47.9%.
 
-Sparse address-payment chains have 0% early recall. MarginShield is therefore a
-precise triage layer, not comprehensive fraud coverage.
+Precision is deliberately moderate. Within the review capacity, accepting more false
+alerts recovers more preventable loss than a stricter queue would: a missed ring costs
+roughly INR 2,100 while a false alert costs roughly INR 200. Rotating identifier cycles
+still reach only 22.2% early recall. MarginShield is a value-optimising triage layer,
+not comprehensive fraud coverage.
 
 ## 8. Why V2.1 Was Rejected
 

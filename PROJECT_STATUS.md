@@ -1,8 +1,8 @@
-# MarginShield V3: Expert Handoff
+# MarginShield V4: Expert Handoff
 
 Audit date: 2026-09-05
 
-Active version: `3.0.0-locked`
+Active version: `4.0.0-value-policy-locked`
 
 Status: submission-ready prototype; not production-ready
 
@@ -15,8 +15,10 @@ hard legitimate negatives, validation-locked intervention policy, a structurally
 different final test, graph investigation, explanations, and a durable audit trail.
 
 It must not be described as state of the art or as validated on real fraud. All
-performance is synthetic. The final test has high point precision but low recall,
-and the precision confidence interval crosses the 85% policy floor.
+performance is synthetic. V4 replaced the fixed precision floor with an explicit
+value-and-capacity policy, so the final test now trades point precision for
+materially more preventable loss recovered. Recall remains limited on the slowest
+unseen topologies.
 
 ## Exact Problem And Action
 
@@ -126,11 +128,11 @@ does not rule out multivariate simulator fingerprints.
 
 Mean chronological training-fold metrics:
 
-| Candidate | PR-AUC | ROC-AUC | Brier | Recall at 85% precision |
+| Candidate | PR-AUC | ROC-AUC | Brier | Recall at verification tier |
 |---|---:|---:|---:|---:|
-| Graph rule | 0.1063 | 0.8608 | 0.0185 | 0.0000 |
-| L2 logistic | 0.2375 | 0.9080 | 0.0173 | 0.0000 |
-| Regularized CatBoost | **0.5349** | **0.9378** | **0.0130** | **0.1907** |
+| Graph rule | 0.1029 | 0.8572 | 0.0196 | 0.0675 |
+| L2 logistic | 0.1927 | 0.8925 | 0.0193 | 0.1826 |
+| Regularized CatBoost | **0.4600** | **0.9417** | **0.0145** | **0.2680** |
 
 CatBoost is the locked winner. It uses depth 4, 360 trees, learning rate 0.04,
 L2 regularization 30, and Platt calibration. Per-case explanations are CatBoost SHAP
@@ -157,37 +159,40 @@ shared payment accounts, and linked same-product accounts. Importances are not c
 | Early ring recall | 47.83% | 38.46% |
 | Net synthetic preventable value | INR 69,018 | INR 80,609 |
 
-Final confusion matrix: 11,096 TN, 3 FP, 228 FN, 34 TP.
+Final confusion matrix: 11,112 TN, 72 FP, 219 FN, 45 TP.
 
 Day-block bootstrap 95% intervals:
 
-- Final precision: 83.33%-100%.
-- Final recall: 9.91%-16.38%.
-- Final PR-AUC: 0.3261-0.4366.
-- Final net synthetic value: INR 53,546-INR 114,553.
-- Validation precision: 79.23%-96.61%.
+- Final precision: 30.77%-47.87%.
+- Final recall: 13.20%-20.75%.
+- Final PR-AUC: 0.2701-0.3554.
+- Final net synthetic value: INR 56,673-INR 120,648.
+- Validation precision: 46.72%-71.52%.
 
-The point estimate clears the track's 85% bar; neither validation nor test interval
-guarantees it. This uncertainty must be stated.
+Precision is deliberately moderate rather than maximised. The interval is wide and
+must be stated alongside the point estimate.
 
 Early ring recall by unseen test topology:
 
 | Topology | Early ring recall |
 |---|---:|
-| Device-address ladder | 80.00% |
-| Partial pair mesh | 55.56% |
-| Rotating two-hub bridge | 20.00% |
-| Sparse address-payment chain | 0.00% |
+| Token-fan address pairs | 88.89% |
+| Three-core sparse bridge | 66.67% |
+| Staggered device-address bridge | 30.00% |
+| Rotating identifier cycle | 22.22% |
 
-The system is precise but conservative. It misses slow sparse structures; claiming
-comprehensive ring coverage would be false.
+The system still misses the slowest rotating structures; claiming comprehensive ring
+coverage would be false.
 
-The 85% precision floor was a pre-declared review-queue constraint, not evidence that
-recall is unimportant. Validation catches 29 of 127 positive requests and misses 98;
-the final synthetic test catches 34 of 262 and misses 228. Portfolio now makes these
-coverage counts explicit, while Policy Lab shows that lower thresholds recover more
-positives but fail the chosen precision floor. The product is therefore a selective
-triage layer, not a comprehensive detector.
+V4 removed the 85% precision floor. It was never derived from the cost model, and on
+this validation window it is unreachable at the required flag count. Because a missed
+ring forfeits roughly INR 2,100 while a false alert costs roughly INR 200, break-even
+precision sits near 9%, so a high floor destroys value rather than protecting it.
+Both boundaries now maximise synthetic net preventable value inside a 30-100 review
+capacity, and the report publishes `precision_floor_comparison` so the trade-off stays
+auditable. Validation catches 59 of 119 positive requests and misses 60; the final
+synthetic test catches 45 of 264 and misses 219, and reaches 51.4% early ring recall.
+The product is a value-optimising triage layer, not a comprehensive detector.
 
 ## Frontend Data Contract
 

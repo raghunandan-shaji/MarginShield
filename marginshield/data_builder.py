@@ -301,6 +301,24 @@ def _inject_cluster(
         devices = [repeated("DEV", f"mesh-device-{index % 2}") for index in range(count)]
         payments = [repeated("PAY", f"mesh-payment-{(index + index // 3) % 3}") for index in range(count)]
         addresses = [repeated("ADR", f"mesh-address-{index // 2}") for index in range(count)]
+    elif topology == "staggered_device_address_bridge":
+        devices = [repeated("DEV", f"staggered-device-{index // 3}") for index in range(count)]
+        addresses = [repeated("ADR", f"staggered-address-{(index + 1) // 3}") for index in range(count)]
+        payments = [repeated("PAY", f"staggered-payment-{index % 2}") for index in range(count)]
+    elif topology == "rotating_identifier_cycle":
+        # Deliberately asymmetric cycle: unlike the development motifs, its three
+        # entity layers do not share the same degree signature.
+        devices = [repeated("DEV", f"cycle-device-{index % 2}") for index in range(count)]
+        payments = [repeated("PAY", f"cycle-payment-{(index + 1) % 3}") for index in range(count)]
+        addresses = [repeated("ADR", f"cycle-address-{(index + 2) % 4}") for index in range(count)]
+    elif topology == "token_fan_address_pairs":
+        payments = [repeated("PAY", f"fan-payment-{0 if index < (count * 2) // 3 else 1}") for index in range(count)]
+        devices = [repeated("DEV", f"fan-device-{index // 2}") for index in range(count)]
+        addresses = [repeated("ADR", f"fan-address-{index // 2}") for index in range(count)]
+    elif topology == "three_core_sparse_bridge":
+        devices = [repeated("DEV", f"three-core-device-{index % 3}") for index in range(count)]
+        payments = [repeated("PAY", f"three-core-payment-{index // 3}") for index in range(count)]
+        addresses = [repeated("ADR", f"three-core-address-{(index + 1) // 2}") for index in range(count)]
     elif topology == "family_wallet":
         devices = [repeated("DEV", f"family-device-{index}") for index in range(count)]
         payments = [repeated("PAY", "family-payment")] * count
@@ -325,6 +343,8 @@ def _inject_cluster(
 
     address_defined = topology in {
         "sparse_address_payment_chain", "device_address_ladder", "partial_pair_mesh",
+        "staggered_device_address_bridge", "rotating_identifier_cycle", "token_fan_address_pairs",
+        "three_core_sparse_bridge",
         "hostel_kiosk", "office_network",
     }
     if topology in {"hostel_kiosk", "office_network"}:
@@ -399,9 +419,11 @@ def _inject_scenarios(cases: pd.DataFrame, seed: int) -> pd.DataFrame:
         "device_hub_rotating_payment", "payment_hub_rotating_device",
         "alternating_device_payment_chain", "two_core_bridge",
     )
+    # V4 final-test motifs are distinct from development and from the previously
+    # examined V3 final test. This list is fixed before V4 model fitting.
     test_topologies = (
-        "sparse_address_payment_chain", "device_address_ladder",
-        "rotating_two_hub_bridge", "partial_pair_mesh",
+        "staggered_device_address_bridge", "rotating_identifier_cycle",
+        "token_fan_address_pairs", "three_core_sparse_bridge",
     )
     benign_topologies = (
         "family_wallet", "group_purchase", "corporate_card",
@@ -501,7 +523,7 @@ def build_dataset(n: int, seed: int) -> tuple[pd.DataFrame, pd.DataFrame, pd.Dat
     cases["false_positive_cost_inr"] = np.rint(cases["refund_amount_inr"] * 0.075 + cases["review_cost_inr"]).astype(int)
     cases["simulator_internal_score"] = np.nan
     cases["is_synthetic"] = 1
-    cases["generator_version"] = "3.0.0-locked"
+    cases["generator_version"] = "4.0.0-value-policy-locked"
     cases["calibration_note"] = "Olist-inspired commerce context only; Olist has no refund-fraud labels."
     links = build_entity_links(cases)
     reviews = cases.loc[cases["linked_refund_burst_72h"].ge(2), ["case_id", "event_timestamp"]].head(int(n * 0.12)).copy()
@@ -675,7 +697,7 @@ def write_outputs(cases: pd.DataFrame, links: pd.DataFrame, reviews: pd.DataFram
     (reports_dir / "validation_report.json").write_text(json.dumps(validation, indent=2), encoding="utf-8")
     manifest = {
         "dataset_name": "MarginShield Coordinated Refund-Abuse Ring Benchmark",
-        "version": "3.0.0-locked", "seed": seed, "target": "ring_label",
+        "version": "4.0.0-value-policy-locked", "seed": seed, "target": "ring_label",
         "target_definition": "A refund request generated as part of a coordinated multi-account refund-abuse event sequence.",
         "all_output_rows_synthetic": True,
         "source_statement": "Olist has no refund-fraud labels. It informs only high-level commerce context; no Olist source row or label is used.",

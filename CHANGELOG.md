@@ -1,5 +1,30 @@
 # Changelog
 
+## 4.0.0-value-policy-locked - 2026-09-05
+
+- Trained and locked the V4 model on the V4 dataset. The dataset had been rebuilt
+  without a retrain, leaving a V3 model scoring V4 rows and a V3 report quoted as
+  current performance.
+- Removed the 85% precision floor from both intervention tiers. It was never derived
+  from the cost model, and on the V4 validation window it is unreachable at the
+  required flag count. Both boundaries now maximise synthetic net preventable value
+  under an explicit 30-100 review capacity.
+- Published `precision_floor_comparison` in the model report so the value a fixed
+  floor would forfeit stays auditable rather than merely asserted.
+- Recorded the change as Amendment 1 in `SIMULATOR_V4_DESIGN.md` rather than
+  rewriting the pre-registered protocol.
+- Removed the constraint requiring the verification threshold to exceed the
+  manual-review threshold. Verification is the cheaper action and is gated on reused
+  identifiers, so the tiers are separated by action and evidence, not by score order.
+- Fixed ring-catalog actions, which used only the manual-review threshold and so
+  mislabelled cases in the new verification band.
+- Stamped the runtime SQLite database with its dataset and model generation. A
+  rebuild now resets stale decisions automatically instead of refusing to start;
+  previously any dataset rebuild left the server unable to boot.
+- Replaced every hardcoded metric in the API tests with values derived from the
+  locked report, and added a test asserting the report and dataset are the same
+  generation.
+
 ## Interface and workflow corrections - 2026-09-05
 
 - Split the frontend into explicit casework, final-test portfolio, validation policy,

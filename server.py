@@ -105,15 +105,16 @@ class ChatRequest(BaseModel):
 
 
 def score_action(probability: float, features: dict[str, Any], bundle: LiveModelBundle) -> tuple[str, str, str]:
+    structural_evidence = (
+        int(features.get("shared_identifier_types_30d", 0)) >= 2
+        or int(features.get("multi_identifier_neighbor_accounts", 0)) >= 1
+    )
+    verify_threshold = float(getattr(bundle, "verify_evidence_threshold", bundle.threshold) or bundle.threshold)
+    if probability >= verify_threshold and structural_evidence:
+        return "verify_evidence", "Verify evidence", "Value-optimal verification boundary met with reused-identifier evidence"
     if probability >= bundle.threshold:
-        structural_evidence = (
-            int(features.get("shared_identifier_types_30d", 0)) >= 2
-            or int(features.get("multi_identifier_neighbor_accounts", 0)) >= 1
-        )
-        if structural_evidence:
-            return "verify_evidence", "Verify evidence", "Review threshold and multi-identifier evidence met"
-        return "manual_review", "Manual review", "Review threshold met without multi-identifier overlap"
-    return "approve", "Approve", "Below review threshold"
+        return "manual_review", "Manual review", "Capacity-bounded manual-review threshold met"
+    return "approve", "Approve", "Below both intervention boundaries"
 
 
 def operational_signals(features: dict[str, Any]) -> list[dict[str, str]]:
@@ -245,42 +246,27 @@ def explanation_basis(bundle: LiveModelBundle) -> str:
     return "Signals used by the transparent graph-rule baseline."
 
 
-def build_policy_metrics(cases: pd.DataFrame, bundle: LiveModelBundle) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def build_policy_metrics(cases: pd.DataFrame, bundle: LiveModelBundle, report: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Expose the already-locked validation curve; never rebuild it from the test set."""
     validation = cases.loc[cases["split"].eq("validation")].copy().sort_values(["event_timestamp", "case_id"])
     validation["event_timestamp"] = pd.to_datetime(validation["event_timestamp"], utc=True, format="mixed")
     cutoff = validation["event_timestamp"].median()
-    policy = validation.loc[validation["event_timestamp"] > cutoff].reset_index(drop=True)
-    scores = score_live_bundle(bundle, policy)
-    ordered = np.sort(scores)[::-1]
-    review_volumes = [max(30, round(len(policy) * share)) for share in (0.01, 0.015, 0.025, 0.035, 0.05)]
-    thresholds = {float(bundle.threshold)}
-    thresholds.update(float(ordered[min(volume - 1, len(ordered) - 1)]) for volume in review_volumes)
-    metrics: list[dict[str, Any]] = []
-    for threshold in sorted(thresholds):
-        metric = classification_metrics(policy, scores, threshold, include_ring_metrics=False)
-        metrics.append({
-            "threshold": round(threshold, 6),
-            "threshold_percent": round(threshold * 100, 2),
-            "is_locked": bool(abs(threshold - bundle.threshold) < 1e-9),
-            "net_value": metric["costs"]["net_preventable_value_inr"],
-            "precision": metric["precision"], "recall": metric["recall"],
-            "review_volume": metric["review_volume"],
-            "false_positive_cost": metric["costs"]["false_positive_cost_inr"],
-            "review_cost": metric["costs"]["total_review_cost_inr"],
-            "meets_precision_floor": metric["precision"] >= 0.85,
-            "true_positives": metric["confusion_matrix"]["tp"],
-            "false_positives": metric["confusion_matrix"]["fp"],
-            "false_negatives": metric["confusion_matrix"]["fn"],
-            "positive_requests": metric["confusion_matrix"]["tp"] + metric["confusion_matrix"]["fn"],
-        })
+    policy = validation.loc[validation["event_timestamp"] > cutoff]
+    metrics = list(report.get("policy_curve", []))
+    if not metrics:
+        raise RuntimeError("Model report has no validation policy curve")
+    calibration = report.get("calibration", {})
     return metrics, {
         "source": "later half of validation split",
         "rows": len(policy),
         "cutoff": cutoff.isoformat(),
         "test_labels_used": False,
-        "selection_rule": "maximize recall subject to the validation precision floor and minimum flag count",
-        "precision_floor": 0.85,
-        "minimum_flags": 30,
+        "selection_rule": calibration.get("policy_selection", "Validation-only capacity and value policy"),
+        "minimum_manual_reviews": int(getattr(bundle, "minimum_manual_reviews", 30)),
+        "maximum_manual_reviews": int(getattr(bundle, "maximum_manual_reviews", 100)),
+        "selection_objective": "synthetic net preventable value",
+        "precision_floor_applied": False,
+        "precision_floor_comparison": report.get("precision_floor_comparison", {}),
     }
 
 
@@ -309,6 +295,7 @@ def benchmark_payload(report: dict[str, Any]) -> dict[str, Any]:
             "early_detected_rings": ring_level["detected_before_half_loss"],
             "early_ring_recall": ring_level["ring_recall"],
             "ring_candidate_precision": ring_level["ring_precision"],
+            "policy_tiers": report.get("policy_tiers" if name == "validation" else "test_policy_tiers", {}),
         }
     return payload
 
@@ -351,7 +338,7 @@ def build_dashboard(cases: pd.DataFrame, bundle: LiveModelBundle, report: dict[s
                 {"step": "Policy action", "value": row["action"]},
             ],
         })
-    policy_metrics, policy_metadata = build_policy_metrics(cases, bundle)
+    policy_metrics, policy_metadata = build_policy_metrics(cases, bundle, report)
     by_vertical = []
     for vertical, group in held_out.groupby("vertical"):
         flagged = group["ring_probability"] >= bundle.threshold
@@ -397,7 +384,12 @@ class MarginShieldService:
         self.engine = PointInTimeFeatureEngine()
         self.cases, self.engine = apply_features_via_engine(self.cases, self.engine)
         self._init_database()
-        self._replay_live_events()
+        if not self._replay_live_events():
+            # Stale runtime state was discarded mid-replay, so rebuild clean
+            # offline state before serving.
+            self.cases = pd.read_csv(DATA / "processed" / "master_refund_cases.csv.gz")
+            self.engine = PointInTimeFeatureEngine()
+            self.cases, self.engine = apply_features_via_engine(self.cases, self.engine)
         self.rings = build_ring_catalog(self.cases, self.bundle)
         self.dashboard = build_dashboard(self.cases, self.bundle, self.report)
 
@@ -414,7 +406,9 @@ class MarginShieldService:
             "action": action_key, "action_label": action,
             "policy": {
                 "manual_review_threshold": round(self.bundle.threshold, 6),
-                "action_rule": "Above threshold: verify evidence when at least two identifier types or one neighbour overlap; otherwise manual review.",
+                "verify_evidence_threshold": round(float(getattr(self.bundle, "verify_evidence_threshold", self.bundle.threshold) or self.bundle.threshold), 6),
+                "maximum_manual_reviews": int(getattr(self.bundle, "maximum_manual_reviews", 100)),
+                "action_rule": "Both boundaries maximise synthetic net preventable value under their own review capacity, with no precision floor. Verify evidence is the cheaper evidence-collection action and additionally requires multi-identifier structural evidence.",
             },
             "model": {"name": self.bundle.model_name, "version": self.bundle.version, "target": self.bundle.target},
             "decision_rationale": rationale,
@@ -427,6 +421,14 @@ class MarginShieldService:
         connection = sqlite3.connect(self.db_path)
         connection.row_factory = sqlite3.Row
         return connection
+
+    def _runtime_generation(self) -> str:
+        """Identify the dataset build and model bundle that runtime state belongs to."""
+        if "generator_version" in self.cases.columns and len(self.cases):
+            generator = str(self.cases["generator_version"].iloc[0])
+        else:
+            generator = "unknown"
+        return f"{generator}|{self.bundle.version}"
 
     def _init_database(self) -> None:
         with self._connect() as connection:
@@ -453,7 +455,32 @@ class MarginShieldService:
                     created_at TEXT NOT NULL,
                     FOREIGN KEY (case_id) REFERENCES decisions(case_id)
                 );
+                CREATE TABLE IF NOT EXISTS runtime_generation (
+                    id INTEGER PRIMARY KEY CHECK (id = 1),
+                    generation TEXT NOT NULL
+                );
             """)
+            current = self._runtime_generation()
+            stored = connection.execute("SELECT generation FROM runtime_generation WHERE id = 1").fetchone()
+            if stored is None:
+                # A database written before generation stamping carries rows we cannot
+                # attribute to any build, so treat any existing state as stale.
+                existing = connection.execute("SELECT COUNT(*) AS rows FROM decisions").fetchone()["rows"]
+                stored = {"generation": "an unstamped build"} if existing else None
+            if stored is not None and stored["generation"] != current:
+                # Case ids are reused across dataset builds but describe different events,
+                # so stored decisions and analyst actions are meaningless after a rebuild.
+                connection.execute("DELETE FROM analyst_actions")
+                connection.execute("DELETE FROM decisions")
+                print(
+                    f"Runtime state reset: rebuilt for {current}, discarded state from {stored['generation']}.",
+                    flush=True,
+                )
+            connection.execute(
+                "INSERT INTO runtime_generation (id, generation) VALUES (1, ?) "
+                "ON CONFLICT(id) DO UPDATE SET generation = excluded.generation",
+                (current,),
+            )
 
     @staticmethod
     def _raw_event(payload: dict[str, Any]) -> RawRefundEvent:
@@ -481,22 +508,46 @@ class MarginShieldService:
             "false_positive_cost_inr": round(refund * 0.075 + review_cost),
         }
 
-    def _replay_live_events(self) -> None:
+    def _discard_stale_runtime_state(self, reason: str) -> None:
+        with self._connect() as connection:
+            connection.execute("DELETE FROM analyst_actions")
+            connection.execute("DELETE FROM decisions")
+        print(f"Runtime state reset: {reason}", flush=True)
+
+    def _replay_live_events(self) -> bool:
+        """Replay stored live events. Returns False if stale state was discarded.
+
+        Stored events that do not fit the loaded dataset belong to an older build.
+        They are runtime state, not source data, so they are discarded rather than
+        refusing to start. Ordering of *new* events is still enforced strictly:
+        score_event rejects an out-of-order request with a 409.
+        """
         with self._connect() as connection:
             rows = connection.execute("SELECT raw_event_json, features_json FROM decisions WHERE replayable = 1 ORDER BY event_timestamp, case_id").fetchall()
-        live_rows = []
-        for row in rows:
-            payload = json.loads(row["raw_event_json"])
+        events = [(json.loads(row["raw_event_json"]), json.loads(row["features_json"])) for row in rows]
+
+        # Pre-flight: check ordering before mutating engine state.
+        for payload, _ in events:
             event = self._raw_event(payload)
             if self.engine.last_seconds is not None and event.event_seconds < self.engine.last_seconds:
-                raise RuntimeError("Stored live event predates current feature-engine state")
+                self._discard_stale_runtime_state(
+                    f"stored event {event.case_id} predates the loaded dataset"
+                )
+                return False
+
+        live_rows = []
+        for payload, stored_features in events:
+            event = self._raw_event(payload)
             features = self.engine.observe(event)
-            stored_features = json.loads(row["features_json"])
             if any(abs(float(features[name]) - float(stored_features[name])) > 1e-9 for name in self.bundle.features if name not in self.bundle.categorical_features):
-                raise RuntimeError(f"Feature replay mismatch for {event.case_id}")
+                self._discard_stale_runtime_state(
+                    f"stored features for {event.case_id} do not reproduce under the loaded dataset"
+                )
+                return False
             live_rows.append(self._live_row(payload, features))
         if live_rows:
             self.cases = pd.concat([self.cases, pd.DataFrame(live_rows)], ignore_index=True)
+        return True
 
     def score_event(self, request: RawRefundEventRequest) -> dict[str, Any]:
         payload = request.model_dump(mode="json")
@@ -594,6 +645,8 @@ class MarginShieldService:
             "current_view": request.view,
             "policy": {
                 "threshold": dashboard["active_threshold"],
+                "verification_threshold": float(getattr(self.bundle, "verify_evidence_threshold", self.bundle.threshold) or self.bundle.threshold),
+                "manual_review_capacity": dashboard["policy_metadata"]["maximum_manual_reviews"],
                 "selection": self.report["calibration"]["policy_selection"],
                 "source": dashboard["policy_metadata"]["source"],
                 "test_labels_used_for_selection": False,
@@ -618,18 +671,27 @@ class MarginShieldService:
         validation = context["benchmark"]["validation"]
         test = context["benchmark"]["test"]
         if "precision" in query or "recall" in query or "miss" in query or "performance" in query:
+            verification = validation.get("policy_tiers", {}).get("verify_evidence", {})
+            verification_note = ""
+            if verification:
+                verification_note = (
+                    f" The stricter verification tier has {verification['precision']:.1%} precision across "
+                    f"{verification['volume']} structural-evidence flags."
+                )
             return (
                 f"On the validation policy window, precision is {validation['precision']:.1%} and request recall is "
                 f"{validation['recall']:.1%}: {validation['true_positives']} of {validation['positive_requests']} abuse requests "
                 f"were flagged and {validation['false_negatives']} were missed. On the final synthetic test, precision is "
-                f"{test['precision']:.1%} and recall is {test['recall']:.1%}. This is a high-confidence triage policy with low "
-                "coverage, not a comprehensive detector. All figures are synthetic benchmark results."
+                f"{test['precision']:.1%} and recall is {test['recall']:.1%}. Manual review is deliberately capacity-bounded, "
+                "so the policy does not claim comprehensive coverage." + verification_note + " All figures are synthetic benchmark results."
             )
         if "threshold" in query or "policy" in query:
             return (
                 f"The manual-review threshold is {context['policy']['threshold']:.4f}. It was locked on the later validation "
-                f"window by this rule: {context['policy']['selection']} Final-test labels were not used to choose it. Lower "
-                "thresholds improve recall but fail the declared 85% validation precision constraint."
+                f"window by this rule: {context['policy']['selection']} The queue is capped at "
+                f"{context['policy']['manual_review_capacity']} validation reviews. The separate verification threshold is "
+                f"{context['policy']['verification_threshold']:.4f} and requires structural evidence; that tier, rather than the "
+                "manual-review queue, is constrained to 85% validation precision. Final-test labels were not used to choose either threshold."
             )
         if "case" in query or "decision" in query or "why" in query:
             case = context.get("selected_case")
@@ -782,7 +844,7 @@ def list_rings() -> dict[str, Any]:
         "as_of": service.rings["as_of"], "window_days": service.rings["window_days"],
         "ranking_note": service.rings["ranking_note"], "method": service.rings["method"],
         "manual_review_threshold": service.bundle.threshold,
-        "action_rule": "Verify evidence requires an above-threshold score plus multi-identifier overlap; other above-threshold cases go to manual review.",
+        "action_rule": "Verify evidence requires the verification boundary plus multi-identifier overlap; other cases above the manual-review boundary go to manual review. Both boundaries maximise synthetic net preventable value under their own review capacity.",
         "data_scope": "Trailing 30-day graph over final synthetic test and replayed live or demo events. Labels are never used to form candidate components.",
         "live_event_count": int(service.cases["split"].eq("live").sum()),
         "rings": [{key: value for key, value in ring.items() if key not in {"nodes", "edges"}} for ring in service.rings["candidate_rings"]],

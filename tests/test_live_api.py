@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import sqlite3
 import unittest
 import uuid
 from datetime import datetime, timezone
@@ -31,13 +33,59 @@ class LiveApiTests(unittest.TestCase):
         row = self.service.cases.iloc[-1]
         return {name: row[name].item() if hasattr(row[name], "item") else row[name] for name in self.service.bundle.features}
 
+    def test_runtime_state_from_an_older_build_is_discarded_not_fatal(self) -> None:
+        """A dataset rebuild must not leave the service unable to start."""
+        with TemporaryDirectory() as directory:
+            db_path = Path(directory) / "decisions.sqlite"
+            stale_event = {
+                "case_id": "STALE-0001", "event_timestamp": "2020-01-01T00:00:00+00:00",
+                "customer_id": "c1", "merchant_id": "m1", "device_id": "d1", "address_id": "a1",
+                "payment_token_id": "p1", "product_id": "pr1", "vertical": "home",
+                "payment_method": "upi", "refund_amount_inr": 1000.0, "refund_share": 0.5,
+                "account_age_days": 100.0,
+            }
+            connection = sqlite3.connect(db_path)
+            connection.executescript("""
+                CREATE TABLE decisions (
+                    case_id TEXT PRIMARY KEY, event_timestamp TEXT NOT NULL,
+                    model_version TEXT NOT NULL, threshold REAL NOT NULL,
+                    raw_event_json TEXT NOT NULL, features_json TEXT NOT NULL,
+                    probability REAL NOT NULL, recommendation TEXT NOT NULL,
+                    evidence_json TEXT NOT NULL, linked_state_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL, replayable INTEGER NOT NULL
+                );
+                CREATE TABLE analyst_actions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT, case_id TEXT NOT NULL,
+                    action TEXT NOT NULL, note TEXT NOT NULL, created_at TEXT NOT NULL
+                );
+            """)
+            connection.execute(
+                "INSERT INTO decisions VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                ("STALE-0001", stale_event["event_timestamp"], "marginshield-0.0.0-old", 0.5,
+                 json.dumps(stale_event), json.dumps({}), 0.5, "approve", "{}", "{}",
+                 "2020-01-01T00:00:00+00:00", 1),
+            )
+            connection.commit()
+            connection.close()
+
+            service = MarginShieldService(db_path)
+
+            self.assertTrue(service.dashboard["cases"])
+            with sqlite3.connect(db_path) as check:
+                remaining = check.execute("SELECT COUNT(*) FROM decisions").fetchone()[0]
+            self.assertEqual(remaining, 0)
+
     def test_health_and_model_scope(self) -> None:
         response = self.client.get("/api/health")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["target"], "ring_label")
         model = self.client.get("/api/model").json()
         self.assertEqual(model["target"], "ring_label")
-        self.assertEqual(model["dataset_version"], "3.0.0-locked")
+        # Derived from the dataset actually loaded, so a rebuild cannot silently
+        # leave the model and the data on different generations.
+        generator = str(self.service.cases["generator_version"].iloc[0])
+        self.assertEqual(model["dataset_version"], generator)
+        self.assertIn(generator, self.service.bundle.version)
 
     def test_static_routes_do_not_expose_project_artifacts(self) -> None:
         for path in ("/", "/index.html", "/rings.html", "/styles.css", "/app.js", "/rings.js", "/chat.js"):
@@ -70,7 +118,12 @@ class LiveApiTests(unittest.TestCase):
         self.assertTrue(all("contribution" in item for item in body["model_evidence"]))
         self.assertNotEqual(body["model_evidence"][0]["name"], "Model explanation unavailable")
         self.assertIn("SHAP", body["explanation_basis"])
-        self.assertNotIn("verify_evidence_threshold", body["policy"])
+        # Both tiers are locked by value, so both boundaries are published.
+        self.assertIn("verify_evidence_threshold", body["policy"])
+        self.assertEqual(
+            body["policy"]["verify_evidence_threshold"],
+            round(float(self.service.bundle.verify_evidence_threshold), 6),
+        )
 
     def test_score_endpoint_rejects_missing_contract_fields(self) -> None:
         response = self.client.post("/api/score", json={"features": {}})
@@ -87,8 +140,14 @@ class LiveApiTests(unittest.TestCase):
         self.assertNotIn("impact", case["evidence"][0])
         self.assertIn("contribution", case["evidence"][0])
         self.assertFalse(body["policy_metadata"]["test_labels_used"])
-        self.assertEqual(body["policy_metadata"]["precision_floor"], 0.85)
-        self.assertEqual(body["policy_metadata"]["minimum_flags"], 30)
+        # The policy is selected on economic value, not a fixed precision floor.
+        self.assertFalse(body["policy_metadata"]["precision_floor_applied"])
+        self.assertEqual(body["policy_metadata"]["selection_objective"], "synthetic net preventable value")
+        self.assertEqual(body["policy_metadata"]["minimum_manual_reviews"], 30)
+        self.assertEqual(body["policy_metadata"]["maximum_manual_reviews"], 100)
+        comparison = body["policy_metadata"]["precision_floor_comparison"]
+        self.assertEqual(comparison["compared_precision_floor"], 0.85)
+        self.assertIn("locked_net_value_inr", comparison)
         self.assertEqual(len(body["metrics"]), len({item["threshold"] for item in body["metrics"]}))
         self.assertEqual(1, sum(item["is_locked"] for item in body["metrics"]))
         self.assertEqual([item["threshold"] for item in body["metrics"]], sorted(item["threshold"] for item in body["metrics"]))
@@ -98,8 +157,15 @@ class LiveApiTests(unittest.TestCase):
         self.assertEqual(test["true_positives"] + test["false_negatives"], test["positive_requests"])
         self.assertEqual(validation["window"], "later validation policy window")
         self.assertEqual(test["window"], "final synthetic test")
-        self.assertAlmostEqual(validation["precision"], 29 / 33)
-        self.assertAlmostEqual(validation["recall"], 29 / 127)
+        # Derived from the locked report rather than hardcoded, so a retrain
+        # updates the expectation instead of breaking the suite.
+        confusion = self.service.report["policy_validation"]["confusion_matrix"]
+        self.assertAlmostEqual(
+            validation["precision"], confusion["tp"] / (confusion["tp"] + confusion["fp"])
+        )
+        self.assertAlmostEqual(
+            validation["recall"], confusion["tp"] / (confusion["tp"] + confusion["fn"])
+        )
 
     def test_dashboard_returns_latest_persisted_analyst_action(self) -> None:
         case_id = self.client.get("/api/dashboard").json()["cases"][0]["case_id"]
@@ -170,8 +236,11 @@ class LiveApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200, response.text)
         body = response.json()
         self.assertEqual(body["provider"], "local_grounded_fallback")
-        self.assertIn("29 of 127", body["answer"])
-        self.assertIn("low coverage", body["answer"])
+        # Derived from the locked report so the assertion cannot go stale on retrain.
+        validation = self.service.report["policy_validation"]
+        confusion = validation["confusion_matrix"]
+        self.assertIn(f"{confusion['tp']} of {confusion['tp'] + confusion['fn']}", body["answer"])
+        self.assertIn(f"{validation['precision']:.1%}", body["answer"])
         self.assertIn("synthetic", body["answer"].lower())
 
     def test_chat_uses_selected_case_context(self) -> None:

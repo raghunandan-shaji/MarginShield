@@ -221,8 +221,8 @@
         <div class="view-heading policy-heading">
           <div>
             <p>Validation policy analysis</p>
-            <h2>Threshold trade-offs</h2>
-            <p class="section-deck"><em>Every extra detection spends attention.</em> The policy makes that cost visible.</p>
+            <h2>Capacity and coverage trade-offs</h2>
+            <p class="section-deck"><em>Every extra detection spends attention.</em> The review queue has a declared limit; the verification tier has a declared evidence standard.</p>
           </div>
           <div class="policy-note">
             <p>Scenarios use only the later validation window. The final test split is not used for threshold selection.</p>
@@ -231,9 +231,9 @@
         </div>
 
         <div class="threshold-control">
-          <span>More reviews</span>
+          <span>More coverage</span>
           <div id="thresholdButtons" class="threshold-buttons" role="group" aria-label="Policy threshold"></div>
-          <span>Fewer reviews</span>
+          <span>Higher confidence</span>
         </div>
 
         <section class="policy-result">
@@ -247,7 +247,7 @@
         </section>
 
         <section class="chart-section">
-          <div class="section-title"><div><p>Threshold curve</p><h2>Value after friction and review cost</h2></div><span class="text-meta">Later validation window</span></div>
+          <div class="section-title"><div><p>Operating curve</p><h2>Value after friction and review cost</h2></div><span class="text-meta">Later validation window</span></div>
           <div class="chart-wrap"><canvas id="metricsChart" width="1180" height="360"></canvas></div>
         </section>
       </section>

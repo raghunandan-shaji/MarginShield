@@ -58,6 +58,19 @@ def build_ring_catalog(cases: pd.DataFrame, bundle: LiveModelBundle, window_days
             for case_id in group["case_id"]:
                 graph.add_edge(f"case:{case_id}", entity_node, relation=relation)
 
+    # Verification is the cheaper action and can begin below the manual-review
+    # queue, so "any intervention" starts at the lower of the two boundaries.
+    verify_threshold = float(getattr(bundle, "verify_evidence_threshold", None) or bundle.threshold)
+    intervention_threshold = min(float(bundle.threshold), verify_threshold)
+
+    def case_action(probability: float, shared_types: int, neighbours: int) -> str:
+        structural = shared_types >= 2 or neighbours >= 1
+        if probability >= verify_threshold and structural:
+            return "verify_evidence"
+        if probability >= bundle.threshold:
+            return "manual_review"
+        return "approve"
+
     rings: list[dict[str, Any]] = []
     indexed = frame.set_index("case_id", drop=False)
     for component in nx.connected_components(graph):
@@ -67,10 +80,10 @@ def build_ring_catalog(cases: pd.DataFrame, bundle: LiveModelBundle, window_days
             continue
         case_ids = [node.removeprefix("case:") for node in case_nodes]
         cluster = indexed.loc[case_ids].sort_values("event_timestamp")
-        if cluster["customer_id"].nunique() < 3 or not (cluster["ring_probability"] >= bundle.threshold).any():
+        if cluster["customer_id"].nunique() < 3 or not (cluster["ring_probability"] >= intervention_threshold).any():
             continue
         entities = [entity_metadata[node] for node in entity_nodes]
-        high = int((cluster["ring_probability"] >= bundle.threshold).sum())
+        high = int((cluster["ring_probability"] >= intervention_threshold).sum())
         scores = cluster["ring_probability"].to_numpy(float)
         account_count = int(cluster["customer_id"].nunique())
         burst_hours = max((cluster["event_timestamp"].max() - cluster["event_timestamp"].min()).total_seconds() / 3600, 0.0)
@@ -86,12 +99,11 @@ def build_ring_catalog(cases: pd.DataFrame, bundle: LiveModelBundle, window_days
         ]
         nodes = []
         for row in cluster.itertuples():
-            if float(row.ring_probability) < bundle.threshold:
-                action = "approve"
-            elif int(row.shared_identifier_types_30d) >= 2 or int(row.multi_identifier_neighbor_accounts) >= 1:
-                action = "verify_evidence"
-            else:
-                action = "manual_review"
+            action = case_action(
+                float(row.ring_probability),
+                int(row.shared_identifier_types_30d),
+                int(row.multi_identifier_neighbor_accounts),
+            )
             nodes.append({
                 "id": f"case:{row.case_id}", "label": row.case_id, "kind": "case",
                 "risk_probability": round(float(row.ring_probability), 4), "action": action,

@@ -1,5 +1,5 @@
 {
-  "dataset_version": "3.0.0-locked",
+  "dataset_version": "4.0.0-value-policy-locked",
   "target": "ring_label",
   "target_definition": "Coordinated multi-account refund-abuse ring event. No broad all-refund-abuse classifier is trained.",
   "feature_contract": [
@@ -41,1183 +41,677 @@
     "rolling_folds": [
       {
         "fold": 1,
-        "train_rows": 34910,
-        "validation_rows": 5818,
-        "train_end": "2025-04-09 00:13:40+00:00",
-        "validation_end": "2025-04-24 20:30:57+00:00"
+        "train_rows": 35053,
+        "validation_rows": 5842,
+        "train_end": "2025-04-09 11:24:51+00:00",
+        "validation_end": "2025-04-25 11:15:46+00:00"
       },
       {
         "fold": 2,
-        "train_rows": 40728,
-        "validation_rows": 5818,
-        "train_end": "2025-04-24 20:30:57+00:00",
-        "validation_end": "2025-05-10 23:04:58+00:00"
+        "train_rows": 40895,
+        "validation_rows": 5842,
+        "train_end": "2025-04-25 11:15:46+00:00",
+        "validation_end": "2025-05-11 08:55:24.459199+00:00"
       },
       {
         "fold": 3,
-        "train_rows": 46546,
-        "validation_rows": 5818,
-        "train_end": "2025-05-10 23:04:58+00:00",
-        "validation_end": "2025-05-27 23:58:58+00:00"
+        "train_rows": 46737,
+        "validation_rows": 5842,
+        "train_end": "2025-05-11 08:55:24.459199+00:00",
+        "validation_end": "2025-05-27 23:56:32+00:00"
       }
     ],
     "candidates": {
       "graph_rule_baseline": {
         "folds": [
           {
-            "pr_auc": 0.07082088122851066,
-            "roc_auc": 0.8516957356983402,
-            "brier_score": 0.0153373646259849,
-            "recall_at_85pct_precision": 0.0
+            "pr_auc": 0.08986440217445509,
+            "roc_auc": 0.8478041574833673,
+            "brier_score": 0.019399953298349523,
+            "recall_at_high_confidence_precision": 0.03361344537815126
           },
           {
-            "pr_auc": 0.1334134551299851,
-            "roc_auc": 0.8545575337242004,
-            "brier_score": 0.023532656382163633,
-            "recall_at_85pct_precision": 0.0
+            "pr_auc": 0.11531845167134905,
+            "roc_auc": 0.8464646110870544,
+            "brier_score": 0.026677668403764926,
+            "recall_at_high_confidence_precision": 0.04216867469879518
           },
           {
-            "pr_auc": 0.11455828823024217,
-            "roc_auc": 0.876268813440672,
-            "brier_score": 0.016699736997402584,
-            "recall_at_85pct_precision": 0.0
+            "pr_auc": 0.1036312682049066,
+            "roc_auc": 0.8771934448698265,
+            "brier_score": 0.012854643515808424,
+            "recall_at_high_confidence_precision": 0.12658227848101267
           }
         ],
-        "mean_pr_auc": 0.10626420819624598,
-        "mean_roc_auc": 0.8608406942877375,
-        "mean_brier_score": 0.01852325266851704,
-        "mean_recall_at_precision_floor": 0.0
+        "mean_pr_auc": 0.10293804068357025,
+        "mean_roc_auc": 0.8571540711467494,
+        "mean_brier_score": 0.01964408840597429,
+        "mean_recall_at_high_confidence_precision": 0.0674547995193197
       },
       "logistic_l2": {
         "folds": [
           {
-            "pr_auc": 0.2254813129407144,
-            "roc_auc": 0.9224247900499627,
-            "brier_score": 0.013985006640120244,
-            "recall_at_85pct_precision": 0.0
+            "pr_auc": 0.2794499065971372,
+            "roc_auc": 0.910181091482548,
+            "brier_score": 0.017177123624679814,
+            "recall_at_high_confidence_precision": 0.2689075630252101
           },
           {
-            "pr_auc": 0.1735878659375759,
-            "roc_auc": 0.8813551646884981,
-            "brier_score": 0.02355754249280751,
-            "recall_at_85pct_precision": 0.0
+            "pr_auc": 0.20171860759917565,
+            "roc_auc": 0.8941930512748669,
+            "brier_score": 0.025496712206273267,
+            "recall_at_high_confidence_precision": 0.1144578313253012
           },
           {
-            "pr_auc": 0.31342897759163335,
-            "roc_auc": 0.9202061064591691,
-            "brier_score": 0.014453845700003253,
-            "recall_at_85pct_precision": 0.0
+            "pr_auc": 0.09700797153835974,
+            "roc_auc": 0.8731102164176974,
+            "brier_score": 0.015193592039335825,
+            "recall_at_high_confidence_precision": 0.16455696202531644
           }
         ],
-        "mean_pr_auc": 0.23749938548997454,
-        "mean_roc_auc": 0.9079953537325434,
-        "mean_brier_score": 0.017332131610977002,
-        "mean_recall_at_precision_floor": 0.0
+        "mean_pr_auc": 0.19272549524489088,
+        "mean_roc_auc": 0.8924947863917042,
+        "mean_brier_score": 0.019289142623429633,
+        "mean_recall_at_high_confidence_precision": 0.18264078545860926
       },
       "catboost_calibrated": {
         "folds": [
           {
-            "pr_auc": 0.4638918627928472,
-            "roc_auc": 0.9434928776443074,
-            "brier_score": 0.011250231224725194,
-            "recall_at_85pct_precision": 0.0
+            "pr_auc": 0.4757601553685711,
+            "roc_auc": 0.948746543873534,
+            "brier_score": 0.013871340068584778,
+            "recall_at_high_confidence_precision": 0.2605042016806723
           },
           {
-            "pr_auc": 0.5007190579389224,
-            "roc_auc": 0.924917774917775,
-            "brier_score": 0.017236205495887575,
-            "recall_at_85pct_precision": 0.21621621621621623
+            "pr_auc": 0.5605207255590227,
+            "roc_auc": 0.9393796114691323,
+            "brier_score": 0.018536274281869335,
+            "recall_at_high_confidence_precision": 0.26506024096385544
           },
           {
-            "pr_auc": 0.6399667585954121,
-            "roc_auc": 0.9448814988826364,
-            "brier_score": 0.010663443292143094,
-            "recall_at_85pct_precision": 0.3557692307692308
+            "pr_auc": 0.3436664039367096,
+            "roc_auc": 0.9369548648405257,
+            "brier_score": 0.011185670247857693,
+            "recall_at_high_confidence_precision": 0.27848101265822783
           }
         ],
-        "mean_pr_auc": 0.5348592264423938,
-        "mean_roc_auc": 0.9377640504815729,
-        "mean_brier_score": 0.013049960004251954,
-        "mean_recall_at_precision_floor": 0.1906618156618157
+        "mean_pr_auc": 0.4599824282881011,
+        "mean_roc_auc": 0.9416936733943974,
+        "mean_brier_score": 0.014531094866103935,
+        "mean_recall_at_high_confidence_precision": 0.2680151517675852
       }
     },
     "winner": "catboost_calibrated",
-    "selection_rule": "Highest mean rolling-train PR-AUC, then recall subject to the 85% precision floor and minimum review volume, then lower Brier score. The final test split is excluded from this selection."
+    "selection_rule": "Highest mean rolling-train PR-AUC, then lower Brier score, then recall at the high-confidence verification constraint. The final test split is excluded from selection."
   },
   "winner": "catboost_calibrated",
   "calibration": {
     "method": "Platt scaling on the early validation window",
-    "calibration_rows": 5638,
-    "policy_rows": 5637,
-    "manual_review_threshold": 0.5450029782318668,
-    "policy_selection": "Maximize recall subject to >= 85% validation precision and >= 30 flags; place the operating boundary at the validation-only log-odds midpoint to the next excluded score."
+    "calibration_rows": 5487,
+    "policy_rows": 5486,
+    "manual_review_threshold": 0.3014997727563408,
+    "verify_evidence_threshold": 0.22715910935002576,
+    "policy_selection": "Manual review: maximize synthetic net preventable value with 30-100 validation flags. Verify evidence: maximize synthetic net preventable value on the structural-evidence subset with 30-100 validation flags. Neither tier imposes a precision floor; the synthetic cost model defines the break-even point and review capacity is the binding constraint. Both boundaries use a validation-only log-odds midpoint to the next excluded score."
   },
   "policy_validation": {
-    "rows": 5637,
-    "ring_rate": 0.02252971438708533,
-    "pr_auc": 0.5634731866833861,
-    "roc_auc": 0.9509160152621576,
-    "brier_score": 0.014264307776468848,
-    "threshold": 0.5450029782318668,
-    "precision": 0.8787878787878788,
-    "recall": 0.2283464566929134,
-    "flag_rate": 0.005854177754124534,
-    "review_volume": 33,
+    "rows": 5486,
+    "ring_rate": 0.02169157856361648,
+    "pr_auc": 0.5561893496521407,
+    "roc_auc": 0.9541580746328715,
+    "brier_score": 0.013695045380720593,
+    "threshold": 0.3014997727563408,
+    "precision": 0.5959595959595959,
+    "recall": 0.4957983193277311,
+    "flag_rate": 0.01804593510754648,
+    "review_volume": 99,
     "confusion_matrix": {
-      "tn": 5506,
-      "fp": 4,
-      "fn": 98,
-      "tp": 29
+      "tn": 5327,
+      "fp": 40,
+      "fn": 60,
+      "tp": 59
     },
     "costs": {
-      "preventable_loss_inr": 71858.0,
-      "false_positive_cost_inr": 730.0,
-      "true_positive_review_cost_inr": 2110.0,
-      "total_review_cost_inr": 2370.0,
-      "missed_loss_inr": 212077.0,
-      "net_preventable_value_inr": 69018.0
+      "preventable_loss_inr": 125439.0,
+      "false_positive_cost_inr": 7834.0,
+      "true_positive_review_cost_inr": 4135.0,
+      "total_review_cost_inr": 6810.0,
+      "missed_loss_inr": 139996.0,
+      "net_preventable_value_inr": 113470.0
     },
     "calibration": {
       "method": "Equal-frequency reliability table with up to 10 bins",
-      "expected_calibration_error": 0.005131390568002327,
+      "expected_calibration_error": 0.0022882624870252007,
       "bins": [
         {
-          "rows": 564,
-          "mean_probability": 0.0023839200408666997,
+          "rows": 549,
+          "mean_probability": 0.001116836712927276,
           "observed_rate": 0.0
         },
         {
-          "rows": 564,
-          "mean_probability": 0.0031697360339212988,
+          "rows": 549,
+          "mean_probability": 0.0014655598999559962,
           "observed_rate": 0.0
         },
         {
-          "rows": 565,
-          "mean_probability": 0.003741876044274709,
+          "rows": 548,
+          "mean_probability": 0.0021769082526290635,
           "observed_rate": 0.0
         },
         {
-          "rows": 563,
-          "mean_probability": 0.00426818368253826,
-          "observed_rate": 0.003552397868561279
+          "rows": 549,
+          "mean_probability": 0.0031516970551764955,
+          "observed_rate": 0.0018214936247723133
         },
         {
-          "rows": 563,
-          "mean_probability": 0.00482572147647668,
-          "observed_rate": 0.0
+          "rows": 548,
+          "mean_probability": 0.0036587268530494208,
+          "observed_rate": 0.0018248175182481751
         },
         {
-          "rows": 563,
-          "mean_probability": 0.00528345413816136,
-          "observed_rate": 0.003552397868561279
+          "rows": 549,
+          "mean_probability": 0.004056524019867084,
+          "observed_rate": 0.0018214936247723133
         },
         {
-          "rows": 564,
-          "mean_probability": 0.005720516334656173,
-          "observed_rate": 0.0017730496453900709
+          "rows": 548,
+          "mean_probability": 0.0045037429245908586,
+          "observed_rate": 0.005474452554744526
         },
         {
-          "rows": 563,
-          "mean_probability": 0.00690560112858554,
-          "observed_rate": 0.010657193605683837
+          "rows": 549,
+          "mean_probability": 0.0055603978350804144,
+          "observed_rate": 0.009107468123861567
         },
         {
-          "rows": 564,
-          "mean_probability": 0.012206341839931658,
-          "observed_rate": 0.008865248226950355
+          "rows": 548,
+          "mean_probability": 0.011857301744109821,
+          "observed_rate": 0.009124087591240875
         },
         {
-          "rows": 564,
-          "mean_probability": 0.17311723620345862,
-          "observed_rate": 0.19680851063829788
+          "rows": 549,
+          "mean_probability": 0.19308440625427933,
+          "observed_rate": 0.18761384335154827
         }
       ],
       "above_1pct": {
-        "rows": 756,
-        "expected_calibration_error": 0.025164730281499834,
+        "rows": 713,
+        "expected_calibration_error": 0.05668461138297271,
         "bins": [
           {
-            "rows": 95,
-            "mean_probability": 0.01420748039763703,
+            "rows": 90,
+            "mean_probability": 0.015282079541606389,
             "observed_rate": 0.0
           },
           {
-            "rows": 94,
-            "mean_probability": 0.024494541723327948,
-            "observed_rate": 0.010638297872340425
+            "rows": 89,
+            "mean_probability": 0.03336930290980651,
+            "observed_rate": 0.0
           },
           {
-            "rows": 95,
-            "mean_probability": 0.04183555641929923,
-            "observed_rate": 0.042105263157894736
+            "rows": 89,
+            "mean_probability": 0.055582456401796924,
+            "observed_rate": 0.0
           },
           {
-            "rows": 94,
-            "mean_probability": 0.05906408687291973,
-            "observed_rate": 0.0425531914893617
+            "rows": 89,
+            "mean_probability": 0.08265919290523038,
+            "observed_rate": 0.02247191011235955
           },
           {
-            "rows": 94,
-            "mean_probability": 0.07948487151171109,
-            "observed_rate": 0.0851063829787234
+            "rows": 89,
+            "mean_probability": 0.11977500144644639,
+            "observed_rate": 0.033707865168539325
           },
           {
-            "rows": 95,
-            "mean_probability": 0.12460872431278096,
-            "observed_rate": 0.14736842105263157
+            "rows": 89,
+            "mean_probability": 0.18251433465242675,
+            "observed_rate": 0.16853932584269662
           },
           {
-            "rows": 94,
-            "mean_probability": 0.2222309217222818,
-            "observed_rate": 0.24468085106382978
+            "rows": 89,
+            "mean_probability": 0.26442411295339546,
+            "observed_rate": 0.3258426966292135
           },
           {
-            "rows": 95,
-            "mean_probability": 0.5053283620996418,
-            "observed_rate": 0.6105263157894737
+            "rows": 89,
+            "mean_probability": 0.4786813353924804,
+            "observed_rate": 0.6067415730337079
           }
         ]
       }
     },
     "ring_level": {
-      "actual_rings": 23,
-      "detected_before_half_loss": 11,
-      "ring_recall": 0.4782608695652174,
-      "predicted_ring_candidates": 14,
-      "ring_precision": 0.7857142857142857,
+      "actual_rings": 20,
+      "detected_before_half_loss": 12,
+      "ring_recall": 0.6,
+      "predicted_ring_candidates": 37,
+      "ring_precision": 0.43243243243243246,
       "window_days": 30,
       "definition": "Within the same trailing 30-day window used by the Rings page, a true ring is detected only when its first flagged request has a pre-decision shared device, address or payment link and occurs before half of that ring's simulated loss. Candidate grouping is label-free and requires a connected component spanning at least three cases and three accounts; ring_id is evaluation-only."
     }
   },
+  "precision_floor_comparison": {
+    "compared_precision_floor": 0.85,
+    "compared_minimum_flags": 30,
+    "locked_threshold": 0.3014997727563408,
+    "locked_precision": 0.5959595959595959,
+    "locked_recall": 0.4957983193277311,
+    "locked_review_volume": 99,
+    "locked_net_value_inr": 113470.0,
+    "rationale": "The locked boundary maximises synthetic net preventable value under an explicit review capacity. A fixed precision floor is reported here only as a comparison baseline; it is not a constraint, because the cost model already defines the economic break-even point.",
+    "precision_floor_feasible": false,
+    "precision_floor_note": "No validation threshold reaches 85% precision with at least 30 flags"
+  },
+  "policy_tiers": {
+    "manual_review_threshold": 0.3014997727563408,
+    "verify_evidence_threshold": 0.22715910935002576,
+    "any_intervention": {
+      "volume": 146,
+      "true_positives": 71,
+      "false_positives": 75,
+      "precision": 0.4863013698630137,
+      "recall": 0.5966386554621849
+    },
+    "manual_review": {
+      "volume": 46,
+      "true_positives": 29,
+      "false_positives": 17,
+      "precision": 0.6304347826086957,
+      "recall": 0.24369747899159663
+    },
+    "verify_evidence": {
+      "volume": 100,
+      "true_positives": 42,
+      "false_positives": 58,
+      "precision": 0.42,
+      "recall": 0.35294117647058826
+    },
+    "definition": "Both boundaries maximise synthetic net preventable value under their own review capacity, with no precision floor. Verify evidence is the cheaper evidence-collection action and additionally requires at least two reused identifier types or one multi-identifier neighbour; manual review covers the remaining flagged requests."
+  },
   "policy_validation_temporal_bootstrap_95pct_ci": {
     "precision": [
-      0.7923491379310345,
-      0.9661206896551724
+      0.46724770642201835,
+      0.7152454545454544
     ],
     "recall": [
-      0.17745425228738562,
-      0.2816287878787878
+      0.4117647058823529,
+      0.5744568387284923
     ],
     "pr_auc": [
-      0.46832691858170356,
-      0.6607811105455363
+      0.4750422149242723,
+      0.6462640203634391
     ],
     "net_preventable_value_inr": [
-      36668.325,
-      103806.2
+      49786.95,
+      189885.175
     ]
   },
   "policy_curve": [
     {
-      "threshold": 0.9665725744987117,
-      "precision": 1.0,
-      "recall": 0.007874015748031496,
-      "flag_rate": 0.00017739932588256165,
-      "review_volume": 1
-    },
-    {
-      "threshold": 0.39238649786322655,
-      "precision": 0.7368421052631579,
-      "recall": 0.33070866141732286,
-      "flag_rate": 0.010111761575306013,
-      "review_volume": 57
-    },
-    {
-      "threshold": 0.27433080683343286,
-      "precision": 0.5486725663716814,
-      "recall": 0.4881889763779528,
-      "flag_rate": 0.020046123824729464,
-      "review_volume": 113
-    },
-    {
-      "threshold": 0.18352773923602383,
-      "precision": 0.4235294117647059,
-      "recall": 0.5669291338582677,
-      "flag_rate": 0.03015788540003548,
-      "review_volume": 170
-    },
-    {
-      "threshold": 0.13099483671897505,
-      "precision": 0.3938053097345133,
-      "recall": 0.7007874015748031,
-      "flag_rate": 0.04009224764945893,
-      "review_volume": 226
-    },
-    {
-      "threshold": 0.09375856501052744,
-      "precision": 0.33687943262411346,
-      "recall": 0.7480314960629921,
-      "flag_rate": 0.050026609898882385,
-      "review_volume": 282
-    },
-    {
-      "threshold": 0.07770353581675805,
-      "precision": 0.2920353982300885,
-      "recall": 0.7795275590551181,
-      "flag_rate": 0.0601383714741884,
-      "review_volume": 339
-    },
-    {
-      "threshold": 0.06405706290021244,
-      "precision": 0.26582278481012656,
-      "recall": 0.8267716535433071,
-      "flag_rate": 0.07007273372361185,
-      "review_volume": 395
-    },
-    {
-      "threshold": 0.05415547567122982,
-      "precision": 0.23725055432372505,
-      "recall": 0.84251968503937,
-      "flag_rate": 0.0800070959730353,
-      "review_volume": 451
-    },
-    {
-      "threshold": 0.045465886085704794,
-      "precision": 0.21456692913385828,
-      "recall": 0.8582677165354331,
-      "flag_rate": 0.09011885754834131,
-      "review_volume": 508
-    },
-    {
-      "threshold": 0.03203572559281509,
-      "precision": 0.19680851063829788,
-      "recall": 0.8740157480314961,
-      "flag_rate": 0.10005321979776477,
-      "review_volume": 564
-    },
-    {
-      "threshold": 0.02375881915064079,
-      "precision": 0.17903225806451614,
-      "recall": 0.8740157480314961,
-      "flag_rate": 0.10998758204718823,
-      "review_volume": 620
-    },
-    {
-      "threshold": 0.017900501196557794,
-      "precision": 0.1654357459379616,
-      "recall": 0.8818897637795275,
-      "flag_rate": 0.12009934362249423,
-      "review_volume": 677
-    },
-    {
-      "threshold": 0.011821720484885277,
-      "precision": 0.15279672578444747,
-      "recall": 0.8818897637795275,
-      "flag_rate": 0.13003370587191768,
-      "review_volume": 733
-    },
-    {
-      "threshold": 0.009366928641578077,
-      "precision": 0.14177215189873418,
-      "recall": 0.8818897637795275,
-      "flag_rate": 0.1401454674472237,
-      "review_volume": 790
-    },
-    {
-      "threshold": 0.008695738969118662,
-      "precision": 0.1359338061465721,
-      "recall": 0.905511811023622,
-      "flag_rate": 0.15007982969664715,
-      "review_volume": 846
-    },
-    {
-      "threshold": 0.008400380944222208,
-      "precision": 0.1286031042128603,
-      "recall": 0.9133858267716536,
-      "flag_rate": 0.1600141919460706,
-      "review_volume": 902
-    },
-    {
-      "threshold": 0.008268572056274707,
-      "precision": 0.12095933263816476,
-      "recall": 0.9133858267716536,
-      "flag_rate": 0.1701259535213766,
-      "review_volume": 959
-    },
-    {
-      "threshold": 0.008108203967159779,
-      "precision": 0.11428571428571428,
-      "recall": 0.9133858267716536,
-      "flag_rate": 0.18006031577080006,
-      "review_volume": 1015
-    },
-    {
-      "threshold": 0.007933890492540067,
-      "precision": 0.10830999066293184,
-      "recall": 0.9133858267716536,
-      "flag_rate": 0.18999467802022352,
-      "review_volume": 1071
-    },
-    {
-      "threshold": 0.007742053004094488,
-      "precision": 0.10283687943262411,
-      "recall": 0.9133858267716536,
-      "flag_rate": 0.20010643959552954,
-      "review_volume": 1128
-    },
-    {
-      "threshold": 0.007658146178457056,
-      "precision": 0.09881756756756757,
-      "recall": 0.9212598425196851,
-      "flag_rate": 0.210040801844953,
-      "review_volume": 1184
-    },
-    {
-      "threshold": 0.007518689431928841,
-      "precision": 0.09435483870967742,
-      "recall": 0.9212598425196851,
-      "flag_rate": 0.21997516409437645,
-      "review_volume": 1240
-    },
-    {
-      "threshold": 0.007375219174804108,
-      "precision": 0.09175019275250579,
-      "recall": 0.937007874015748,
-      "flag_rate": 0.23008692566968245,
-      "review_volume": 1297
-    },
-    {
-      "threshold": 0.007288422497585844,
-      "precision": 0.08795269770879527,
-      "recall": 0.937007874015748,
-      "flag_rate": 0.2400212879191059,
-      "review_volume": 1353
-    },
-    {
-      "threshold": 0.007157654096567964,
-      "precision": 0.08439716312056737,
-      "recall": 0.937007874015748,
-      "flag_rate": 0.2501330494944119,
-      "review_volume": 1410
-    },
-    {
-      "threshold": 0.00665253478823056,
-      "precision": 0.08117326057298772,
-      "recall": 0.937007874015748,
-      "flag_rate": 0.26006741174383535,
-      "review_volume": 1466
-    },
-    {
-      "threshold": 0.006335373146846559,
-      "precision": 0.07884362680683311,
-      "recall": 0.9448818897637795,
-      "flag_rate": 0.2700017739932588,
-      "review_volume": 1522
-    },
-    {
-      "threshold": 0.006184933628519531,
-      "precision": 0.0766307789740342,
-      "recall": 0.952755905511811,
-      "flag_rate": 0.28011353556856483,
-      "review_volume": 1579
-    },
-    {
-      "threshold": 0.006065117147400147,
-      "precision": 0.0746177370030581,
-      "recall": 0.9606299212598425,
-      "flag_rate": 0.2900478978179883,
-      "review_volume": 1635
-    },
-    {
-      "threshold": 0.005983504548213282,
-      "precision": 0.07214665878178593,
-      "recall": 0.9606299212598425,
-      "flag_rate": 0.29998226006741174,
-      "review_volume": 1691
-    },
-    {
-      "threshold": 0.005915780178498734,
-      "precision": 0.06979405034324943,
-      "recall": 0.9606299212598425,
-      "flag_rate": 0.31009402164271777,
-      "review_volume": 1748
-    },
-    {
-      "threshold": 0.005857691906619654,
-      "precision": 0.06762749445676275,
-      "recall": 0.9606299212598425,
-      "flag_rate": 0.3200283838921412,
-      "review_volume": 1804
-    },
-    {
-      "threshold": 0.005792178288091688,
-      "precision": 0.06612903225806452,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.3299627461415647,
-      "review_volume": 1860
-    },
-    {
-      "threshold": 0.005743251673845511,
-      "precision": 0.06416275430359937,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.3400745077168707,
-      "review_volume": 1917
-    },
-    {
-      "threshold": 0.005698772511549748,
-      "precision": 0.06234161175874303,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.3500088699662941,
-      "review_volume": 1973
-    },
-    {
-      "threshold": 0.00566218046146473,
-      "precision": 0.060620995564317395,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.35994323221571756,
-      "review_volume": 2029
-    },
-    {
-      "threshold": 0.0056285961401525515,
-      "precision": 0.05896452540747843,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.3700549937910236,
-      "review_volume": 2086
-    },
-    {
-      "threshold": 0.0055954554093712435,
-      "precision": 0.05742296918767507,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.37998935604044703,
-      "review_volume": 2142
-    },
-    {
-      "threshold": 0.005560245788521314,
-      "precision": 0.05593451568894952,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.39010111761575306,
-      "review_volume": 2199
-    },
-    {
-      "threshold": 0.005512268269815645,
-      "precision": 0.05454545454545454,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.4000354798651765,
-      "review_volume": 2255
-    },
-    {
-      "threshold": 0.005465473817220915,
-      "precision": 0.053223712678494156,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.40996984211459997,
-      "review_volume": 2311
-    },
-    {
-      "threshold": 0.005410788513351154,
-      "precision": 0.051942567567567564,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.420081603689906,
-      "review_volume": 2368
-    },
-    {
-      "threshold": 0.005367846299491168,
-      "precision": 0.050742574257425746,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.43001596593932945,
-      "review_volume": 2424
-    },
-    {
-      "threshold": 0.005333515979103927,
-      "precision": 0.04959677419354839,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.4399503281887529,
-      "review_volume": 2480
-    },
-    {
-      "threshold": 0.005284103939772193,
-      "precision": 0.048482459597950334,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.45006208976405887,
-      "review_volume": 2537
-    },
-    {
-      "threshold": 0.005246432127819704,
-      "precision": 0.047435403008098724,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.4599964520134823,
-      "review_volume": 2593
-    },
-    {
-      "threshold": 0.005197788372087848,
-      "precision": 0.0464326160815402,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.4699308142629058,
-      "review_volume": 2649
-    },
-    {
-      "threshold": 0.005147361624308244,
-      "precision": 0.045454545454545456,
-      "recall": 0.968503937007874,
-      "flag_rate": 0.4800425758382118,
-      "review_volume": 2706
-    },
-    {
-      "threshold": 0.005098188776910623,
-      "precision": 0.04489500362056481,
-      "recall": 0.9763779527559056,
-      "flag_rate": 0.48997693808763526,
-      "review_volume": 2762
-    },
-    {
-      "threshold": 0.005057648489106356,
-      "precision": 0.044341965235899256,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.5000886996629412,
-      "review_volume": 2819
-    },
-    {
-      "threshold": 0.005024178569748137,
-      "precision": 0.043478260869565216,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.5100230619123647,
-      "review_volume": 2875
-    },
-    {
-      "threshold": 0.0049968256340522715,
-      "precision": 0.042647560559535995,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.5199574241617881,
-      "review_volume": 2931
-    },
-    {
-      "threshold": 0.004971307453937768,
-      "precision": 0.04183400267737617,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.5300691857370942,
-      "review_volume": 2988
-    },
-    {
-      "threshold": 0.004928170096983551,
-      "precision": 0.04106438896189225,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.5400035479865176,
-      "review_volume": 3044
-    },
-    {
-      "threshold": 0.004866173560334395,
-      "precision": 0.04032258064516129,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.5499379102359411,
-      "review_volume": 3100
-    },
-    {
-      "threshold": 0.004770071462064334,
-      "precision": 0.03959455178967374,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.5600496718112471,
-      "review_volume": 3157
-    },
-    {
-      "threshold": 0.004700237048152553,
-      "precision": 0.03890445066915655,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.5699840340606706,
-      "review_volume": 3213
-    },
-    {
-      "threshold": 0.004636582162208413,
-      "precision": 0.03823799327011319,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.579918396310094,
-      "review_volume": 3269
-    },
-    {
-      "threshold": 0.004573500662111547,
-      "precision": 0.037582681900180395,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.5900301578854,
-      "review_volume": 3326
-    },
-    {
-      "threshold": 0.004518367002588504,
-      "precision": 0.03696037847427558,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.5999645201348235,
-      "review_volume": 3382
-    },
-    {
-      "threshold": 0.004465615006996117,
-      "precision": 0.036358347876672484,
-      "recall": 0.984251968503937,
-      "flag_rate": 0.6098988823842469,
-      "review_volume": 3438
-    },
-    {
-      "threshold": 0.004391202461353671,
-      "precision": 0.036051502145922745,
-      "recall": 0.9921259842519685,
-      "flag_rate": 0.620010643959553,
-      "review_volume": 3495
-    },
-    {
-      "threshold": 0.004345267565358575,
-      "precision": 0.035482962545761755,
-      "recall": 0.9921259842519685,
-      "flag_rate": 0.6299450062089764,
-      "review_volume": 3551
-    },
-    {
-      "threshold": 0.004291609020871182,
-      "precision": 0.03492239467849224,
-      "recall": 0.9921259842519685,
-      "flag_rate": 0.6400567677842824,
-      "review_volume": 3608
-    },
-    {
-      "threshold": 0.004255378700464205,
-      "precision": 0.034388646288209604,
-      "recall": 0.9921259842519685,
-      "flag_rate": 0.6499911300337059,
-      "review_volume": 3664
-    },
-    {
-      "threshold": 0.004216469024825603,
-      "precision": 0.03387096774193549,
-      "recall": 0.9921259842519685,
-      "flag_rate": 0.6599254922831294,
-      "review_volume": 3720
-    },
-    {
-      "threshold": 0.004179457203077302,
-      "precision": 0.03335980937251787,
-      "recall": 0.9921259842519685,
-      "flag_rate": 0.6700372538584354,
-      "review_volume": 3777
-    },
-    {
-      "threshold": 0.004144825763556485,
-      "precision": 0.03287242368901644,
-      "recall": 0.9921259842519685,
-      "flag_rate": 0.6799716161078588,
-      "review_volume": 3833
-    },
-    {
-      "threshold": 0.00409966142942669,
-      "precision": 0.03239907431216251,
-      "recall": 0.9921259842519685,
-      "flag_rate": 0.6899059783572823,
-      "review_volume": 3889
-    },
-    {
-      "threshold": 0.004051388003384948,
-      "precision": 0.03218449062341612,
-      "recall": 1.0,
-      "flag_rate": 0.7000177399325882,
-      "review_volume": 3946
-    },
-    {
-      "threshold": 0.004005379790008027,
-      "precision": 0.031734132933533235,
-      "recall": 1.0,
-      "flag_rate": 0.7099521021820117,
-      "review_volume": 4002
-    },
-    {
-      "threshold": 0.003932838584482903,
-      "precision": 0.03129620502710695,
-      "recall": 1.0,
-      "flag_rate": 0.7198864644314351,
-      "review_volume": 4058
-    },
-    {
-      "threshold": 0.003879502484893941,
-      "precision": 0.03086269744835966,
-      "recall": 1.0,
-      "flag_rate": 0.7299982260067411,
-      "review_volume": 4115
-    },
-    {
-      "threshold": 0.003800560002579963,
-      "precision": 0.030448333732917766,
-      "recall": 1.0,
-      "flag_rate": 0.7399325882561646,
-      "review_volume": 4171
-    },
-    {
-      "threshold": 0.0037429540348259092,
-      "precision": 0.030037842951750236,
-      "recall": 1.0,
-      "flag_rate": 0.7500443498314706,
-      "review_volume": 4228
-    },
-    {
-      "threshold": 0.0036815025579560127,
-      "precision": 0.02964519140989729,
-      "recall": 1.0,
-      "flag_rate": 0.7599787120808941,
-      "review_volume": 4284
-    },
-    {
-      "threshold": 0.0036152308528815485,
-      "precision": 0.029262672811059907,
-      "recall": 1.0,
-      "flag_rate": 0.7699130743303175,
-      "review_volume": 4340
-    },
-    {
-      "threshold": 0.0035383645141558633,
-      "precision": 0.02888332954287014,
-      "recall": 1.0,
-      "flag_rate": 0.7800248359056235,
-      "review_volume": 4397
-    },
-    {
-      "threshold": 0.0034776722652816055,
-      "precision": 0.02852009880979115,
-      "recall": 1.0,
-      "flag_rate": 0.789959198155047,
-      "review_volume": 4453
-    },
-    {
-      "threshold": 0.003427997984414767,
-      "precision": 0.028165890441339544,
-      "recall": 1.0,
-      "flag_rate": 0.7998935604044705,
-      "review_volume": 4509
-    },
-    {
-      "threshold": 0.0033731037909178964,
-      "precision": 0.027814279456855016,
-      "recall": 1.0,
-      "flag_rate": 0.8100053219797765,
-      "review_volume": 4566
-    },
-    {
-      "threshold": 0.003308235555842526,
-      "precision": 0.02747728256166162,
-      "recall": 1.0,
-      "flag_rate": 0.8199396842291999,
-      "review_volume": 4622
-    },
-    {
-      "threshold": 0.003259277168541752,
-      "precision": 0.0271483539974348,
-      "recall": 1.0,
-      "flag_rate": 0.8298740464786234,
-      "review_volume": 4678
-    },
-    {
-      "threshold": 0.0032183738103437843,
-      "precision": 0.02682154171066526,
-      "recall": 1.0,
-      "flag_rate": 0.8399858080539294,
-      "review_volume": 4735
-    },
-    {
-      "threshold": 0.0031714789155785975,
-      "precision": 0.026508035900647046,
-      "recall": 1.0,
-      "flag_rate": 0.8499201703033529,
-      "review_volume": 4791
-    },
-    {
-      "threshold": 0.0031365511839136465,
-      "precision": 0.026201774293377347,
-      "recall": 1.0,
-      "flag_rate": 0.8598545325527763,
-      "review_volume": 4847
-    },
-    {
-      "threshold": 0.0031022716841822644,
-      "precision": 0.025897226753670472,
-      "recall": 1.0,
-      "flag_rate": 0.8699662941280824,
-      "review_volume": 4904
-    },
-    {
-      "threshold": 0.003050361760903705,
-      "precision": 0.02560483870967742,
-      "recall": 1.0,
-      "flag_rate": 0.8799006563775058,
-      "review_volume": 4960
-    },
-    {
-      "threshold": 0.002944134285190799,
-      "precision": 0.025313932629061193,
-      "recall": 1.0,
-      "flag_rate": 0.8900124179528118,
-      "review_volume": 5017
-    },
-    {
-      "threshold": 0.0028262540524906215,
-      "precision": 0.025034496353242657,
-      "recall": 1.0,
-      "flag_rate": 0.8999467802022353,
-      "review_volume": 5073
-    },
-    {
-      "threshold": 0.0027310085539144773,
-      "precision": 0.024761162019886918,
-      "recall": 1.0,
-      "flag_rate": 0.9098811424516586,
-      "review_volume": 5129
-    },
-    {
-      "threshold": 0.002654114680615884,
-      "precision": 0.02448900887003471,
-      "recall": 1.0,
-      "flag_rate": 0.9199929040269647,
-      "review_volume": 5186
-    },
-    {
-      "threshold": 0.0026003631531145437,
-      "precision": 0.02422739412438001,
-      "recall": 1.0,
-      "flag_rate": 0.9299272662763881,
-      "review_volume": 5242
-    },
-    {
-      "threshold": 0.0025406819541972424,
-      "precision": 0.02397130992827482,
-      "recall": 1.0,
-      "flag_rate": 0.9398616285258116,
-      "review_volume": 5298
-    },
-    {
-      "threshold": 0.0024879821247474,
-      "precision": 0.023716153127917833,
-      "recall": 1.0,
-      "flag_rate": 0.9499733901011176,
-      "review_volume": 5355
-    },
-    {
-      "threshold": 0.002399931921552677,
-      "precision": 0.02347070781740898,
-      "recall": 1.0,
-      "flag_rate": 0.959907752350541,
-      "review_volume": 5411
-    },
-    {
-      "threshold": 0.002287843190396124,
-      "precision": 0.02323029083592464,
-      "recall": 1.0,
-      "flag_rate": 0.9698421145999645,
-      "review_volume": 5467
-    },
-    {
-      "threshold": 0.0020653335492766163,
-      "precision": 0.022990586531498915,
-      "recall": 1.0,
-      "flag_rate": 0.9799538761752705,
-      "review_volume": 5524
-    },
-    {
-      "threshold": 0.0019077410751875256,
-      "precision": 0.022759856630824374,
-      "recall": 1.0,
-      "flag_rate": 0.989888238424694,
-      "review_volume": 5580
-    },
+      "threshold": 0.12533167187301125,
+      "threshold_percent": 12.53,
+      "precision": 0.33666666666666667,
+      "recall": 0.8487394957983193,
+      "flag_rate": 0.054684651841049946,
+      "review_volume": 300,
+      "net_value": 163953.0,
+      "false_positive_cost": 44974.0,
+      "review_cost": 21225.0,
+      "true_positives": 101,
+      "false_positives": 199,
+      "false_negatives": 18,
+      "positive_requests": 119,
+      "within_capacity": false,
+      "is_locked": false
+    },
+    {
+      "threshold": 0.2005983737250054,
+      "threshold_percent": 20.06,
+      "precision": 0.445,
+      "recall": 0.7478991596638656,
+      "flag_rate": 0.03645643456069996,
+      "review_volume": 200,
+      "net_value": 165567.0,
+      "false_positive_cost": 25432.0,
+      "review_cost": 14200.0,
+      "true_positives": 89,
+      "false_positives": 111,
+      "false_negatives": 30,
+      "positive_requests": 119,
+      "within_capacity": false,
+      "is_locked": false
+    },
+    {
+      "threshold": 0.24901080464196815,
+      "threshold_percent": 24.9,
+      "precision": 0.5,
+      "recall": 0.6302521008403361,
+      "flag_rate": 0.027342325920524973,
+      "review_volume": 150,
+      "net_value": 142739.0,
+      "false_positive_cost": 17229.0,
+      "review_cost": 10575.0,
+      "true_positives": 75,
+      "false_positives": 75,
+      "false_negatives": 44,
+      "positive_requests": 119,
+      "within_capacity": false,
+      "is_locked": false
+    },
+    {
+      "threshold": 0.29976865646120493,
+      "threshold_percent": 29.98,
+      "precision": 0.59,
+      "recall": 0.4957983193277311,
+      "flag_rate": 0.01822821728034998,
+      "review_volume": 100,
+      "net_value": 113355.0,
+      "false_positive_cost": 7949.0,
+      "review_cost": 6875.0,
+      "true_positives": 59,
+      "false_positives": 41,
+      "false_negatives": 60,
+      "positive_requests": 119,
+      "within_capacity": true,
+      "is_locked": false
+    },
+    {
+      "threshold": 0.3014997727563408,
+      "threshold_percent": 30.15,
+      "precision": 0.5959595959595959,
+      "recall": 0.4957983193277311,
+      "flag_rate": 0.01804593510754648,
+      "review_volume": 99,
+      "net_value": 113470.0,
+      "false_positive_cost": 7834.0,
+      "review_cost": 6810.0,
+      "true_positives": 59,
+      "false_positives": 40,
+      "false_negatives": 60,
+      "positive_requests": 119,
+      "within_capacity": true,
+      "is_locked": true
+    },
+    {
+      "threshold": 0.3307688919894571,
+      "threshold_percent": 33.08,
+      "precision": 0.6,
+      "recall": 0.37815126050420167,
+      "flag_rate": 0.013671162960262486,
+      "review_volume": 75,
+      "net_value": 84288.0,
+      "false_positive_cost": 6142.0,
+      "review_cost": 5175.0,
+      "true_positives": 45,
+      "false_positives": 30,
+      "false_negatives": 74,
+      "positive_requests": 119,
+      "within_capacity": true,
+      "is_locked": false
+    },
     {
-      "threshold": 0.001395978064712961,
-      "precision": 0.02252971438708533,
-      "recall": 1.0,
-      "flag_rate": 1.0,
-      "review_volume": 5637
+      "threshold": 0.3791755657292253,
+      "threshold_percent": 37.92,
+      "precision": 0.6,
+      "recall": 0.25210084033613445,
+      "flag_rate": 0.00911410864017499,
+      "review_volume": 50,
+      "net_value": 61863.0,
+      "false_positive_cost": 4533.0,
+      "review_cost": 3550.0,
+      "true_positives": 30,
+      "false_positives": 20,
+      "false_negatives": 89,
+      "positive_requests": 119,
+      "within_capacity": true,
+      "is_locked": false
+    },
+    {
+      "threshold": 0.4938324719034605,
+      "threshold_percent": 49.38,
+      "precision": 0.7333333333333333,
+      "recall": 0.18487394957983194,
+      "flag_rate": 0.005468465184104995,
+      "review_volume": 30,
+      "net_value": 48327.0,
+      "false_positive_cost": 1417.0,
+      "review_cost": 2100.0,
+      "true_positives": 22,
+      "false_positives": 8,
+      "false_negatives": 97,
+      "positive_requests": 119,
+      "within_capacity": true,
+      "is_locked": false
     }
   ],
   "test": {
-    "rows": 11361,
-    "ring_rate": 0.023061350233254115,
-    "pr_auc": 0.3795211321245689,
-    "roc_auc": 0.9164395870888582,
-    "brier_score": 0.01811506802862087,
-    "threshold": 0.5450029782318668,
-    "precision": 0.918918918918919,
-    "recall": 0.1297709923664122,
-    "flag_rate": 0.0032567555672916118,
-    "review_volume": 37,
+    "rows": 11448,
+    "ring_rate": 0.023060796645702306,
+    "pr_auc": 0.3067788516754836,
+    "roc_auc": 0.9168322847574457,
+    "brier_score": 0.018555779623916403,
+    "threshold": 0.3014997727563408,
+    "precision": 0.38461538461538464,
+    "recall": 0.17045454545454544,
+    "flag_rate": 0.010220125786163521,
+    "review_volume": 117,
     "confusion_matrix": {
-      "tn": 11096,
-      "fp": 3,
-      "fn": 228,
-      "tp": 34
+      "tn": 11112,
+      "fp": 72,
+      "fn": 219,
+      "tp": 45
     },
     "costs": {
-      "preventable_loss_inr": 84160.0,
-      "false_positive_cost_inr": 1041.0,
-      "true_positive_review_cost_inr": 2510.0,
-      "total_review_cost_inr": 2780.0,
-      "missed_loss_inr": 440362.0,
-      "net_preventable_value_inr": 80609.0
+      "preventable_loss_inr": 103040.0,
+      "false_positive_cost_inr": 13986.0,
+      "true_positive_review_cost_inr": 3150.0,
+      "total_review_cost_inr": 7980.0,
+      "missed_loss_inr": 473942.0,
+      "net_preventable_value_inr": 85904.0
     },
     "calibration": {
       "method": "Equal-frequency reliability table with up to 10 bins",
-      "expected_calibration_error": 0.004633593921742827,
+      "expected_calibration_error": 0.003777812364440452,
       "bins": [
         {
-          "rows": 1137,
-          "mean_probability": 0.0023670108420567114,
+          "rows": 1145,
+          "mean_probability": 0.0011230666740620386,
           "observed_rate": 0.0
         },
         {
-          "rows": 1136,
-          "mean_probability": 0.003194455616129293,
-          "observed_rate": 0.0008802816901408451
+          "rows": 1145,
+          "mean_probability": 0.0014764892771819567,
+          "observed_rate": 0.0
         },
         {
-          "rows": 1136,
-          "mean_probability": 0.003755870982191274,
-          "observed_rate": 0.0008802816901408451
+          "rows": 1145,
+          "mean_probability": 0.002192264779718603,
+          "observed_rate": 0.0
         },
         {
-          "rows": 1136,
-          "mean_probability": 0.004291285023940327,
-          "observed_rate": 0.0008802816901408451
+          "rows": 1144,
+          "mean_probability": 0.0031536112219205,
+          "observed_rate": 0.0017482517482517483
         },
         {
-          "rows": 1137,
-          "mean_probability": 0.0048697958728810995,
-          "observed_rate": 0.0043975373790677225
+          "rows": 1145,
+          "mean_probability": 0.0036731258588803073,
+          "observed_rate": 0.0069868995633187774
         },
         {
-          "rows": 1135,
-          "mean_probability": 0.005305039099023201,
-          "observed_rate": 0.004405286343612335
+          "rows": 1145,
+          "mean_probability": 0.004076494127347685,
+          "observed_rate": 0.0026200873362445414
         },
         {
-          "rows": 1136,
-          "mean_probability": 0.005748233701972087,
-          "observed_rate": 0.0017605633802816902
+          "rows": 1144,
+          "mean_probability": 0.004516997917531774,
+          "observed_rate": 0.007867132867132868
         },
         {
-          "rows": 1137,
-          "mean_probability": 0.007064499035315125,
-          "observed_rate": 0.013192612137203167
+          "rows": 1145,
+          "mean_probability": 0.005731251097410705,
+          "observed_rate": 0.011353711790393014
         },
         {
-          "rows": 1135,
-          "mean_probability": 0.013582328974927936,
-          "observed_rate": 0.03612334801762115
+          "rows": 1145,
+          "mean_probability": 0.014287739043432397,
+          "observed_rate": 0.029694323144104803
         },
         {
-          "rows": 1136,
-          "mean_probability": 0.16677763518132704,
-          "observed_rate": 0.1681338028169014
+          "rows": 1145,
+          "mean_probability": 0.16787653918357065,
+          "observed_rate": 0.1703056768558952
         }
       ],
       "above_1pct": {
-        "rows": 1568,
-        "expected_calibration_error": 0.0550736092667021,
+        "rows": 1548,
+        "expected_calibration_error": 0.01890156742029684,
         "bins": [
           {
-            "rows": 196,
-            "mean_probability": 0.014530660678091974,
-            "observed_rate": 0.04591836734693878
+            "rows": 194,
+            "mean_probability": 0.017130255884415777,
+            "observed_rate": 0.030927835051546393
           },
           {
-            "rows": 196,
-            "mean_probability": 0.026310500947412732,
-            "observed_rate": 0.07653061224489796
+            "rows": 193,
+            "mean_probability": 0.034823578222788844,
+            "observed_rate": 0.031088082901554404
           },
           {
-            "rows": 196,
-            "mean_probability": 0.044710289965146435,
-            "observed_rate": 0.1683673469387755
+            "rows": 194,
+            "mean_probability": 0.05800320801355608,
+            "observed_rate": 0.03608247422680412
           },
           {
-            "rows": 196,
-            "mean_probability": 0.06346437634758276,
-            "observed_rate": 0.10714285714285714
+            "rows": 193,
+            "mean_probability": 0.08214174815043247,
+            "observed_rate": 0.06217616580310881
           },
           {
-            "rows": 196,
-            "mean_probability": 0.09432764856777597,
-            "observed_rate": 0.05612244897959184
+            "rows": 193,
+            "mean_probability": 0.10703683461706506,
+            "observed_rate": 0.13989637305699482
           },
           {
-            "rows": 196,
-            "mean_probability": 0.137913766880738,
-            "observed_rate": 0.0663265306122449
+            "rows": 194,
+            "mean_probability": 0.14952878262246808,
+            "observed_rate": 0.15979381443298968
           },
           {
-            "rows": 196,
-            "mean_probability": 0.21487703515594422,
-            "observed_rate": 0.14795918367346939
+            "rows": 193,
+            "mean_probability": 0.21700379245587798,
+            "observed_rate": 0.24870466321243523
           },
           {
-            "rows": 196,
-            "mean_probability": 0.4187382383285258,
-            "observed_rate": 0.4336734693877551
+            "rows": 194,
+            "mean_probability": 0.38301232225449167,
+            "observed_rate": 0.36597938144329895
           }
         ]
       }
     },
     "ring_level": {
-      "actual_rings": 39,
-      "detected_before_half_loss": 15,
-      "ring_recall": 0.38461538461538464,
-      "predicted_ring_candidates": 20,
-      "ring_precision": 0.85,
+      "actual_rings": 37,
+      "detected_before_half_loss": 19,
+      "ring_recall": 0.5135135135135135,
+      "predicted_ring_candidates": 73,
+      "ring_precision": 0.3287671232876712,
       "window_days": 30,
       "definition": "Within the same trailing 30-day window used by the Rings page, a true ring is detected only when its first flagged request has a pre-decision shared device, address or payment link and occurs before half of that ring's simulated loss. Candidate grouping is label-free and requires a connected component spanning at least three cases and three accounts; ring_id is evaluation-only."
     }
   },
+  "test_policy_tiers": {
+    "manual_review_threshold": 0.3014997727563408,
+    "verify_evidence_threshold": 0.22715910935002576,
+    "any_intervention": {
+      "volume": 216,
+      "true_positives": 81,
+      "false_positives": 135,
+      "precision": 0.375,
+      "recall": 0.3068181818181818
+    },
+    "manual_review": {
+      "volume": 48,
+      "true_positives": 11,
+      "false_positives": 37,
+      "precision": 0.22916666666666666,
+      "recall": 0.041666666666666664
+    },
+    "verify_evidence": {
+      "volume": 168,
+      "true_positives": 70,
+      "false_positives": 98,
+      "precision": 0.4166666666666667,
+      "recall": 0.26515151515151514
+    },
+    "definition": "Both boundaries maximise synthetic net preventable value under their own review capacity, with no precision floor. Verify evidence is the cheaper evidence-collection action and additionally requires at least two reused identifier types or one multi-identifier neighbour; manual review covers the remaining flagged requests."
+  },
   "test_temporal_bootstrap_95pct_ci": {
     "precision": [
-      0.8333333333333334,
-      1.0
+      0.3076923076923077,
+      0.4787045454545454
     ],
     "recall": [
-      0.09909662653740951,
-      0.16376194743130218
+      0.1319709334311388,
+      0.20749246534056656
     ],
     "pr_auc": [
-      0.32612743664180166,
-      0.43657735902605904
+      0.27009422446275627,
+      0.35536112762514843
     ],
     "net_preventable_value_inr": [
-      53545.525,
-      114552.74999999997
+      56673.45,
+      120647.79999999994
     ]
   },
   "test_topology_recall": {
     "by_topology": [
       {
-        "topology": "device_address_ladder",
-        "requests": 67,
-        "request_recall": 0.3582089552238806,
-        "actual_rings": 10,
-        "early_ring_recall": 0.8
-      },
-      {
-        "topology": "partial_pair_mesh",
-        "requests": 67,
-        "request_recall": 0.07462686567164178,
+        "topology": "rotating_identifier_cycle",
+        "requests": 59,
+        "request_recall": 0.05084745762711865,
         "actual_rings": 9,
-        "early_ring_recall": 0.5555555555555556
+        "early_ring_recall": 0.2222222222222222
       },
       {
-        "topology": "rotating_two_hub_bridge",
-        "requests": 65,
-        "request_recall": 0.06153846153846154,
+        "topology": "staggered_device_address_bridge",
+        "requests": 69,
+        "request_recall": 0.13043478260869565,
         "actual_rings": 10,
-        "early_ring_recall": 0.2
+        "early_ring_recall": 0.3
       },
       {
-        "topology": "sparse_address_payment_chain",
-        "requests": 63,
-        "request_recall": 0.015873015873015872,
-        "actual_rings": 10,
-        "early_ring_recall": 0.0
+        "topology": "three_core_sparse_bridge",
+        "requests": 66,
+        "request_recall": 0.19696969696969696,
+        "actual_rings": 9,
+        "early_ring_recall": 0.6666666666666666
+      },
+      {
+        "topology": "token_fan_address_pairs",
+        "requests": 70,
+        "request_recall": 0.2857142857142857,
+        "actual_rings": 9,
+        "early_ring_recall": 0.8888888888888888
       }
     ]
   },
   "false_positive_cost_sensitivity": [
     {
       "refund_value_rate": 0.05,
-      "false_positive_cost_inr": 784.0999999999999,
-      "net_preventable_value_inr": 80865.9
+      "false_positive_cost_inr": 10932.400000000001,
+      "net_preventable_value_inr": 88957.6
     },
     {
       "refund_value_rate": 0.075,
-      "false_positive_cost_inr": 1041.1499999999999,
-      "net_preventable_value_inr": 80608.85
+      "false_positive_cost_inr": 13983.599999999999,
+      "net_preventable_value_inr": 85906.4
     },
     {
       "refund_value_rate": 0.15,
-      "false_positive_cost_inr": 1812.3,
-      "net_preventable_value_inr": 79837.7
+      "false_positive_cost_inr": 23137.199999999997,
+      "net_preventable_value_inr": 76752.8
     }
   ],
   "diagnostics": {
@@ -1230,14 +724,14 @@
         "account_age_days"
       ],
       "validation": {
-        "pr_auc": 0.038537869704050626,
-        "roc_auc": 0.6623426680219602,
-        "brier_score": 0.022425852125729465
+        "pr_auc": 0.043773453635076356,
+        "roc_auc": 0.6634884163489121,
+        "brier_score": 0.023351026076535487
       },
       "test": {
-        "pr_auc": 0.04047745205153543,
-        "roc_auc": 0.6659079388900313,
-        "brier_score": 0.02231294273895374
+        "pr_auc": 0.04682095655156491,
+        "roc_auc": 0.6988602494906143,
+        "brier_score": 0.022303118481766693
       }
     },
     "graph_velocity_only": {
@@ -1259,232 +753,232 @@
         "graph_overlap_surprisal"
       ],
       "validation": {
-        "pr_auc": 0.15595767395410096,
-        "roc_auc": 0.8826404847331192,
-        "brier_score": 0.021557507530410396
+        "pr_auc": 0.2409585218839546,
+        "roc_auc": 0.8839816465911574,
+        "brier_score": 0.020253164107326447
       },
       "test": {
-        "pr_auc": 0.15726269888583078,
-        "roc_auc": 0.8753780170003624,
-        "brier_score": 0.021547012488609966
+        "pr_auc": 0.25127492826101977,
+        "roc_auc": 0.8843917988901895,
+        "brier_score": 0.01950548341736616
       }
     },
     "device_payment_pair_rule": {
       "validation": {
         "rule": "device_payment_pair_accounts_30d >= 2",
-        "pr_auc": 0.04840275744095349,
-        "roc_auc": 0.5924782599923331,
-        "precision": 0.13679245283018868,
-        "recall": 0.2222222222222222,
-        "review_volume": 424,
+        "pr_auc": 0.049321838953141475,
+        "roc_auc": 0.5918244867177422,
+        "precision": 0.1372093023255814,
+        "recall": 0.22264150943396227,
+        "review_volume": 430,
         "false_positive_scenarios": {
-          "benign_group_purchase": 239,
-          "benign_support_migration": 127
+          "benign_group_purchase": 248,
+          "benign_support_migration": 123
         },
         "interpretation": "A strong result here indicates simulator-rule recoverability, not model sophistication."
       },
       "test": {
         "rule": "device_payment_pair_accounts_30d >= 2",
-        "pr_auc": 0.043295645088098425,
-        "roc_auc": 0.5872355256542608,
-        "precision": 0.13317191283292978,
-        "recall": 0.2099236641221374,
-        "review_volume": 413,
+        "pr_auc": 0.047355323513127975,
+        "roc_auc": 0.58856672952703,
+        "precision": 0.1375921375921376,
+        "recall": 0.21212121212121213,
+        "review_volume": 407,
         "false_positive_scenarios": {
-          "benign_group_purchase": 237,
-          "benign_support_migration": 121
+          "benign_group_purchase": 229,
+          "benign_support_migration": 122
         },
         "interpretation": "A strong result here indicates simulator-rule recoverability, not model sophistication."
       }
     },
     "single_numeric_feature": {
       "validation": {
-        "maximum_univariate_pr_auc": 0.10749694375501415,
+        "maximum_univariate_pr_auc": 0.11722923420932649,
         "features": [
           {
             "feature": "linked_refund_burst_72h",
-            "best_pr_auc": 0.10749694375501415,
+            "best_pr_auc": 0.11722923420932649,
             "direction": "high"
           },
           {
             "feature": "shared_identifier_types_30d",
-            "best_pr_auc": 0.10156545868836962,
+            "best_pr_auc": 0.11056608129158879,
             "direction": "high"
           },
           {
             "feature": "graph_overlap_surprisal",
-            "best_pr_auc": 0.0989026861554449,
-            "direction": "high"
-          },
-          {
-            "feature": "connected_accounts_max_window",
-            "best_pr_auc": 0.09015603638944417,
-            "direction": "high"
-          },
-          {
-            "feature": "identifier_reuse_balance",
-            "best_pr_auc": 0.08656253464881446,
+            "best_pr_auc": 0.0983590581673076,
             "direction": "high"
           },
           {
             "feature": "linked_same_product_accounts_30d",
-            "best_pr_auc": 0.08086755484894224,
+            "best_pr_auc": 0.09701173532899661,
+            "direction": "high"
+          },
+          {
+            "feature": "identifier_reuse_balance",
+            "best_pr_auc": 0.09064455017111793,
+            "direction": "high"
+          },
+          {
+            "feature": "connected_accounts_max_window",
+            "best_pr_auc": 0.08614500083179416,
             "direction": "high"
           },
           {
             "feature": "shared_device_accounts_30d",
-            "best_pr_auc": 0.07344909501775271,
+            "best_pr_auc": 0.06829518651773235,
             "direction": "high"
           },
           {
             "feature": "shared_payment_accounts_30d",
-            "best_pr_auc": 0.06449757381375422,
+            "best_pr_auc": 0.06769798903409877,
             "direction": "high"
           },
           {
             "feature": "multi_identifier_neighbor_accounts",
-            "best_pr_auc": 0.05495565899478217,
+            "best_pr_auc": 0.05744333578788762,
             "direction": "high"
           },
           {
             "feature": "shared_address_accounts_90d",
-            "best_pr_auc": 0.050278297091730234,
+            "best_pr_auc": 0.05137703670156355,
             "direction": "high"
           },
           {
             "feature": "device_payment_pair_accounts_30d",
-            "best_pr_auc": 0.04840275744095349,
+            "best_pr_auc": 0.049321838953141475,
             "direction": "high"
           },
           {
             "feature": "linked_merchants_30d",
-            "best_pr_auc": 0.044044402745448026,
+            "best_pr_auc": 0.036858797453532884,
             "direction": "high"
-          },
-          {
-            "feature": "merchant_refund_volume_index_30d",
-            "best_pr_auc": 0.037551742628483986,
-            "direction": "high"
-          },
-          {
-            "feature": "refund_share",
-            "best_pr_auc": 0.025841990188140967,
-            "direction": "low"
           },
           {
             "feature": "account_age_days",
-            "best_pr_auc": 0.024957982702697192,
+            "best_pr_auc": 0.027135133841912278,
+            "direction": "low"
+          },
+          {
+            "feature": "merchant_refund_volume_index_30d",
+            "best_pr_auc": 0.026357920130770783,
             "direction": "high"
           },
           {
             "feature": "refund_amount_inr",
-            "best_pr_auc": 0.024545905491944138,
-            "direction": "high"
+            "best_pr_auc": 0.025843501613004825,
+            "direction": "low"
+          },
+          {
+            "feature": "refund_share",
+            "best_pr_auc": 0.025222130758324662,
+            "direction": "low"
           },
           {
             "feature": "refund_velocity_7d",
-            "best_pr_auc": 0.02392274783725104,
+            "best_pr_auc": 0.02478784396921186,
             "direction": "low"
           },
           {
             "feature": "refund_velocity_24h",
-            "best_pr_auc": 0.023160474391557107,
+            "best_pr_auc": 0.0241889679998954,
             "direction": "low"
           }
         ],
         "interpretation": "Low univariate PR-AUC supports, but does not prove, that no single numeric simulator field defines the label."
       },
       "test": {
-        "maximum_univariate_pr_auc": 0.10560692150995428,
+        "maximum_univariate_pr_auc": 0.14021162906236123,
         "features": [
           {
-            "feature": "linked_same_product_accounts_30d",
-            "best_pr_auc": 0.10560692150995428,
-            "direction": "high"
-          },
-          {
             "feature": "shared_identifier_types_30d",
-            "best_pr_auc": 0.09677080564925741,
-            "direction": "high"
-          },
-          {
-            "feature": "identifier_reuse_balance",
-            "best_pr_auc": 0.09199591296676965,
-            "direction": "high"
-          },
-          {
-            "feature": "linked_refund_burst_72h",
-            "best_pr_auc": 0.0782534854241491,
-            "direction": "high"
-          },
-          {
-            "feature": "connected_accounts_max_window",
-            "best_pr_auc": 0.07787680177588936,
-            "direction": "high"
-          },
-          {
-            "feature": "graph_overlap_surprisal",
-            "best_pr_auc": 0.07538950950732681,
-            "direction": "high"
-          },
-          {
-            "feature": "shared_device_accounts_30d",
-            "best_pr_auc": 0.054119764003203064,
+            "best_pr_auc": 0.14021162906236123,
             "direction": "high"
           },
           {
             "feature": "shared_payment_accounts_30d",
-            "best_pr_auc": 0.05290800444923049,
+            "best_pr_auc": 0.09660851843187018,
             "direction": "high"
           },
           {
-            "feature": "shared_address_accounts_90d",
-            "best_pr_auc": 0.0437677463852388,
+            "feature": "identifier_reuse_balance",
+            "best_pr_auc": 0.09560484134962038,
             "direction": "high"
           },
           {
-            "feature": "device_payment_pair_accounts_30d",
-            "best_pr_auc": 0.043295645088098425,
+            "feature": "connected_accounts_max_window",
+            "best_pr_auc": 0.07918252876547807,
             "direction": "high"
           },
           {
-            "feature": "merchant_refund_volume_index_30d",
-            "best_pr_auc": 0.02948877374456247,
+            "feature": "shared_device_accounts_30d",
+            "best_pr_auc": 0.0743948827639448,
+            "direction": "high"
+          },
+          {
+            "feature": "linked_refund_burst_72h",
+            "best_pr_auc": 0.06514971068474323,
+            "direction": "high"
+          },
+          {
+            "feature": "graph_overlap_surprisal",
+            "best_pr_auc": 0.06409120454106858,
+            "direction": "high"
+          },
+          {
+            "feature": "linked_same_product_accounts_30d",
+            "best_pr_auc": 0.05755713049358351,
             "direction": "high"
           },
           {
             "feature": "multi_identifier_neighbor_accounts",
-            "best_pr_auc": 0.02919361060879674,
+            "best_pr_auc": 0.05209125516680295,
+            "direction": "high"
+          },
+          {
+            "feature": "shared_address_accounts_90d",
+            "best_pr_auc": 0.04973275401387185,
+            "direction": "high"
+          },
+          {
+            "feature": "device_payment_pair_accounts_30d",
+            "best_pr_auc": 0.047355323513127975,
+            "direction": "high"
+          },
+          {
+            "feature": "merchant_refund_volume_index_30d",
+            "best_pr_auc": 0.03418963768306455,
+            "direction": "high"
+          },
+          {
+            "feature": "refund_amount_inr",
+            "best_pr_auc": 0.02903967897175722,
             "direction": "high"
           },
           {
             "feature": "linked_merchants_30d",
-            "best_pr_auc": 0.025709522149425873,
+            "best_pr_auc": 0.028432102702804496,
             "direction": "high"
           },
           {
             "feature": "refund_share",
-            "best_pr_auc": 0.024933730474229438,
-            "direction": "low"
-          },
-          {
-            "feature": "account_age_days",
-            "best_pr_auc": 0.024401994453092435,
+            "best_pr_auc": 0.024270911126862478,
             "direction": "high"
           },
           {
             "feature": "refund_velocity_7d",
-            "best_pr_auc": 0.02382189365429106,
+            "best_pr_auc": 0.02373606000980627,
             "direction": "low"
           },
           {
-            "feature": "refund_amount_inr",
-            "best_pr_auc": 0.02326442607183753,
+            "feature": "account_age_days",
+            "best_pr_auc": 0.023602505015917666,
             "direction": "low"
           },
           {
             "feature": "refund_velocity_24h",
-            "best_pr_auc": 0.023103318003626264,
+            "best_pr_auc": 0.02317212323356447,
             "direction": "low"
           }
         ],
@@ -1493,285 +987,285 @@
     },
     "within_shared_identity": {
       "validation": {
-        "maximum_univariate_pr_auc": 0.1426012541908644,
+        "maximum_univariate_pr_auc": 0.1392364572079216,
         "features": [
           {
             "feature": "shared_address_accounts_90d",
-            "best_pr_auc": 0.1426012541908644,
-            "direction": "low"
-          },
-          {
-            "feature": "merchant_refund_volume_index_30d",
-            "best_pr_auc": 0.14111999271766512,
-            "direction": "high"
-          },
-          {
-            "feature": "linked_merchants_30d",
-            "best_pr_auc": 0.13389285355753072,
-            "direction": "low"
-          },
-          {
-            "feature": "identifier_reuse_balance",
-            "best_pr_auc": 0.1323368432425765,
+            "best_pr_auc": 0.1392364572079216,
             "direction": "low"
           },
           {
             "feature": "linked_refund_burst_72h",
-            "best_pr_auc": 0.12740458595212892,
+            "best_pr_auc": 0.13738663668118356,
+            "direction": "high"
+          },
+          {
+            "feature": "linked_same_product_accounts_30d",
+            "best_pr_auc": 0.13590887810103988,
             "direction": "high"
           },
           {
             "feature": "multi_identifier_neighbor_accounts",
-            "best_pr_auc": 0.1271824999078039,
-            "direction": "low"
-          },
-          {
-            "feature": "linked_same_product_accounts_30d",
-            "best_pr_auc": 0.12602341964641287,
-            "direction": "high"
-          },
-          {
-            "feature": "refund_share",
-            "best_pr_auc": 0.1258171225382771,
-            "direction": "low"
-          },
-          {
-            "feature": "refund_amount_inr",
-            "best_pr_auc": 0.11854785455219177,
+            "best_pr_auc": 0.13200130925175646,
             "direction": "low"
           },
           {
             "feature": "account_age_days",
-            "best_pr_auc": 0.11791841539266266,
-            "direction": "high"
-          },
-          {
-            "feature": "device_payment_pair_accounts_30d",
-            "best_pr_auc": 0.1166463141940425,
-            "direction": "high"
+            "best_pr_auc": 0.1313112368786309,
+            "direction": "low"
           },
           {
             "feature": "connected_accounts_max_window",
-            "best_pr_auc": 0.11617128049941502,
+            "best_pr_auc": 0.13124275240726743,
+            "direction": "low"
+          },
+          {
+            "feature": "linked_merchants_30d",
+            "best_pr_auc": 0.12928146303707658,
+            "direction": "low"
+          },
+          {
+            "feature": "identifier_reuse_balance",
+            "best_pr_auc": 0.1270519429557856,
+            "direction": "low"
+          },
+          {
+            "feature": "merchant_refund_volume_index_30d",
+            "best_pr_auc": 0.12682752571506226,
             "direction": "low"
           },
           {
             "feature": "shared_identifier_types_30d",
-            "best_pr_auc": 0.11534140056797383,
+            "best_pr_auc": 0.12547855865577537,
             "direction": "high"
           },
           {
+            "feature": "refund_amount_inr",
+            "best_pr_auc": 0.12386026938585401,
+            "direction": "low"
+          },
+          {
             "feature": "graph_overlap_surprisal",
-            "best_pr_auc": 0.11259991079515613,
+            "best_pr_auc": 0.12067385841138642,
+            "direction": "low"
+          },
+          {
+            "feature": "device_payment_pair_accounts_30d",
+            "best_pr_auc": 0.11927839846283897,
+            "direction": "high"
+          },
+          {
+            "feature": "refund_share",
+            "best_pr_auc": 0.11552142963127755,
             "direction": "high"
           },
           {
             "feature": "refund_velocity_7d",
-            "best_pr_auc": 0.11132708694431487,
+            "best_pr_auc": 0.11421657272567273,
             "direction": "low"
           },
           {
             "feature": "shared_device_accounts_30d",
-            "best_pr_auc": 0.11107664288791905,
-            "direction": "high"
+            "best_pr_auc": 0.11405674854795558,
+            "direction": "low"
           },
           {
             "feature": "refund_velocity_24h",
-            "best_pr_auc": 0.11015424650106447,
+            "best_pr_auc": 0.1131812412377882,
             "direction": "high"
           },
           {
             "feature": "shared_payment_accounts_30d",
-            "best_pr_auc": 0.10701060015094639,
+            "best_pr_auc": 0.11137904766675596,
             "direction": "low"
           }
         ],
         "interpretation": "This conditions on already-shared identities; low lift is evidence against a simple reuse-shape simulator shortcut.",
-        "rows": 2027,
-        "prevalence": 0.10952146028613714,
-        "maximum_univariate_ap_lift": 1.302039379481451
+        "rows": 2001,
+        "prevalence": 0.11294352823588207,
+        "maximum_univariate_ap_lift": 1.2327971277568632
       },
       "test": {
-        "maximum_univariate_pr_auc": 0.19430411011041987,
+        "maximum_univariate_pr_auc": 0.16963814147033718,
         "features": [
           {
-            "feature": "graph_overlap_surprisal",
-            "best_pr_auc": 0.19430411011041987,
-            "direction": "low"
+            "feature": "shared_identifier_types_30d",
+            "best_pr_auc": 0.16963814147033718,
+            "direction": "high"
           },
           {
-            "feature": "connected_accounts_max_window",
-            "best_pr_auc": 0.17117825330107966,
+            "feature": "shared_address_accounts_90d",
+            "best_pr_auc": 0.14662405507706083,
             "direction": "low"
           },
           {
             "feature": "linked_refund_burst_72h",
-            "best_pr_auc": 0.17021188425604286,
-            "direction": "low"
-          },
-          {
-            "feature": "multi_identifier_neighbor_accounts",
-            "best_pr_auc": 0.1663494000504164,
-            "direction": "low"
-          },
-          {
-            "feature": "shared_address_accounts_90d",
-            "best_pr_auc": 0.15885036327681307,
-            "direction": "low"
-          },
-          {
-            "feature": "linked_merchants_30d",
-            "best_pr_auc": 0.14961729009814415,
-            "direction": "low"
-          },
-          {
-            "feature": "linked_same_product_accounts_30d",
-            "best_pr_auc": 0.14242085700757326,
-            "direction": "high"
-          },
-          {
-            "feature": "shared_identifier_types_30d",
-            "best_pr_auc": 0.13741919539912512,
-            "direction": "low"
-          },
-          {
-            "feature": "identifier_reuse_balance",
-            "best_pr_auc": 0.13346216082030982,
-            "direction": "low"
-          },
-          {
-            "feature": "shared_device_accounts_30d",
-            "best_pr_auc": 0.1208972221826664,
+            "best_pr_auc": 0.13928214038739725,
             "direction": "low"
           },
           {
             "feature": "merchant_refund_volume_index_30d",
-            "best_pr_auc": 0.11879469479939322,
+            "best_pr_auc": 0.1384401606123148,
             "direction": "high"
           },
           {
-            "feature": "refund_share",
-            "best_pr_auc": 0.11862423906649888,
+            "feature": "multi_identifier_neighbor_accounts",
+            "best_pr_auc": 0.13414966324074817,
+            "direction": "low"
+          },
+          {
+            "feature": "graph_overlap_surprisal",
+            "best_pr_auc": 0.13165064054514822,
             "direction": "low"
           },
           {
             "feature": "shared_payment_accounts_30d",
-            "best_pr_auc": 0.11750544245319053,
-            "direction": "low"
-          },
-          {
-            "feature": "account_age_days",
-            "best_pr_auc": 0.11278761366000666,
-            "direction": "high"
-          },
-          {
-            "feature": "device_payment_pair_accounts_30d",
-            "best_pr_auc": 0.1116525858210128,
-            "direction": "high"
-          },
-          {
-            "feature": "refund_velocity_7d",
-            "best_pr_auc": 0.1111574813098519,
-            "direction": "low"
-          },
-          {
-            "feature": "refund_velocity_24h",
-            "best_pr_auc": 0.10910882361831437,
+            "best_pr_auc": 0.12911211908162498,
             "direction": "high"
           },
           {
             "feature": "refund_amount_inr",
-            "best_pr_auc": 0.10908494683498128,
+            "best_pr_auc": 0.12275970196491832,
             "direction": "low"
+          },
+          {
+            "feature": "linked_merchants_30d",
+            "best_pr_auc": 0.12247585132651204,
+            "direction": "low"
+          },
+          {
+            "feature": "connected_accounts_max_window",
+            "best_pr_auc": 0.12151316601986402,
+            "direction": "low"
+          },
+          {
+            "feature": "device_payment_pair_accounts_30d",
+            "best_pr_auc": 0.11386265395545414,
+            "direction": "high"
+          },
+          {
+            "feature": "identifier_reuse_balance",
+            "best_pr_auc": 0.1138268051852017,
+            "direction": "high"
+          },
+          {
+            "feature": "account_age_days",
+            "best_pr_auc": 0.11370621325789373,
+            "direction": "low"
+          },
+          {
+            "feature": "shared_device_accounts_30d",
+            "best_pr_auc": 0.1113165597101024,
+            "direction": "low"
+          },
+          {
+            "feature": "refund_share",
+            "best_pr_auc": 0.10956068600300954,
+            "direction": "low"
+          },
+          {
+            "feature": "refund_velocity_7d",
+            "best_pr_auc": 0.10726995424504321,
+            "direction": "low"
+          },
+          {
+            "feature": "refund_velocity_24h",
+            "best_pr_auc": 0.10581745235707121,
+            "direction": "low"
+          },
+          {
+            "feature": "linked_same_product_accounts_30d",
+            "best_pr_auc": 0.1048032893590999,
+            "direction": "high"
           }
         ],
         "interpretation": "This conditions on already-shared identities; low lift is evidence against a simple reuse-shape simulator shortcut.",
-        "rows": 2044,
-        "prevalence": 0.10909980430528375,
-        "maximum_univariate_ap_lift": 1.780975789532279
+        "rows": 2004,
+        "prevalence": 0.10528942115768464,
+        "maximum_univariate_ap_lift": 1.6111603578509748
       }
     }
   },
   "feature_summary": [
     {
       "feature": "linked_merchants_30d",
-      "importance": 16.80711612068008
+      "importance": 29.528777224502218
     },
     {
       "feature": "linked_refund_burst_72h",
-      "importance": 10.520413573097224
-    },
-    {
-      "feature": "identifier_reuse_balance",
-      "importance": 9.694864238423825
+      "importance": 11.813316246892658
     },
     {
       "feature": "graph_overlap_surprisal",
-      "importance": 9.38153705890072
-    },
-    {
-      "feature": "shared_device_accounts_30d",
-      "importance": 8.08379246839936
-    },
-    {
-      "feature": "vertical",
-      "importance": 7.069667006967394
-    },
-    {
-      "feature": "shared_payment_accounts_30d",
-      "importance": 6.20658210545317
-    },
-    {
-      "feature": "linked_same_product_accounts_30d",
-      "importance": 6.064195528837419
-    },
-    {
-      "feature": "shared_address_accounts_90d",
-      "importance": 5.812640060052067
-    },
-    {
-      "feature": "device_payment_pair_accounts_30d",
-      "importance": 4.644077862029323
-    },
-    {
-      "feature": "multi_identifier_neighbor_accounts",
-      "importance": 4.516464491197757
+      "importance": 8.336108858105966
     },
     {
       "feature": "connected_accounts_max_window",
-      "importance": 3.0190972193581014
+      "importance": 7.328686377900189
     },
     {
-      "feature": "payment_method",
-      "importance": 2.4992301122003986
+      "feature": "identifier_reuse_balance",
+      "importance": 6.633925055956226
     },
     {
-      "feature": "merchant_refund_volume_index_30d",
-      "importance": 2.4200253261026576
+      "feature": "shared_device_accounts_30d",
+      "importance": 5.060638960214946
+    },
+    {
+      "feature": "shared_payment_accounts_30d",
+      "importance": 4.297263890577589
+    },
+    {
+      "feature": "device_payment_pair_accounts_30d",
+      "importance": 4.017348919109216
+    },
+    {
+      "feature": "shared_address_accounts_90d",
+      "importance": 3.8366698565098125
+    },
+    {
+      "feature": "linked_same_product_accounts_30d",
+      "importance": 3.7433002099583548
     },
     {
       "feature": "shared_identifier_types_30d",
-      "importance": 1.752313728087433
+      "importance": 3.680460563549224
+    },
+    {
+      "feature": "vertical",
+      "importance": 3.661182372731205
+    },
+    {
+      "feature": "multi_identifier_neighbor_accounts",
+      "importance": 3.1245689035016406
+    },
+    {
+      "feature": "payment_method",
+      "importance": 1.9566799233739396
+    },
+    {
+      "feature": "merchant_refund_volume_index_30d",
+      "importance": 1.6551461770004119
     },
     {
       "feature": "refund_amount_inr",
-      "importance": 0.5502194632596568
+      "importance": 0.6089428294161277
     },
     {
       "feature": "refund_share",
-      "importance": 0.5115229733300117
+      "importance": 0.2969479221541164
     },
     {
       "feature": "account_age_days",
-      "importance": 0.27276365903304645
+      "importance": 0.25193072643366876
     },
     {
       "feature": "refund_velocity_7d",
-      "importance": 0.1722024806804562
+      "importance": 0.15113716483040934
     },
     {
       "feature": "refund_velocity_24h",
-      "importance": 0.0012745239098954878
+      "importance": 0.016967817282095985
     }
   ],
   "synthetic_cost_assumptions": {
@@ -1787,6 +1281,6 @@
     "Final-test ring topologies are structurally disjoint from train and validation and unfold over a slower event horizon, but remain synthetic.",
     "The device-payment pair rule is reported as an explicit shortcut diagnostic and is not the candidate-ring definition.",
     "The system recommends approve, verify evidence or manual review; it never auto-rejects a customer.",
-    "The 85% validation precision constraint is applied to the point estimate; its day-block bootstrap interval is reported separately and may cross the floor."
+    "The manual-review threshold is selected by synthetic value under a stated review-capacity assumption. The 85% precision constraint applies only to the stricter verification tier and its day-block bootstrap interval may cross the floor."
   ]
 }
