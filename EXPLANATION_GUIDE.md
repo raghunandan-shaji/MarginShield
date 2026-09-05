@@ -41,18 +41,23 @@ such as a refund burst being suspicious only when combined with rotating identif
 and product reuse. Chronological training folds selected CatBoost; the final test was
 not used to choose it.
 
-CatBoost's output is calibrated with Platt scaling on the earlier validation half.
-The later half locks both intervention boundaries. Each maximizes synthetic net
-preventable value inside a 30-100 flag review capacity, with no precision floor. SHAP contributions explain which observed
-features raised or lowered each case's calibrated log-odds. They are model
-explanations, not causal proof.
+The tournament also evaluates a recency-weighted CatBoost candidate using a 45-day
+half-life. The active winner is calibrated with Platt scaling on chronological
+out-of-fold predictions from the training split, so no calibration row was scored by
+the model that trained on it. The later validation half locks one intervention
+boundary that maximizes synthetic net preventable value inside a 30-100 flag review
+capacity, with no precision floor. SHAP contributions explain which observed features
+raised or lowered each case's calibrated log-odds. They are model explanations, not
+causal proof.
 
 ## 5. What The Actions Mean
 
 - **Approve:** the probability is below the locked review threshold.
 - **Manual review:** the probability is above threshold, but named graph evidence is thin.
-- **Verify evidence:** the probability is above threshold and the account overlaps
-  through at least two identifier types, so an analyst can request specific evidence.
+- **Verify evidence:** the probability is above the same queue threshold and the
+  account overlaps through at least two identifier types or a multi-identifier
+  neighbour, so an analyst can request specific evidence. This is a sub-route inside
+  the review queue, not a separate threshold or capacity.
 
 There is deliberately no automatic rejection.
 
@@ -60,7 +65,8 @@ There is deliberately no automatic rejection.
 
 The Rings page builds a graph without using `ring_id` or labels. Case nodes connect
 to device, address, or payment-token nodes shared by multiple accounts. A candidate
-needs at least three cases, three accounts, and one above-threshold request. Queue
+needs at least three cases, three accounts, and one request above the active queue
+threshold. Queue
 rank P1 is unique and means “review first”; it is ordered by probability-weighted
 conditional loss, not an arbitrary score called priority.
 
@@ -70,10 +76,10 @@ than eventual recognition.
 
 ## 7. How To Read The Result
 
-Final synthetic precision is 38.5%: 45 of 117 flagged requests are positive in this
-simulator. Recall is 17.0%, so 219 positive requests are missed. At ring level, 19 of
-37 rings are detected early, and 32.9% of generated candidate clusters correspond to a
-true simulated ring. The day-bootstrap precision interval is 30.8%-47.9%.
+Final synthetic precision is 46.6%: 54 of 116 flagged requests are positive in this
+simulator. Recall is 20.5%, so 210 positive requests are missed. At ring level, 28 of
+37 rings are detected early, and 41.3% of generated candidate clusters correspond to a
+true simulated ring. The day-bootstrap precision interval is 38.1%-54.6%.
 
 Precision is deliberately moderate. Within the review capacity, accepting more false
 alerts recovers more preventable loss than a stricter queue would: a missed ring costs
@@ -97,4 +103,3 @@ Synthetic: every benchmark event, abuse label, loss estimate, and measured model
 performance. Olist has no refund-fraud labels. Real deployment requires Razorpay or
 merchant event data and adjudicated outcomes, followed by temporal and merchant
 holdouts and prospective shadow testing.
-

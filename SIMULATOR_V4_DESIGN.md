@@ -7,8 +7,8 @@ training or final-test scoring.
 
 V3 used a single 85% validation precision floor as its only intervention threshold.
 That created a narrow high-confidence queue but left too much simulated coordinated
-ring loss unreviewed. V4 treats manual review and evidence verification as separate
-operational actions rather than pretending one probability cutoff serves both jobs.
+ring loss unreviewed. V4 treats the score boundary as a value-based review queue and
+uses evidence verification as a structural sub-route inside that queue.
 
 ## Fixed Dataset Design
 
@@ -26,41 +26,44 @@ operational actions rather than pretending one probability cutoff serves both jo
 ## Fixed Model Selection
 
 The candidate family remains graph-rule baseline, regularized logistic regression,
-and regularized CatBoost. Rolling chronological training folds select the winner by
-mean PR-AUC, then calibration quality. Platt scaling uses the earlier half of the
-validation split.
+regularized CatBoost, and a recency-weighted regularized CatBoost. Rolling
+chronological training folds select the winner by mean PR-AUC, then Brier score and
+recall at the declared review capacity. The selected model is fitted on the full
+training split. Platt scaling uses chronological out-of-fold predictions from the
+training folds, so calibration rows are not scored by a model trained on those rows.
 
 ## Fixed Intervention Policy
 
-The later validation half selects two thresholds using no final-test labels:
+The later validation half selects one score boundary using no final-test labels:
 
-1. **Manual review:** maximise simulated net preventable value subject to a queue
+1. **Intervention queue:** maximise simulated net preventable value subject to a queue
    between 30 and 100 requests. The capacity represents roughly 6-7 reviewable
    requests per day over this validation window; it is a stated synthetic operating
    assumption, not a Razorpay fact.
-2. **Verify evidence:** maximise recall subject to at least 85% validation precision
-   and at least 30 flags. A request must also have at least two reused identifier
-   types or a multi-identifier neighbour. This is an evidence-collection tier, not
-   an auto-rejection rule.
+2. **Evidence route:** a request already in that queue is routed to `verify_evidence`
+   when it has at least two reused identifier types or a multi-identifier neighbour;
+   otherwise it is routed to `manual_review`. This is an evidence-collection route,
+   not another score boundary, capacity, or auto-rejection rule.
 
-There is no auto-reject action. The V4 final test is first scored only after the
-simulator, model, calibration, review capacity, and both policy rules are locked.
+There is no auto-reject action. In the original V4 run, the final test was scored only
+after the simulator, model, calibration, review capacity, and action contract were
+locked. The later 4.1 model refresh uses the same fixed test split without using its
+labels for selection, but is therefore a comparative refresh rather than a pristine
+first-look holdout.
 
-## Amendment 1 - 2026-09-05 - Value-Based Tier Selection
+## Amendment 1 - 2026-09-05 - Historical Value-Based Policy
 
-The intervention policy above could not be locked as written. On the V4 validation
-policy window the verification rule is infeasible: reaching 30 structural-evidence
-flags at 85% precision needs roughly 26 true positives, and the ceiling is 14. The
-maximum volume at 85% precision is 16 flags, so training aborted rather than
-silently relaxing the gate.
+The original V4 proposal's 85% precision verification requirement was infeasible on
+the validation policy window. Reaching 30 structural-evidence flags at 85% precision
+was not supported by the available positives. A fixed floor was therefore retained
+only as a published comparison, never as an unreported relaxed constraint.
 
-Rather than lower the floor to whatever the data happened to allow, the floor was
-removed from both tiers. It was never derived from the cost model, and measurement
-shows it forfeits most of the available value:
+The floor was removed because it was not derived from the cost model, and measurement
+showed that it forfeited available value:
 
 | Operating point on the validation policy window | Flags | Precision | Recall | Net value (INR) |
 | --- | --- | --- | --- | --- |
-| 85% precision floor | 23 | 87.0% | 16.8% | 43,003 |
+| 85% precision comparison | 23 | 87.0% | 16.8% | 43,003 |
 | Value-optimal within 30-100 capacity | 99 | 59.6% | 49.6% | 113,470 |
 | Value-optimal unconstrained | 208 | 45.2% | 79.0% | 176,283 |
 
@@ -68,26 +71,25 @@ The asymmetry is the reason. A missed ring forfeits the full expected loss, on
 average about INR 2,100, while a false alert costs roughly INR 200. Break-even
 precision is therefore near 9%, and any round percentage above it destroys value.
 
-Both tiers are now selected by maximising synthetic net preventable value under an
-explicit review capacity, which is a real operational constraint rather than a
-statistical convention:
-
-1. **Manual review:** maximise net preventable value with a queue of 30-100
-   validation flags. Unchanged from the original design.
-2. **Verify evidence:** maximise net preventable value on the structural-evidence
-   subset with 30-100 validation flags. A request must still show at least two
-   reused identifier types or a multi-identifier neighbour.
-
-Because verification is the cheaper, lighter-touch action and is gated on reused
-identifiers, its economic boundary may sit below the manual-review queue. The
-tiers are therefore separated by action and evidence, not by a nested score
-ordering, and the previous constraint requiring the verification threshold to
-exceed the manual-review threshold has been removed.
+This historical two-boundary implementation is superseded. It allowed verification
+to begin below the review queue, which made the displayed manual-only metrics differ
+from the actions served by the API and created a second hidden workload. The active
+implementation uses the single-queue contract above.
 
 The 85% floor is still computed and published in the model report as
 `precision_floor_comparison`, so the value it would have forfeited stays auditable.
-There is still no auto-reject action, and the final test is still scored only once,
-after the simulator, model, calibration, and both policy rules are locked.
+
+## Amendment 2 - 2026-09-05 - Temporal Calibration And Single Queue
+
+The active model adds a recency-weighted CatBoost candidate with a 45-day half-life
+and selects it only if it wins rolling chronological validation. The active winner
+achieved mean PR-AUC 0.4628 versus 0.4600 for ordinary CatBoost. Calibration now uses
+17,526 chronological out-of-fold predictions from the training split.
+
+The active action boundary is `0.2677768616`. Verification uses that same boundary
+and only changes the requested evidence workflow when structural evidence is already
+visible. This keeps capacity, API actions, dashboard counts, and benchmark metrics
+consistent.
 
 ## Interpretation Limits
 

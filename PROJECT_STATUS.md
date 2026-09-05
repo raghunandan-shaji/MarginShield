@@ -35,10 +35,10 @@ single-account abuse are outside scope.
 Policy:
 
 1. Below the validation-locked probability threshold: `approve`.
-2. Above threshold with at least two shared identifier types or one account linked
-   through multiple identifier types: `verify_evidence`.
-3. Above threshold without that named structural evidence: `manual_review`.
-4. There is no auto-reject action.
+2. At or above threshold: enter the one capacity-bounded intervention queue.
+3. Within that queue, route to `verify_evidence` when at least two shared identifier
+   types or one multi-identifier neighbour is observable; otherwise use `manual_review`.
+4. There is no auto-reject action and no second verification workload.
 
 ## Architecture And Files
 
@@ -50,7 +50,7 @@ Policy:
 - UI: `index.html`, `rings.html`, `app.js`, `rings.js`, `chat.js`, `styles.css`
 - Active model: `data/model/live_refund_ring_model.joblib`
 - Active report: `data/reports/ring_model_report.json`
-- Locked protocol: `SIMULATOR_V3_DESIGN.md`
+- Locked protocol: `SIMULATOR_V4_DESIGN.md`
 - Superseded history: `data/model/v2.1/`, `data/reports/v2.1/`
 
 SQLite `data/decisions.sqlite` is runtime state and is gitignored.
@@ -70,14 +70,14 @@ Claude's valid findings were reproduced and fixed:
   product, and existing-customer modes overlap across labels.
 - **Non-live API:** `POST /api/events` now accepts raw events, computes features,
   scores, logs, and commits state in that order.
-- **Unexplainable second threshold:** verify-evidence is now based on observable
-  multi-identifier structure, not another probability cutoff.
+- **Unexplainable second threshold:** verification is now an evidence-based sub-route
+  inside the same score queue, with no second probability boundary or hidden capacity.
 - **Unvalidated input:** exact Pydantic schemas reject missing, extra, or impossible
   values with 422 responses.
 - **No audit trail:** SQLite stores raw event, exact features, model version,
   threshold, probability, recommendation, evidence, prior links, and analyst actions.
-- **Misleading calibration headline:** the report includes calibration for scores
-  above 1%, where final-test ECE is 0.0551, not only the all-row ECE of 0.0046.
+- **Calibration leakage risk:** the active report records temporal rolling out-of-fold
+  Platt calibration, with 17,526 training predictions not scored by their training model.
 - **Weak uncertainty blocks:** confidence intervals now resample days rather than
   weeks.
 - **Ring window mismatch:** evaluation and the Rings page both use a trailing 30-day
@@ -93,9 +93,9 @@ log-odds midpoint and a new seed/test period.
 
 | Split | Rows | Positive requests |
 |---|---:|---:|
-| Train | 52,364 | 1,047 |
-| Validation | 11,275 | 261 |
-| Final test | 11,361 | 262 |
+| Train | 52,579 | 1,047 |
+| Validation | 10,973 | 265 |
+| Final test | 11,448 | 264 |
 
 The split is assigned before label injection. Development rings use device/payment
 hubs, alternating chains, and two-core bridges. Test rings use four slower and
@@ -128,16 +128,18 @@ does not rule out multivariate simulator fingerprints.
 
 Mean chronological training-fold metrics:
 
-| Candidate | PR-AUC | ROC-AUC | Brier | Recall at verification tier |
+| Candidate | PR-AUC | ROC-AUC | Brier | Recall at review capacity |
 |---|---:|---:|---:|---:|
 | Graph rule | 0.1029 | 0.8572 | 0.0196 | 0.0675 |
-| L2 logistic | 0.1927 | 0.8925 | 0.0193 | 0.1826 |
-| Regularized CatBoost | **0.4600** | **0.9417** | **0.0145** | **0.2680** |
+| L2 logistic | 0.1927 | 0.8925 | 0.0193 | 0.1641 |
+| Regularized CatBoost | 0.4600 | 0.9417 | **0.0145** | 0.3849 |
+| Recency-weighted CatBoost | **0.4628** | **0.9429** | 0.0146 | **0.3887** |
 
-CatBoost is the locked winner. It uses depth 4, 360 trees, learning rate 0.04,
-L2 regularization 30, and Platt calibration. Per-case explanations are CatBoost SHAP
-contributions scaled into calibrated log-odds. The locked review threshold is
-`0.5450029782`.
+The recency-weighted CatBoost is the locked winner. It uses depth 4, 360 trees,
+learning rate 0.04, L2 regularization 30, and a 45-day sample-weight half-life.
+Probabilities are calibrated with temporal rolling out-of-fold Platt scaling on
+17,526 predictions. Per-case explanations are CatBoost SHAP contributions scaled
+into calibrated log-odds. The locked review threshold is `0.2677768616`.
 
 The largest global importances are linked merchants, linked 72-hour refund burst,
 identifier reuse balance, graph overlap, shared device accounts, merchant vertical,
@@ -147,27 +149,31 @@ shared payment accounts, and linked same-product accounts. Importances are not c
 
 | Metric | Validation policy | Final synthetic test |
 |---|---:|---:|
-| Rows | 5,637 | 11,361 |
-| PR-AUC | 0.5635 | 0.3795 |
-| ROC-AUC | 0.9509 | 0.9164 |
-| Brier score | 0.0143 | 0.0181 |
-| Precision | 87.88% | 91.89% |
-| Request recall | 22.83% | 12.98% |
-| Flags | 33 | 37 |
-| Flag rate | 0.59% | 0.33% |
-| Ring-candidate precision | 78.57% | 85.00% |
-| Early ring recall | 47.83% | 38.46% |
-| Net synthetic preventable value | INR 69,018 | INR 80,609 |
+| Rows | 5,486 | 11,448 |
+| PR-AUC | 0.5552 | 0.3010 |
+| ROC-AUC | 0.9486 | 0.9142 |
+| Brier score | 0.0140 | 0.0189 |
+| Precision | 58.76% | 46.55% |
+| Request recall | 47.90% | 20.45% |
+| Flags | 97 | 116 |
+| Flag rate | 1.77% | 1.01% |
+| Ring-candidate precision | 47.50% | 41.25% |
+| Early ring recall | 70.00% | 75.68% |
+| Net synthetic preventable value | INR 107,883 | INR 94,055 |
 
-Final confusion matrix: 11,112 TN, 72 FP, 219 FN, 45 TP.
+Final confusion matrix: 11,122 TN, 62 FP, 210 FN, 54 TP.
+
+The V4 final-test split was previously scored by the superseded bundle before the
+4.1 model-layer refresh. No final-test labels were used to select the recency half-life,
+model, calibration, or policy, but the refreshed results are comparative rather than
+a pristine first-look holdout.
 
 Day-block bootstrap 95% intervals:
 
-- Final precision: 30.77%-47.87%.
-- Final recall: 13.20%-20.75%.
-- Final PR-AUC: 0.2701-0.3554.
-- Final net synthetic value: INR 56,673-INR 120,648.
-- Validation precision: 46.72%-71.52%.
+- Final precision: 38.11%-54.63%.
+- Final recall: 15.17%-25.62%.
+- Final PR-AUC: 0.2598-0.3535.
+- Final net synthetic value: INR 59,681-INR 127,575.
 
 Precision is deliberately moderate rather than maximised. The interval is wide and
 must be stated alongside the point estimate.
@@ -177,9 +183,9 @@ Early ring recall by unseen test topology:
 | Topology | Early ring recall |
 |---|---:|
 | Token-fan address pairs | 88.89% |
-| Three-core sparse bridge | 66.67% |
-| Staggered device-address bridge | 30.00% |
-| Rotating identifier cycle | 22.22% |
+| Three-core sparse bridge | 100.00% |
+| Staggered device-address bridge | 50.00% |
+| Rotating identifier cycle | 66.67% |
 
 The system still misses the slowest rotating structures; claiming comprehensive ring
 coverage would be false.
@@ -188,11 +194,19 @@ V4 removed the 85% precision floor. It was never derived from the cost model, an
 this validation window it is unreachable at the required flag count. Because a missed
 ring forfeits roughly INR 2,100 while a false alert costs roughly INR 200, break-even
 precision sits near 9%, so a high floor destroys value rather than protecting it.
-Both boundaries now maximise synthetic net preventable value inside a 30-100 review
-capacity, and the report publishes `precision_floor_comparison` so the trade-off stays
-auditable. Validation catches 59 of 119 positive requests and misses 60; the final
-synthetic test catches 45 of 264 and misses 219, and reaches 51.4% early ring recall.
-The product is a value-optimising triage layer, not a comprehensive detector.
+The active policy maximises synthetic net preventable value inside a single 30-100
+review capacity, and the report publishes `precision_floor_comparison` so the trade-off
+stays auditable. Validation catches 57 of 119 positive requests and misses 62; the
+final synthetic test catches 54 of 264 and misses 210, and reaches 75.7% early ring
+recall. The product is a value-optimising triage layer, not a comprehensive detector.
+
+The active model adds two deliberately small ML improvements. First, the tournament
+evaluates a recency-weighted CatBoost candidate with a 45-day half-life, which won by
+rolling mean PR-AUC (0.4628 versus 0.4600 for ordinary CatBoost). Second, Platt
+calibration is fitted on 17,526 chronological out-of-fold predictions from the
+training split, rather than on predictions from the final model over its own rows.
+These improve model governance and adaptation modestly; they do not turn synthetic
+benchmark results into production evidence.
 
 ## Frontend Data Contract
 
@@ -210,7 +224,7 @@ The product is a value-optimising triage layer, not a comprehensive detector.
 
 ## Verification
 
-- `27/27` unit and API tests pass.
+- `31/31` unit and API tests pass in the approved writable project environment.
 - Grounded-chat tests cover locked-report recall/precision answers and selected-case context.
 - Static app-shell responses use `no-store`; both pages expose the same four-view navigation.
 - Full-dataset offline/live feature replay passes.
@@ -224,10 +238,10 @@ The product is a value-optimising triage layer, not a comprehensive detector.
 
 Artifact SHA-256:
 
-- Dataset: `de6bb654edac1e89446c36ca92c9236089c4683858b4b102f5093fc5fac1e414`
-- Entity links: `efe116424412de1b90de50087aedf8f22eb46d9aa1bff8a44c4a8724d8b77b3c`
-- Model: `084dd280d82186a0f26af1b40bc3d28f92cc02cc1b1d0687b2d390460de64130`
-- Report: `3c775200e2b28d07308b6241c2d74299be006b86e48456d4e799b38dd3d62c0a`
+- Dataset: `3224b11a1fb6a44a1b10104dc3571fe352e79c4007d6d394bfe165f2093b81e7`
+- Entity links: `677d92c844593b9ce7afabc8b3d6ee84aa5ca2200498f3106d8dcb8712a780f9`
+- Model: `dfa7e117dafd0b850af863de7be00b21b1cb83c1049f3dcf90c364e112006832`
+- Report: `5591f569258038f9f7dcc7084fb34518529af66f7a5e2cb17c11e58efe73b807`
 
 ## Feasibility
 

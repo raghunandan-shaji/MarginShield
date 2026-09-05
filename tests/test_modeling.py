@@ -43,7 +43,10 @@ class ModelingTests(unittest.TestCase):
         self.assertLessEqual(validation["review_volume"], 100)
         self.assertGreater(validation["recall"], 0.0)
         self.assertGreater(validation["costs"]["net_preventable_value_inr"], 0.0)
-        self.assertIn("Neither tier imposes a precision floor", calibration["policy_selection"])
+        self.assertIn("one intervention capacity", calibration["policy_selection"])
+        self.assertEqual(calibration["method"], "Temporal rolling out-of-fold Platt scaling")
+        self.assertEqual(calibration["calibration_folds"], 3)
+        self.assertGreater(calibration["calibration_rows"], 0)
 
     def test_value_policy_beats_the_precision_floor_it_replaced(self) -> None:
         """The floor was removed on evidence, so the evidence stays in the report."""
@@ -63,8 +66,13 @@ class ModelingTests(unittest.TestCase):
             tiers = self.report[key]
             self.assertIn("verify_evidence", tiers)
             self.assertIn("manual_review", tiers)
-            # Verification is gated on structural evidence, so it never exceeds any intervention.
+            # Verification is gated on structural evidence and is a sub-route of
+            # the one intervention queue.
             self.assertLessEqual(tiers["verify_evidence"]["volume"], tiers["any_intervention"]["volume"])
+            self.assertEqual(
+                tiers["any_intervention"]["volume"],
+                tiers["manual_review"]["volume"] + tiers["verify_evidence"]["volume"],
+            )
 
     def test_final_report_has_ring_and_uncertainty_metrics(self) -> None:
         test = self.report["test"]

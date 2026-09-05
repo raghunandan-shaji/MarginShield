@@ -39,10 +39,9 @@ class TournamentConfig:
     minimum_validation_flags: int = 30
     maximum_manual_reviews: int = 100
     minimum_manual_reviews: int = 30
-    maximum_verifications: int = 100
-    minimum_verifications: int = 30
     rolling_folds: int = 3
     bootstrap_samples: int = 300
+    recency_half_life_days: float = 45.0
 
 
 @dataclass
@@ -153,17 +152,30 @@ def candidate_builders(seed: int) -> dict[str, CandidateBuilder]:
         "graph_rule_baseline": lambda _: None,
         "logistic_l2": lambda frame: build_logistic(frame),
         "catboost_calibrated": lambda _: build_catboost(seed),
+        "catboost_recency_weighted": lambda _: build_catboost(seed),
     }
 
 
-def fit_candidate(model_name: str, builder: CandidateBuilder, train: pd.DataFrame) -> Any:
+def fit_candidate(
+    model_name: str,
+    builder: CandidateBuilder,
+    train: pd.DataFrame,
+    recency_half_life_days: float = 45.0,
+) -> Any:
     if model_name == "graph_rule_baseline":
         return None
     model = builder(train)
-    if model_name == "catboost_calibrated":
+    if model_name in {"catboost_calibrated", "catboost_recency_weighted"}:
         _, categorical = feature_types(train)
         medians = {name: float(train[name].median()) for name in MODEL_FEATURE_COLUMNS if name not in categorical}
-        model.fit(catboost_frame(train, categorical, medians), train[TARGET], cat_features=categorical)
+        fit_kwargs: dict[str, Any] = {"cat_features": categorical}
+        if model_name == "catboost_recency_weighted":
+            if recency_half_life_days <= 0:
+                raise ValueError("recency_half_life_days must be positive")
+            timestamps = pd.to_datetime(train["event_timestamp"], utc=True)
+            age_days = (timestamps.max() - timestamps).dt.total_seconds().to_numpy() / 86_400
+            fit_kwargs["sample_weight"] = np.power(0.5, age_days / recency_half_life_days)
+        model.fit(catboost_frame(train, categorical, medians), train[TARGET], **fit_kwargs)
         model._marginshield_medians = medians
         return model
     model.fit(train[MODEL_FEATURE_COLUMNS], train[TARGET])
@@ -173,7 +185,7 @@ def fit_candidate(model_name: str, builder: CandidateBuilder, train: pd.DataFram
 def predict_candidate(model_name: str, model: Any, frame: pd.DataFrame) -> np.ndarray:
     if model_name == "graph_rule_baseline":
         return graph_rule_score(frame)
-    if model_name == "catboost_calibrated":
+    if model_name in {"catboost_calibrated", "catboost_recency_weighted"}:
         _, categorical = feature_types(frame)
         return model.predict_proba(catboost_frame(frame, categorical, model._marginshield_medians))[:, 1]
     return model.predict_proba(frame[MODEL_FEATURE_COLUMNS])[:, 1]
@@ -205,7 +217,7 @@ def score_live_bundle(bundle: LiveModelBundle, feature_frame: pd.DataFrame) -> n
         prepared[name] = pd.to_numeric(prepared[name], errors="coerce").fillna(median)
     if bundle.model_name == "graph_rule_baseline":
         raw = graph_rule_score(prepared)
-    elif bundle.model_name == "catboost_calibrated":
+    elif bundle.model_name in {"catboost_calibrated", "catboost_recency_weighted"}:
         raw = bundle.model.predict_proba(catboost_frame(prepared, bundle.categorical_features, bundle.numeric_medians))[:, 1]
     else:
         raw = bundle.model.predict_proba(prepared)[:, 1]
@@ -267,6 +279,32 @@ def rolling_folds(train: pd.DataFrame, count: int) -> list[tuple[pd.DataFrame, p
     return [(train.iloc[:initial + fold * horizon].copy(), train.iloc[initial + fold * horizon: initial + (fold + 1) * horizon].copy()) for fold in range(count)]
 
 
+def temporal_oof_scores(
+    model_name: str,
+    builder: CandidateBuilder,
+    train: pd.DataFrame,
+    config: TournamentConfig,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Generate chronological out-of-fold scores for probability calibration.
+
+    Each prediction is made by a model that was not fitted on that row. This is
+    the calibration analogue of the rolling tournament and prevents the
+    calibrator from learning the final model's in-sample optimism.
+    """
+    score_parts: list[np.ndarray] = []
+    label_parts: list[np.ndarray] = []
+    for fold_train, fold_validation in rolling_folds(train, config.rolling_folds):
+        fold_model = fit_candidate(
+            model_name,
+            builder,
+            fold_train,
+            recency_half_life_days=config.recency_half_life_days,
+        )
+        score_parts.append(predict_candidate(model_name, fold_model, fold_validation))
+        label_parts.append(fold_validation[TARGET].to_numpy(dtype=int))
+    return np.concatenate(score_parts), np.concatenate(label_parts)
+
+
 def constrained_recall(frame: pd.DataFrame, scores: np.ndarray, precision_floor: float, min_flags: int) -> float:
     truth = frame[TARGET].to_numpy(int)
     order = np.argsort(-scores, kind="stable")
@@ -312,67 +350,6 @@ def structural_evidence_mask(frame: pd.DataFrame) -> np.ndarray:
     ) | (
         frame["multi_identifier_neighbor_accounts"].to_numpy(int) >= 1
     )
-
-
-def select_verification_value_threshold(
-    frame: pd.DataFrame,
-    scores: np.ndarray,
-    maximum_verifications: int,
-    minimum_verifications: int,
-) -> float:
-    """Lock the verification tier on economic value, not a fixed precision percentage.
-
-    Verification is an evidence-collection action, so it is offered only where the
-    submitted graph already shows reused identifiers. Within that subset the
-    boundary is economic: request evidence for one more request whenever the
-    preventable loss recovered from the additional true positives exceeds the cost
-    of the false requests that come with it.
-
-    No precision floor is imposed. The cost model already defines the break-even
-    point, and it sits far below any round percentage: a missed ring forfeits the
-    full expected loss while a false evidence request costs a fraction of the
-    refund. A fixed floor would override that arithmetic and forfeit real value.
-    """
-    if maximum_verifications < minimum_verifications:
-        raise ValueError("maximum_verifications must be at least minimum_verifications")
-    structural = structural_evidence_mask(frame)
-    if not structural.any():
-        raise ValueError("No structural-evidence rows are available to lock a verification tier")
-    subset = frame.loc[structural].reset_index(drop=True)
-    subset_scores = np.asarray(scores)[structural]
-    order = np.argsort(-subset_scores, kind="stable")
-    sorted_scores = subset_scores[order]
-    boundaries = np.r_[sorted_scores[:-1] != sorted_scores[1:], True]
-    count = np.arange(1, len(subset) + 1)
-    candidate_indices = np.flatnonzero(
-        boundaries & (count >= minimum_verifications) & (count <= maximum_verifications)
-    )
-    if not len(candidate_indices):
-        raise ValueError("No distinct validation score boundary falls within the verification-capacity range")
-    truth = subset[TARGET].to_numpy(int)[order]
-    expected_loss = subset["expected_loss_if_ring_inr"].to_numpy(float)[order]
-    false_positive_cost = subset["false_positive_cost_inr"].to_numpy(float)[order]
-    review_cost = subset["review_cost_inr"].to_numpy(float)[order]
-    net_value = (
-        np.cumsum(expected_loss * truth)
-        - np.cumsum(false_positive_cost * (1 - truth))
-        - np.cumsum(review_cost * truth)
-    )
-    # Maximise economic value. A tie spends less verification capacity.
-    best_value = net_value[candidate_indices].max()
-    best = candidate_indices[net_value[candidate_indices] == best_value][0]
-    return _midpoint_threshold(sorted_scores, int(best))
-
-
-def verification_recall(frame: pd.DataFrame, scores: np.ndarray, maximum_verifications: int, minimum_verifications: int) -> float:
-    """Fold-level coverage at the exact verification action rule."""
-    try:
-        threshold = select_verification_value_threshold(frame, scores, maximum_verifications, minimum_verifications)
-    except ValueError:
-        return 0.0
-    truth = frame[TARGET].to_numpy(int)
-    flagged = (scores >= threshold) & structural_evidence_mask(frame)
-    return float(truth[flagged].sum() / max(truth.sum(), 1))
 
 
 def precision_floor_comparison(
@@ -437,9 +414,9 @@ def select_capacity_value_threshold(
 ) -> tuple[float, list[dict[str, Any]]]:
     """Maximise synthetic net value on validation under an explicit review queue capacity.
 
-    This is deliberately distinct from the high-confidence verification threshold:
-    the manual-review queue accepts some false alerts when their expected cost is
-    lower than the preventable loss recovered from additional true positives.
+    The queue accepts some false alerts when their expected cost is lower than the
+    preventable loss recovered from additional true positives. Evidence verification
+    is routed inside this queue after the boundary is applied.
     """
     if maximum_reviews < minimum_reviews:
         raise ValueError("maximum_reviews must be at least minimum_reviews")
@@ -628,15 +605,16 @@ def policy_tier_metrics(
     manual_review_threshold: float,
     verify_evidence_threshold: float,
 ) -> dict[str, Any]:
-    """Report the two actions as operational tiers, without changing the target."""
+    """Report one intervention queue with an evidence-based sub-route."""
     truth = frame[TARGET].to_numpy(int)
     review = scores >= manual_review_threshold
     structural = structural_evidence_mask(frame)
-    verify = (scores >= verify_evidence_threshold) & structural
-    # Verification can begin below the manual-review queue, so any intervention is
-    # the union of both actions rather than the manual-review mask alone.
+    effective_verify_threshold = max(manual_review_threshold, verify_evidence_threshold)
+    verify = (scores >= effective_verify_threshold) & structural
+    # Evidence verification is a sub-route inside the one capacity-bounded
+    # intervention queue. It cannot silently create a second workload.
     manual_only = review & ~verify
-    intervened = review | verify
+    intervened = review
 
     def summarize(mask: np.ndarray) -> dict[str, Any]:
         tp = int((mask & (truth == 1)).sum())
@@ -651,11 +629,11 @@ def policy_tier_metrics(
 
     return {
         "manual_review_threshold": float(manual_review_threshold),
-        "verify_evidence_threshold": float(verify_evidence_threshold),
+        "verify_evidence_threshold": float(effective_verify_threshold),
         "any_intervention": summarize(intervened),
         "manual_review": summarize(manual_only),
         "verify_evidence": summarize(verify),
-        "definition": "Both boundaries maximise synthetic net preventable value under their own review capacity, with no precision floor. Verify evidence is the cheaper evidence-collection action and additionally requires at least two reused identifier types or one multi-identifier neighbour; manual review covers the remaining flagged requests.",
+        "definition": "The single manual-review queue maximises synthetic net preventable value within its declared capacity, with no precision floor. Requests in that queue are routed to verify evidence when at least two reused identifier types or one multi-identifier neighbour is already observable; all other queued requests go to manual review. Verification never creates a second hidden queue.",
     }
 
 
@@ -792,32 +770,34 @@ def lock_intervention_policy(
         maximum_reviews=config.maximum_manual_reviews,
         minimum_reviews=config.minimum_manual_reviews,
     )
-    verify_evidence_threshold = select_verification_value_threshold(
-        policy_frame,
-        policy_scores,
-        maximum_verifications=config.maximum_verifications,
-        minimum_verifications=config.minimum_verifications,
-    )
-    # The tiers are separated by action and evidence, not by a nested score ordering.
-    # Verification is the cheaper, lighter-touch action and is gated on reused
-    # identifiers, so its economic boundary may sit below the manual-review queue.
-    return manual_review_threshold, verify_evidence_threshold, policy_curve
+    # Verification is a named evidence route inside the same queue. Keeping the
+    # score boundary identical makes capacity, API actions, and reported metrics
+    # describe one deployable operating policy.
+    return manual_review_threshold, manual_review_threshold, policy_curve
 
 
 def validate_policy_only(splits: dict[str, pd.DataFrame], config: TournamentConfig) -> dict[str, Any]:
     """Develop and validate the policy without scoring or fitting against final test."""
     winner, tournament_report = tournament(splits, config)
-    model = fit_candidate(winner, candidate_builders(config.seed)[winner], splits["train"])
+    builder = candidate_builders(config.seed)[winner]
+    model = fit_candidate(
+        winner,
+        builder,
+        splits["train"],
+        recency_half_life_days=config.recency_half_life_days,
+    )
     raw_validation = predict_candidate(winner, model, splits["validation"])
     cutoff = splits["validation"]["event_timestamp"].median()
-    calibration_mask = splits["validation"]["event_timestamp"] <= cutoff
-    calibrator = fit_platt_calibrator(
-        raw_validation[calibration_mask.to_numpy()],
-        splits["validation"].loc[calibration_mask, TARGET],
-        config.seed,
+    oof_scores, oof_labels = temporal_oof_scores(
+        winner,
+        builder,
+        splits["train"],
+        config,
     )
-    policy_frame = splits["validation"].loc[~calibration_mask].reset_index(drop=True)
-    policy_scores = calibrate(calibrator, raw_validation[~calibration_mask.to_numpy()])
+    calibrator = fit_platt_calibrator(oof_scores, pd.Series(oof_labels, name=TARGET), config.seed)
+    policy_mask = splits["validation"]["event_timestamp"] > cutoff
+    policy_frame = splits["validation"].loc[policy_mask].reset_index(drop=True)
+    policy_scores = calibrate(calibrator, raw_validation[policy_mask.to_numpy()])
     manual_review_threshold, verify_evidence_threshold, _ = lock_intervention_policy(
         policy_frame, policy_scores, config
     )
@@ -845,7 +825,7 @@ def validate_policy_only(splits: dict[str, pd.DataFrame], config: TournamentConf
 
 
 def feature_summary(model_name: str, model: Any) -> list[dict[str, Any]]:
-    if model_name == "catboost_calibrated":
+    if model_name in {"catboost_calibrated", "catboost_recency_weighted"}:
         table = pd.DataFrame({"feature": MODEL_FEATURE_COLUMNS, "importance": model.get_feature_importance()})
         return table.sort_values("importance", ascending=False).head(20).to_dict(orient="records")
     if model_name == "logistic_l2":
@@ -865,30 +845,52 @@ def tournament(splits: dict[str, pd.DataFrame], config: TournamentConfig) -> tup
     for name, builder in candidate_builders(config.seed).items():
         rows = []
         for fold_train, fold_validation in folds:
-            model = fit_candidate(name, builder, fold_train)
+            model = fit_candidate(
+                name,
+                builder,
+                fold_train,
+                recency_half_life_days=config.recency_half_life_days,
+            )
             scores = predict_candidate(name, model, fold_validation)
             metrics = raw_metrics(fold_validation, scores)
-            metrics["recall_at_high_confidence_precision"] = verification_recall(
-                fold_validation, scores, config.maximum_verifications, config.minimum_verifications
-            )
+            try:
+                capacity_threshold, _ = select_capacity_value_threshold(
+                    fold_validation,
+                    scores,
+                    maximum_reviews=config.maximum_manual_reviews,
+                    minimum_reviews=config.minimum_manual_reviews,
+                )
+                metrics["recall_at_review_capacity"] = float(
+                    (fold_validation.loc[scores >= capacity_threshold, TARGET].sum())
+                    / max(int(fold_validation[TARGET].sum()), 1)
+                )
+            except ValueError:
+                metrics["recall_at_review_capacity"] = 0.0
             rows.append(metrics)
-        report["candidates"][name] = {"folds": rows, "mean_pr_auc": float(np.mean([row["pr_auc"] for row in rows])), "mean_roc_auc": float(np.mean([row["roc_auc"] for row in rows])), "mean_brier_score": float(np.mean([row["brier_score"] for row in rows])), "mean_recall_at_high_confidence_precision": float(np.mean([row["recall_at_high_confidence_precision"] for row in rows]))}
-    winner = max(report["candidates"], key=lambda name: (report["candidates"][name]["mean_pr_auc"], -report["candidates"][name]["mean_brier_score"], report["candidates"][name]["mean_recall_at_high_confidence_precision"]))
+        report["candidates"][name] = {"folds": rows, "mean_pr_auc": float(np.mean([row["pr_auc"] for row in rows])), "mean_roc_auc": float(np.mean([row["roc_auc"] for row in rows])), "mean_brier_score": float(np.mean([row["brier_score"] for row in rows])), "mean_recall_at_review_capacity": float(np.mean([row["recall_at_review_capacity"] for row in rows]))}
+    winner = max(report["candidates"], key=lambda name: (report["candidates"][name]["mean_pr_auc"], -report["candidates"][name]["mean_brier_score"], report["candidates"][name]["mean_recall_at_review_capacity"]))
     report["winner"] = winner
-    report["selection_rule"] = "Highest mean rolling-train PR-AUC, then lower Brier score, then recall at the high-confidence verification constraint. The final test split is excluded from selection."
+    report["selection_rule"] = "Highest mean chronological rolling-validation PR-AUC, then lower Brier score, then recall at the declared review capacity. The final test split is excluded from selection."
     return winner, report
 
 
 def train_live_model(dataset_path: Path = DEFAULT_DATASET, model_dir: Path = DEFAULT_MODEL_DIR, report_dir: Path = DEFAULT_REPORT_DIR, config: TournamentConfig = TournamentConfig()) -> dict[str, Any]:
     splits = load_dataset(dataset_path)
     winner, tournament_report = tournament(splits, config)
-    model = fit_candidate(winner, candidate_builders(config.seed)[winner], splits["train"])
+    builder = candidate_builders(config.seed)[winner]
+    model = fit_candidate(
+        winner,
+        builder,
+        splits["train"],
+        recency_half_life_days=config.recency_half_life_days,
+    )
     raw_validation = predict_candidate(winner, model, splits["validation"])
     cutoff = splits["validation"]["event_timestamp"].median()
-    calibration_mask = splits["validation"]["event_timestamp"] <= cutoff
-    calibrator = fit_platt_calibrator(raw_validation[calibration_mask.to_numpy()], splits["validation"].loc[calibration_mask, TARGET], config.seed)
-    policy_frame = splits["validation"].loc[~calibration_mask].reset_index(drop=True)
-    policy_scores = calibrate(calibrator, raw_validation[~calibration_mask.to_numpy()])
+    oof_scores, oof_labels = temporal_oof_scores(winner, builder, splits["train"], config)
+    calibrator = fit_platt_calibrator(oof_scores, pd.Series(oof_labels, name=TARGET), config.seed)
+    policy_mask = splits["validation"]["event_timestamp"] > cutoff
+    policy_frame = splits["validation"].loc[policy_mask].reset_index(drop=True)
+    policy_scores = calibrate(calibrator, raw_validation[policy_mask.to_numpy()])
     manual_review_threshold, verify_evidence_threshold, policy_curve = lock_intervention_policy(
         policy_frame, policy_scores, config
     )
@@ -905,7 +907,7 @@ def train_live_model(dataset_path: Path = DEFAULT_DATASET, model_dir: Path = DEF
         categorical,
         medians,
         manual_review_threshold,
-        "marginshield-4.0.0-value-policy-locked",
+        "marginshield-4.0.0-value-policy-locked-temporal-oof-calibration-v4.1",
         verify_evidence_threshold=verify_evidence_threshold,
         maximum_manual_reviews=config.maximum_manual_reviews,
         minimum_manual_reviews=config.minimum_manual_reviews,
@@ -929,21 +931,23 @@ def train_live_model(dataset_path: Path = DEFAULT_DATASET, model_dir: Path = DEF
     report = {
         "dataset_version": "4.0.0-value-policy-locked", "target": TARGET,
         "target_definition": "Coordinated multi-account refund-abuse ring event. No broad all-refund-abuse classifier is trained.",
+        "evaluation_protocol_note": "The V4 final-test split was previously scored by a superseded model bundle before this 4.1 model-layer refresh. No final-test labels were used to select this model or policy, but these results are a comparative benchmark refresh rather than a pristine first-look holdout.",
         "feature_contract": MODEL_FEATURE_COLUMNS, "forbidden_features": TARGET_ONLY_COLUMNS,
         "tournament": tournament_report, "winner": winner,
         "calibration": {
-            "method": "Platt scaling on the early validation window",
-            "calibration_rows": int(calibration_mask.sum()),
-            "policy_rows": int((~calibration_mask).sum()),
+            "method": "Temporal rolling out-of-fold Platt scaling",
+            "calibration_rows": int(len(oof_labels)),
+            "calibration_source": "Chronological out-of-fold predictions from rolling training folds; no calibrator row was scored by the model that trained on it.",
+            "calibration_folds": config.rolling_folds,
+            "policy_rows": int(policy_mask.sum()),
             "manual_review_threshold": manual_review_threshold,
             "verify_evidence_threshold": verify_evidence_threshold,
             "policy_selection": (
                 f"Manual review: maximize synthetic net preventable value with {config.minimum_manual_reviews}-"
-                f"{config.maximum_manual_reviews} validation flags. Verify evidence: maximize synthetic net "
-                f"preventable value on the structural-evidence subset with {config.minimum_verifications}-"
-                f"{config.maximum_verifications} validation flags. Neither tier imposes a precision floor; the "
-                "synthetic cost model defines the break-even point and review capacity is the binding constraint. "
-                "Both boundaries use a validation-only log-odds midpoint to the next excluded score."
+                f"{config.maximum_manual_reviews} validation flags. There is one intervention capacity; verify "
+                "evidence is a structural-evidence sub-route inside that queue. No precision floor is imposed; "
+                "the synthetic cost model defines the break-even point and review capacity is the binding constraint. "
+                "The boundary uses a validation-only log-odds midpoint to the next excluded score."
             ),
         },
         "policy_validation": classification_metrics(policy_frame, policy_scores, manual_review_threshold),
@@ -979,7 +983,7 @@ def train_live_model(dataset_path: Path = DEFAULT_DATASET, model_dir: Path = DEF
             "Final-test ring topologies are structurally disjoint from train and validation and unfold over a slower event horizon, but remain synthetic.",
             "The device-payment pair rule is reported as an explicit shortcut diagnostic and is not the candidate-ring definition.",
             "The system recommends approve, verify evidence or manual review; it never auto-rejects a customer.",
-            "The manual-review threshold is selected by synthetic value under a stated review-capacity assumption. The 85% precision constraint applies only to the stricter verification tier and its day-block bootstrap interval may cross the floor.",
+            "The manual-review threshold is selected by synthetic value under a stated review-capacity assumption. Verification is only a structural-evidence route inside that queue; it does not add a second capacity or a hidden precision constraint.",
         ],
     }
     model_dir.mkdir(parents=True, exist_ok=True)

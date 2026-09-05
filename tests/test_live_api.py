@@ -157,6 +157,16 @@ class LiveApiTests(unittest.TestCase):
         self.assertEqual(test["true_positives"] + test["false_negatives"], test["positive_requests"])
         self.assertEqual(validation["window"], "later validation policy window")
         self.assertEqual(test["window"], "final synthetic test")
+        summary = body["summary"]
+        self.assertEqual(summary["flagged_requests"], test["review_volume"])
+        self.assertEqual(
+            summary["flagged_requests"],
+            summary["risk_bands"]["manual_review"] + summary["risk_bands"]["verify_evidence"],
+        )
+        self.assertEqual(
+            summary["held_out_requests"],
+            summary["risk_bands"]["approve"] + summary["flagged_requests"],
+        )
         # Derived from the locked report rather than hardcoded, so a retrain
         # updates the expectation instead of breaking the suite.
         confusion = self.service.report["policy_validation"]["confusion_matrix"]

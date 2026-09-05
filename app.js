@@ -89,11 +89,11 @@ function renderSummary() {
         ["Abuse requests", validation.positive_requests, "Synthetic positives in this window"],
         ["Manual-review capacity", `${state.data.policy_metadata.minimum_manual_reviews}-${state.data.policy_metadata.maximum_manual_reviews}`, "Flags in the validation policy window"],
         [
-          "Verification tier",
+          "Evidence route",
           validation.policy_tiers?.verify_evidence
             ? `${validation.policy_tiers.verify_evidence.volume} flags`
             : "Not locked",
-          "Value-optimal boundary plus structural-evidence condition",
+          "Inside the same queue; structural-evidence condition",
         ],
       ],
     },
@@ -270,7 +270,7 @@ function renderPolicy() {
     : `${metric.within_capacity ? "Within" : "Outside"} review capacity · ${delta >= 0 ? "+" : ""}${fmtInr(delta)} vs locked`;
   $("#policyDelta").className = metric.within_capacity ? "policy-pass" : "policy-fail";
   const verify = state.data.evaluation.validation.policy_tiers?.verify_evidence;
-  const verifyNote = verify ? ` Verification tier: ${verify.true_positives} caught at ${fmtMetricPct(verify.precision)} precision from ${verify.volume} structural-evidence flags.` : "";
+  const verifyNote = verify ? ` Evidence route: ${verify.true_positives} caught at ${fmtMetricPct(verify.precision)} precision from ${verify.volume} structurally supported queue flags.` : "";
   $("#policyInterpretation").textContent = `${metric.true_positives} of ${metric.positive_requests} abuse requests caught; ${metric.false_negatives} missed; ${metric.false_positives} false alerts. Synthetic validation scenario.${verifyNote}`;
 
   const cards = [

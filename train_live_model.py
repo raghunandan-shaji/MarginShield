@@ -14,7 +14,7 @@ def main() -> None:
     parser.add_argument("--report-dir", type=Path, required=True)
     parser.add_argument(
         "--minimum-precision", type=float, default=0.85,
-        help="Reported comparison baseline only. Not a constraint: both tiers are selected by net value.",
+        help="Reported comparison baseline only. Not a constraint: the review queue is selected by net value.",
     )
     parser.add_argument(
         "--minimum-validation-flags", type=int, default=30,
@@ -22,9 +22,11 @@ def main() -> None:
     )
     parser.add_argument("--maximum-manual-reviews", type=int, default=100)
     parser.add_argument("--minimum-manual-reviews", type=int, default=30)
-    parser.add_argument("--maximum-verifications", type=int, default=100)
-    parser.add_argument("--minimum-verifications", type=int, default=30)
     parser.add_argument("--bootstrap-samples", type=int, default=300)
+    parser.add_argument(
+        "--recency-half-life-days", type=float, default=45.0,
+        help="Half-life used by the recency-weighted CatBoost candidate during tournament selection.",
+    )
     parser.add_argument("--tournament-only", action="store_true")
     parser.add_argument("--validation-only", action="store_true")
     args = parser.parse_args()
@@ -35,9 +37,8 @@ def main() -> None:
         minimum_validation_flags=args.minimum_validation_flags,
         maximum_manual_reviews=args.maximum_manual_reviews,
         minimum_manual_reviews=args.minimum_manual_reviews,
-        maximum_verifications=args.maximum_verifications,
-        minimum_verifications=args.minimum_verifications,
         bootstrap_samples=args.bootstrap_samples,
+        recency_half_life_days=args.recency_half_life_days,
     )
     if args.tournament_only:
         winner, report = tournament(load_dataset(args.dataset), config)

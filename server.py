@@ -109,12 +109,15 @@ def score_action(probability: float, features: dict[str, Any], bundle: LiveModel
         int(features.get("shared_identifier_types_30d", 0)) >= 2
         or int(features.get("multi_identifier_neighbor_accounts", 0)) >= 1
     )
-    verify_threshold = float(getattr(bundle, "verify_evidence_threshold", bundle.threshold) or bundle.threshold)
+    verify_threshold = max(
+        float(bundle.threshold),
+        float(getattr(bundle, "verify_evidence_threshold", bundle.threshold) or bundle.threshold),
+    )
     if probability >= verify_threshold and structural_evidence:
-        return "verify_evidence", "Verify evidence", "Value-optimal verification boundary met with reused-identifier evidence"
+        return "verify_evidence", "Verify evidence", "Review threshold met with reused-identifier evidence"
     if probability >= bundle.threshold:
         return "manual_review", "Manual review", "Capacity-bounded manual-review threshold met"
-    return "approve", "Approve", "Below both intervention boundaries"
+    return "approve", "Approve", "Below the review threshold"
 
 
 def operational_signals(features: dict[str, Any]) -> list[dict[str, str]]:
@@ -209,7 +212,7 @@ def model_evidence(row: pd.Series | dict[str, Any], bundle: LiveModelBundle) -> 
         for encoded_name, value, coefficient in zip(preprocessor.get_feature_names_out(), values, classifier.coef_[0]):
             feature = _source_feature(str(encoded_name), bundle.features)
             contributions[feature] = contributions.get(feature, 0.0) + float(value * coefficient * calibrator_scale)
-    elif bundle.model_name == "catboost_calibrated":
+    elif bundle.model_name in {"catboost_calibrated", "catboost_recency_weighted"}:
         pool = Pool(prepared, cat_features=bundle.categorical_features)
         shap_values = bundle.model.get_feature_importance(pool, type="ShapValues")[0][:-1]
         contributions = {
@@ -222,7 +225,7 @@ def model_evidence(row: pd.Series | dict[str, Any], bundle: LiveModelBundle) -> 
 
 
 def model_evidence_batch(rows: pd.DataFrame, bundle: LiveModelBundle) -> list[list[dict[str, Any]]]:
-    if bundle.model_name != "catboost_calibrated":
+    if bundle.model_name not in {"catboost_calibrated", "catboost_recency_weighted"}:
         return [model_evidence(row, bundle) for _, row in rows.iterrows()]
     prepared = rows[bundle.features].copy()
     for name in bundle.categorical_features:
@@ -239,7 +242,7 @@ def model_evidence_batch(rows: pd.DataFrame, bundle: LiveModelBundle) -> list[li
 
 
 def explanation_basis(bundle: LiveModelBundle) -> str:
-    if bundle.model_name == "catboost_calibrated":
+    if bundle.model_name in {"catboost_calibrated", "catboost_recency_weighted"}:
         return "Per-case CatBoost SHAP contributions scaled into the calibrated model's log-odds."
     if bundle.model_name == "logistic_l2":
         return "Directional per-case contributions to the calibrated logistic model's log-odds."
@@ -341,7 +344,7 @@ def build_dashboard(cases: pd.DataFrame, bundle: LiveModelBundle, report: dict[s
     policy_metrics, policy_metadata = build_policy_metrics(cases, bundle, report)
     by_vertical = []
     for vertical, group in held_out.groupby("vertical"):
-        flagged = group["ring_probability"] >= bundle.threshold
+        flagged = group["action_key"].ne("approve")
         by_vertical.append({
             "vertical": vertical,
             "refund_exposure": int(group["refund_amount_inr"].sum()),
@@ -352,11 +355,11 @@ def build_dashboard(cases: pd.DataFrame, bundle: LiveModelBundle, report: dict[s
         "cases": case_payloads,
         "summary": {
             "queue_refund_exposure": int(queue["refund_amount_inr"].sum()),
-            "flagged_loss_exposure": int(queue.loc[queue["ring_probability"] >= bundle.threshold, "expected_loss_if_ring_inr"].sum()),
+            "flagged_loss_exposure": int(queue.loc[queue["action_key"].ne("approve"), "expected_loss_if_ring_inr"].sum()),
             "verify_evidence_cases": int(queue["action_key"].eq("verify_evidence").sum()),
             "held_out_requests": len(held_out),
             "held_out_refund_exposure": int(held_out["refund_amount_inr"].sum()),
-            "flagged_requests": int((held_out["ring_probability"] >= bundle.threshold).sum()),
+            "flagged_requests": int(held_out["action_key"].ne("approve").sum()),
             "by_vertical": sorted(by_vertical, key=lambda item: item["refund_exposure"], reverse=True),
             "risk_bands": {
                 "approve": int(held_out["action_key"].eq("approve").sum()),
@@ -406,9 +409,9 @@ class MarginShieldService:
             "action": action_key, "action_label": action,
             "policy": {
                 "manual_review_threshold": round(self.bundle.threshold, 6),
-                "verify_evidence_threshold": round(float(getattr(self.bundle, "verify_evidence_threshold", self.bundle.threshold) or self.bundle.threshold), 6),
+                "verify_evidence_threshold": round(max(float(self.bundle.threshold), float(getattr(self.bundle, "verify_evidence_threshold", self.bundle.threshold) or self.bundle.threshold)), 6),
                 "maximum_manual_reviews": int(getattr(self.bundle, "maximum_manual_reviews", 100)),
-                "action_rule": "Both boundaries maximise synthetic net preventable value under their own review capacity, with no precision floor. Verify evidence is the cheaper evidence-collection action and additionally requires multi-identifier structural evidence.",
+                "action_rule": "One score boundary maximises synthetic net preventable value within the review capacity, with no precision floor. Verify evidence is a structural sub-route inside that queue and requires multi-identifier evidence.",
             },
             "model": {"name": self.bundle.model_name, "version": self.bundle.version, "target": self.bundle.target},
             "decision_rationale": rationale,
@@ -645,7 +648,7 @@ class MarginShieldService:
             "current_view": request.view,
             "policy": {
                 "threshold": dashboard["active_threshold"],
-                "verification_threshold": float(getattr(self.bundle, "verify_evidence_threshold", self.bundle.threshold) or self.bundle.threshold),
+                "verification_threshold": max(float(self.bundle.threshold), float(getattr(self.bundle, "verify_evidence_threshold", self.bundle.threshold) or self.bundle.threshold)),
                 "manual_review_capacity": dashboard["policy_metadata"]["maximum_manual_reviews"],
                 "selection": self.report["calibration"]["policy_selection"],
                 "source": dashboard["policy_metadata"]["source"],
@@ -675,8 +678,8 @@ class MarginShieldService:
             verification_note = ""
             if verification:
                 verification_note = (
-                    f" The stricter verification tier has {verification['precision']:.1%} precision across "
-                    f"{verification['volume']} structural-evidence flags."
+                    f" Within that queue, the evidence route has {verification['precision']:.1%} precision across "
+                    f"{verification['volume']} structurally supported flags."
                 )
             return (
                 f"On the validation policy window, precision is {validation['precision']:.1%} and request recall is "
@@ -689,9 +692,9 @@ class MarginShieldService:
             return (
                 f"The manual-review threshold is {context['policy']['threshold']:.4f}. It was locked on the later validation "
                 f"window by this rule: {context['policy']['selection']} The queue is capped at "
-                f"{context['policy']['manual_review_capacity']} validation reviews. The separate verification threshold is "
-                f"{context['policy']['verification_threshold']:.4f} and requires structural evidence; that tier, rather than the "
-                "manual-review queue, is constrained to 85% validation precision. Final-test labels were not used to choose either threshold."
+                f"{context['policy']['manual_review_capacity']} validation reviews. Evidence verification uses the same "
+                f"score boundary ({context['policy']['verification_threshold']:.4f}) and additionally requires structural evidence, "
+                "so it is a sub-route rather than a second hidden queue. Final-test labels were not used to choose the threshold."
             )
         if "case" in query or "decision" in query or "why" in query:
             case = context.get("selected_case")
@@ -844,7 +847,7 @@ def list_rings() -> dict[str, Any]:
         "as_of": service.rings["as_of"], "window_days": service.rings["window_days"],
         "ranking_note": service.rings["ranking_note"], "method": service.rings["method"],
         "manual_review_threshold": service.bundle.threshold,
-        "action_rule": "Verify evidence requires the verification boundary plus multi-identifier overlap; other cases above the manual-review boundary go to manual review. Both boundaries maximise synthetic net preventable value under their own review capacity.",
+        "action_rule": "One validation-locked score boundary controls the review queue. Verify evidence is a sub-route for queued cases with multi-identifier overlap; it does not create a second threshold or capacity.",
         "data_scope": "Trailing 30-day graph over final synthetic test and replayed live or demo events. Labels are never used to form candidate components.",
         "live_event_count": int(service.cases["split"].eq("live").sum()),
         "rings": [{key: value for key, value in ring.items() if key not in {"nodes", "edges"}} for ring in service.rings["candidate_rings"]],
