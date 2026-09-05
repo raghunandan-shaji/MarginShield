@@ -9,6 +9,43 @@ It is not a broad fraud classifier. It never auto-rejects a customer. A request 
 either approved or placed in the single review queue; queued requests with named
 multi-identifier evidence are routed to evidence verification.
 
+**Current status:** submission-ready prototype, not production-ready. All abuse
+labels and reported performance are synthetic. Olist provides commerce context but
+has no refund-abuse labels.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph Offline["Offline development"]
+    A["Mechanism-based event simulator"] --> B["Point-in-time feature engine"]
+    B --> C["Chronological train / validation / test"]
+    C --> D["Rules + logistic + CatBoost tournament"]
+    D --> E["Out-of-fold calibration + policy lock"]
+    E --> F["Versioned LiveModelBundle"]
+  end
+
+  subgraph Online["Live operations"]
+    G["Raw refund event"] --> H["Typed API validation"]
+    H --> I["Same point-in-time feature engine"]
+    I --> F
+    F --> J["Approve or one review queue"]
+    J --> K["Evidence route or manual review"]
+    K --> L["SQLite decision audit"]
+    I --> M["Label-free 30-day relationship graph"]
+    M --> N["Casework and Abuse Rings UI"]
+    L --> N
+  end
+
+  B -. "same Python implementation" .-> I
+```
+
+The offline path creates and evaluates the benchmark before freezing the model,
+calibrator, and policy. The live path scores a raw event before committing it to
+history, so the request cannot become its own evidence. The graph is an
+investigation surface built without labels; it complements the model rather than
+pretending that a connected component is confirmed abuse.
+
 ## Problem Definition
 
 Refund abuse is difficult to detect one request at a time. A coordinated group can
@@ -111,6 +148,10 @@ not submit real merchant or customer data under that policy. See the official
 - Generation fails when simple shared-identifier shortcuts exceed documented gates.
 
 ## Research Basis
+
+The complete provenance index, including datasets, domain references, modelling
+papers, deployment documentation, and UI inspiration, is in
+[`REFERENCES.md`](REFERENCES.md).
 
 - PR-AUC is the primary ranking metric because the ring target is rare; precision-recall
   curves are more informative than ROC curves in imbalanced settings. See
@@ -239,7 +280,8 @@ commits state only after scoring succeeds.
 | `tests/` | Temporal leakage, feature parity, model policy, API, graph, and persistence tests |
 | `data/model/` | Active locked model bundle and preserved superseded model |
 | `data/reports/` | Active and superseded evaluation reports |
-| `SIMULATOR_V4_DESIGN.md` | Protocol fixed before the final synthetic test was evaluated, plus Amendment 1 |
+| `SIMULATOR_V4_DESIGN.md` | Protocol fixed before the final synthetic test was evaluated, plus recorded amendments |
+| `REFERENCES.md` | Dataset, research, product, deployment, and UI provenance index |
 
 Runtime analyst state lives in `data/decisions.sqlite` and is gitignored. API tests
 use a temporary SQLite database and cannot modify the demo's decision history.
